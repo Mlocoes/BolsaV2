@@ -4,6 +4,7 @@ Rutas para obtener precios de activos en tiempo real
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Dict
+from uuid import UUID
 from ..core.database import get_db
 from ..models.asset import Asset
 from ..services.finnhub_service import finnhub_service
@@ -62,7 +63,7 @@ async def get_multiple_prices(symbols: str, db: Session = Depends(get_db)):
     return results
 
 @router.get("/portfolio/{portfolio_id}")
-async def get_portfolio_prices(portfolio_id: int, db: Session = Depends(get_db)):
+async def get_portfolio_prices(portfolio_id: UUID, db: Session = Depends(get_db)):
     """Obtener precios actuales de todos los activos en un portfolio"""
     from ..models.position import Position
     

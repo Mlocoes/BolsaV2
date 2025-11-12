@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
 from enum import Enum
+from uuid import UUID
 
 class AssetType(str, Enum):
     STOCK = "stock"
@@ -28,10 +29,10 @@ class PortfolioUpdate(BaseModel):
     description: Optional[str] = Field(None, max_length=500)
 
 class PortfolioResponse(BaseModel):
-    id: int
+    id: UUID
     name: str
     description: Optional[str]
-    user_id: int
+    user_id: UUID
     created_at: datetime
     updated_at: Optional[datetime]
     
@@ -43,23 +44,27 @@ class AssetCreate(BaseModel):
     symbol: str = Field(..., min_length=1, max_length=20)
     name: str = Field(..., min_length=1, max_length=200)
     asset_type: AssetType
+    market: Optional[str] = Field(None, max_length=50)
     currency: str = Field(default="USD", max_length=10)
 
 class AssetResponse(BaseModel):
-    id: int
+    id: UUID
     symbol: str
     name: str
     asset_type: AssetType
+    market: Optional[str]
     currency: str
+    created_at: datetime
+    updated_at: Optional[datetime]
     
     class Config:
         from_attributes = True
 
 # Position Schemas
 class PositionResponse(BaseModel):
-    id: int
-    portfolio_id: int
-    asset_id: int
+    id: UUID
+    portfolio_id: UUID
+    asset_id: UUID
     asset: AssetResponse
     quantity: float
     average_price: float
@@ -69,23 +74,25 @@ class PositionResponse(BaseModel):
 
 # Transaction Schemas
 class TransactionCreate(BaseModel):
-    asset_id: int
+    asset_id: UUID
     transaction_type: TransactionType
     quantity: float = Field(..., gt=0)
     price: float = Field(..., gt=0)
     fees: float = Field(default=0, ge=0)
+    currency: str = Field(default="USD", max_length=10)
     notes: Optional[str] = Field(None, max_length=500)
     transaction_date: Optional[datetime] = None
 
 class TransactionResponse(BaseModel):
-    id: int
-    portfolio_id: int
-    asset_id: int
+    id: UUID
+    portfolio_id: UUID
+    asset_id: UUID
     asset: AssetResponse
     transaction_type: TransactionType
     quantity: float
     price: float
     fees: float
+    currency: str
     notes: Optional[str]
     transaction_date: datetime
     created_at: datetime

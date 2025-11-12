@@ -41,7 +41,7 @@ export default function Dashboard() {
     }
   };
 
-  const loadPositions = async (portfolioId: number) => {
+  const loadPositions = async (portfolioId: string) => {
     try {
       const data = await portfolioService.getPortfolioPrices(portfolioId);
       setPositions(data);
@@ -133,7 +133,7 @@ export default function Dashboard() {
             id="portfolio"
             value={selectedPortfolio?.id || ''}
             onChange={(e) => {
-              const portfolio = portfolios.find(p => p.id === Number(e.target.value));
+              const portfolio = portfolios.find(p => p.id === e.target.value);
               setSelectedPortfolio(portfolio || null);
             }}
             className="block w-64 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"

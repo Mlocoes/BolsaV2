@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
+from uuid import UUID
 from ..core.database import get_db
 from ..models.asset import Asset
 from ..schemas.portfolio import AssetCreate, AssetResponse
@@ -50,7 +51,7 @@ async def create_asset(
 
 @router.get("/{asset_id}", response_model=AssetResponse)
 async def get_asset(
-    asset_id: int,
+    asset_id: UUID,
     db: Session = Depends(get_db)
 ):
     """Obtener un asset específico"""

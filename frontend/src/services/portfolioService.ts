@@ -17,7 +17,7 @@ export const portfolioService = {
     return response.data;
   },
 
-  async getPortfolio(id: number): Promise<Portfolio> {
+  async getPortfolio(id: string): Promise<Portfolio> {
     const response = await api.get(`/portfolios/${id}`);
     return response.data;
   },
@@ -27,28 +27,28 @@ export const portfolioService = {
     return response.data;
   },
 
-  async updatePortfolio(id: number, data: Partial<CreatePortfolioRequest>): Promise<Portfolio> {
+  async updatePortfolio(id: string, data: Partial<CreatePortfolioRequest>): Promise<Portfolio> {
     const response = await api.put(`/portfolios/${id}`, data);
     return response.data;
   },
 
-  async deletePortfolio(id: number): Promise<void> {
+  async deletePortfolio(id: string): Promise<void> {
     await api.delete(`/portfolios/${id}`);
   },
 
   // Positions
-  async getPositions(portfolioId: number): Promise<Position[]> {
+  async getPositions(portfolioId: string): Promise<Position[]> {
     const response = await api.get(`/portfolios/${portfolioId}/positions`);
     return response.data;
   },
 
   // Transactions
-  async getTransactions(portfolioId: number): Promise<Transaction[]> {
+  async getTransactions(portfolioId: string): Promise<Transaction[]> {
     const response = await api.get(`/portfolios/${portfolioId}/transactions`);
     return response.data;
   },
 
-  async createTransaction(portfolioId: number, data: CreateTransactionRequest): Promise<Transaction> {
+  async createTransaction(portfolioId: string, data: CreateTransactionRequest): Promise<Transaction> {
     const response = await api.post(`/portfolios/${portfolioId}/transactions`, data);
     return response.data;
   },
@@ -64,7 +64,7 @@ export const portfolioService = {
     return response.data;
   },
 
-  async getAsset(id: number): Promise<Asset> {
+  async getAsset(id: string): Promise<Asset> {
     const response = await api.get(`/assets/${id}`);
     return response.data;
   },
@@ -80,7 +80,7 @@ export const portfolioService = {
     return response.data;
   },
 
-  async getPortfolioPrices(portfolioId: number): Promise<PositionWithPrice[]> {
+  async getPortfolioPrices(portfolioId: string): Promise<PositionWithPrice[]> {
     const response = await api.get(`/prices/portfolio/${portfolioId}`);
     return response.data;
   }

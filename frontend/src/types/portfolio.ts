@@ -1,43 +1,47 @@
 export interface Portfolio {
-  id: number;
+  id: string;  // UUID
   name: string;
   description?: string;
   created_at: string;
-  user_id: number;
+  user_id: string;  // UUID
 }
 
 export interface Asset {
-  id: number;
+  id: string;  // UUID
   symbol: string;
   name: string;
   asset_type: 'stock' | 'crypto' | 'etf' | 'bond' | 'commodity' | 'cash';
+  market?: string;
   currency: string;
+  created_at: string;
+  updated_at?: string;
 }
 
 export interface Position {
-  id: number;
-  portfolio_id: number;
-  asset_id: number;
+  id: string;  // UUID
+  portfolio_id: string;  // UUID
+  asset_id: string;  // UUID
   quantity: number;
   average_price: number;
   asset?: Asset;
 }
 
 export interface Transaction {
-  id: number;
-  portfolio_id: number;
-  asset_id: number;
+  id: string;  // UUID
+  portfolio_id: string;  // UUID
+  asset_id: string;  // UUID
   transaction_type: 'buy' | 'sell' | 'dividend' | 'deposit' | 'withdrawal';
   quantity: number;
   price: number;
   fee?: number;
+  currency: string;
   notes?: string;
   transaction_date: string;
   asset?: Asset;
 }
 
 export interface AssetPrice {
-  id: number;
+  id: string;  // UUID
   symbol: string;
   name: string;
   asset_type: string;
@@ -52,8 +56,8 @@ export interface AssetPrice {
 }
 
 export interface PositionWithPrice {
-  position_id: number;
-  asset_id: number;
+  position_id: string;  // UUID
+  asset_id: string;  // UUID
   symbol: string;
   name: string;
   asset_type: string;
@@ -73,11 +77,12 @@ export interface CreatePortfolioRequest {
 }
 
 export interface CreateTransactionRequest {
-  asset_id: number;
+  asset_id: string;  // UUID
   transaction_type: 'buy' | 'sell' | 'dividend' | 'deposit' | 'withdrawal';
   quantity: number;
   price: number;
   fee?: number;
+  currency?: string;
   notes?: string;
   transaction_date?: string;
 }

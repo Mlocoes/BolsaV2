@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
+from uuid import UUID
 from ..core.database import get_db
 from ..models.usuario import Usuario
 from ..models.portfolio import Portfolio
@@ -12,7 +13,7 @@ from ..routes.auth import get_current_user
 
 router = APIRouter(prefix="/api/portfolios/{portfolio_id}/transactions", tags=["transactions"])
 
-def get_user_portfolio(portfolio_id: int, user_id: int, db: Session) -> Portfolio:
+def get_user_portfolio(portfolio_id: UUID, user_id: UUID, db: Session) -> Portfolio:
     """Helper para verificar que el portfolio pertenece al usuario"""
     portfolio = db.query(Portfolio).filter(
         Portfolio.id == portfolio_id,
@@ -29,7 +30,7 @@ def get_user_portfolio(portfolio_id: int, user_id: int, db: Session) -> Portfoli
 
 @router.get("/", response_model=List[TransactionResponse])
 async def list_transactions(
-    portfolio_id: int,
+    portfolio_id: UUID,
     current_user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -44,7 +45,7 @@ async def list_transactions(
 
 @router.post("/", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED)
 async def create_transaction(
-    portfolio_id: int,
+    portfolio_id: UUID,
     transaction: TransactionCreate,
     current_user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -107,8 +108,8 @@ async def create_transaction(
 
 @router.delete("/{transaction_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_transaction(
-    portfolio_id: int,
-    transaction_id: int,
+    portfolio_id: UUID,
+    transaction_id: UUID,
     current_user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):

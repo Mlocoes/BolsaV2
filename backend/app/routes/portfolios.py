@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
+from uuid import UUID
 from ..core.database import get_db
 from ..models.usuario import Usuario
 from ..models.portfolio import Portfolio
@@ -38,7 +39,7 @@ async def create_portfolio(
 
 @router.get("/{portfolio_id}", response_model=PortfolioDetail)
 async def get_portfolio(
-    portfolio_id: int,
+    portfolio_id: UUID,
     current_user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -58,7 +59,7 @@ async def get_portfolio(
 
 @router.put("/{portfolio_id}", response_model=PortfolioResponse)
 async def update_portfolio(
-    portfolio_id: int,
+    portfolio_id: UUID,
     portfolio_update: PortfolioUpdate,
     current_user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -85,7 +86,7 @@ async def update_portfolio(
 
 @router.delete("/{portfolio_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_portfolio(
-    portfolio_id: int,
+    portfolio_id: UUID,
     current_user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):

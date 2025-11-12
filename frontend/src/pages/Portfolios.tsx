@@ -39,7 +39,7 @@ export default function Portfolios() {
     await loadPortfolios();
   };
 
-  const handleDeletePortfolio = async (id: number) => {
+  const handleDeletePortfolio = async (id: string) => {
     if (!confirm('¿Estás seguro de eliminar este portfolio?')) return;
     
     try {

@@ -6,7 +6,7 @@ import type { Asset, CreateTransactionRequest } from '../types/portfolio';
 interface AddTransactionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  portfolioId: number;
+  portfolioId: string;  // UUID
   onSuccess: () => void;
 }
 
