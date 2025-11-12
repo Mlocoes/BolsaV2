@@ -3,7 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.session import session_manager
 from app.routes import auth, portfolios, transactions, assets, prices, worker
-# TODO: Fix Pydantic recursion error in quotes routes
+# NOTE: Quote routes disabled due to Pydantic V2 RecursionError
+# Issue: https://github.com/pydantic/pydantic/issues/7111
+# TODO: Upgrade to Pydantic V2.6+ or redesign schemas
 # from app.routes import quotes
 
 app = FastAPI(
@@ -42,7 +44,7 @@ app.include_router(transactions.router)
 app.include_router(assets.router)
 app.include_router(prices.router)
 app.include_router(worker.router)
-# TODO: Fix Pydantic recursion error in quotes routes
+# NOTE: Quote routes disabled - see comment above
 # app.include_router(quotes.router)
 
 @app.get("/")

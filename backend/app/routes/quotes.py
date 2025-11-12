@@ -3,7 +3,7 @@ Rutas para gestión de cotizaciones históricas
 """
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
-from typing import Optional
+from typing import Optional, List
 from datetime import date
 from uuid import UUID
 
@@ -21,7 +21,7 @@ from app.schemas.quote import (
 router = APIRouter(prefix="/api/quotes", tags=["quotes"])
 
 
-@router.get("/", response_model=list[QuoteResponse])
+@router.get("/", response_model=List[QuoteResponse])
 async def get_quotes(
     symbol: Optional[str] = Query(None, description="Filtrar por símbolo"),
     start_date: Optional[date] = Query(None, description="Fecha de inicio"),

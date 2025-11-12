@@ -2,8 +2,7 @@
 Servicio para gestión de cotizaciones históricas
 Incluye importación desde Finnhub y validación de duplicados
 """
-from __future__ import annotations
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 from datetime import date, datetime
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
@@ -27,7 +26,7 @@ class QuoteService:
         start_date: Optional[date] = None,
         end_date: Optional[date] = None,
         limit: int = 100
-    ) -> list[Quote]:
+    ) -> List[Quote]:
         """
         Obtener cotizaciones con filtros opcionales
         

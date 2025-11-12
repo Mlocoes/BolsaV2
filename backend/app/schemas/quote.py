@@ -1,9 +1,9 @@
 """
 Schemas para cotizaciones históricas
 """
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import date, datetime
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
 
 
@@ -19,9 +19,16 @@ class QuoteBase(BaseModel):
     source: Optional[str] = Field(None, max_length=50, description="Fuente de datos")
 
 
-class QuoteCreate(QuoteBase):
+class QuoteCreate(BaseModel):
     """Schema para crear una cotización"""
-    pass
+    symbol: str = Field(..., max_length=20)
+    date: date
+    open: float = Field(..., gt=0)
+    high: float = Field(..., gt=0)
+    low: float = Field(..., gt=0)
+    close: float = Field(..., gt=0)
+    volume: Optional[int] = Field(None, ge=0)
+    source: Optional[str] = Field(None, max_length=50)
 
 
 class QuoteUpdate(BaseModel):
@@ -34,19 +41,26 @@ class QuoteUpdate(BaseModel):
     source: Optional[str] = Field(None, max_length=50)
 
 
-class QuoteResponse(QuoteBase):
+class QuoteResponse(BaseModel):
     """Schema de respuesta para Quote"""
+    model_config = ConfigDict(from_attributes=True)
+    
     id: UUID
+    symbol: str
+    date: date
+    open: float
+    high: float
+    low: float
+    close: float
+    volume: Optional[int]
+    source: Optional[str]
     created_at: datetime
     updated_at: datetime
-    
-    class Config:
-        from_attributes = True
 
 
 class QuoteBulkCreate(BaseModel):
     """Schema para importación masiva de cotizaciones"""
-    quotes: list[QuoteCreate] = Field(..., min_length=1, description="Lista de cotizaciones a importar")
+    quotes: List[QuoteCreate] = Field(..., min_length=1, description="Lista de cotizaciones a importar")
     skip_duplicates: bool = Field(True, description="Si True, ignora duplicados. Si False, lanza error.")
 
 
@@ -56,7 +70,7 @@ class QuoteBulkResponse(BaseModel):
     created: int = Field(..., description="Cotizaciones creadas")
     updated: int = Field(..., description="Cotizaciones actualizadas")
     skipped: int = Field(..., description="Cotizaciones omitidas (duplicados)")
-    errors: list[str] = Field(default_factory=list, description="Errores encontrados")
+    errors: List[str] = Field(default_factory=list, description="Errores encontrados")
 
 
 class QuoteHistoricalRequest(BaseModel):
