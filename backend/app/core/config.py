@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     FINNHUB_API_KEY: str
     CORS_ORIGINS: str = "http://localhost:3000"
     TOKEN_EXPIRY_MINUTES: int = 60
+    ENVIRONMENT: str = "development"  # development, production
+    COOKIE_DOMAIN: str = "192.168.0.8"  # Dominio para las cookies (sin puerto)
     
     @property
     def cors_origins_list(self) -> List[str]:

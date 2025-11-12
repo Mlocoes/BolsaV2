@@ -8,6 +8,7 @@ from ..core.security import verify_password, hash_password
 from ..core.session import session_manager
 from ..core.middleware import require_auth, optional_auth
 from ..models.usuario import Usuario
+from ..core.config import settings
 from pydantic import BaseModel, EmailStr, ConfigDict, field_serializer
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -86,6 +87,7 @@ async def login(
     response.set_cookie(
         key="session_id",
         value=session_id,
+        domain=settings.COOKIE_DOMAIN if settings.ENVIRONMENT == "development" else None,
         httponly=True,  # No accesible desde JavaScript
         secure=False,   # False para desarrollo HTTP, True para producción HTTPS
         samesite="lax", # Protección CSRF - lax permite cookies en navegación top-level
@@ -125,6 +127,7 @@ async def logout(
     # Eliminar cookie
     response.delete_cookie(
         key="session_id",
+        domain=settings.COOKIE_DOMAIN if settings.ENVIRONMENT == "development" else None,
         path="/",
     )
     
