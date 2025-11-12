@@ -9,6 +9,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.core.database import engine, Base, SessionLocal
 from app.models.usuario import Usuario
+from app.models.portfolio import Portfolio
+from app.models.asset import Asset
+from app.models.position import Position
+from app.models.transaction import Transaction
 from app.core.auth import get_password_hash
 
 def init_db():

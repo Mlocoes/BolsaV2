@@ -1,0 +1,106 @@
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from typing import List
+from ..core.database import get_db
+from ..models.usuario import Usuario
+from ..models.portfolio import Portfolio
+from ..models.position import Position
+from ..models.asset import Asset
+from ..schemas.portfolio import PortfolioCreate, PortfolioUpdate, PortfolioResponse, PortfolioDetail
+from ..routes.auth import get_current_user
+
+router = APIRouter(prefix="/api/portfolios", tags=["portfolios"])
+
+@router.get("/", response_model=List[PortfolioResponse])
+async def list_portfolios(
+    current_user: Usuario = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Listar todos los portfolios del usuario actual"""
+    portfolios = db.query(Portfolio).filter(Portfolio.user_id == current_user.id).all()
+    return portfolios
+
+@router.post("/", response_model=PortfolioResponse, status_code=status.HTTP_201_CREATED)
+async def create_portfolio(
+    portfolio: PortfolioCreate,
+    current_user: Usuario = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Crear un nuevo portfolio"""
+    db_portfolio = Portfolio(
+        **portfolio.dict(),
+        user_id=current_user.id
+    )
+    db.add(db_portfolio)
+    db.commit()
+    db.refresh(db_portfolio)
+    return db_portfolio
+
+@router.get("/{portfolio_id}", response_model=PortfolioDetail)
+async def get_portfolio(
+    portfolio_id: int,
+    current_user: Usuario = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Obtener un portfolio específico con sus posiciones"""
+    portfolio = db.query(Portfolio).filter(
+        Portfolio.id == portfolio_id,
+        Portfolio.user_id == current_user.id
+    ).first()
+    
+    if not portfolio:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Portfolio not found"
+        )
+    
+    return portfolio
+
+@router.put("/{portfolio_id}", response_model=PortfolioResponse)
+async def update_portfolio(
+    portfolio_id: int,
+    portfolio_update: PortfolioUpdate,
+    current_user: Usuario = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Actualizar un portfolio"""
+    db_portfolio = db.query(Portfolio).filter(
+        Portfolio.id == portfolio_id,
+        Portfolio.user_id == current_user.id
+    ).first()
+    
+    if not db_portfolio:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Portfolio not found"
+        )
+    
+    update_data = portfolio_update.dict(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(db_portfolio, field, value)
+    
+    db.commit()
+    db.refresh(db_portfolio)
+    return db_portfolio
+
+@router.delete("/{portfolio_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_portfolio(
+    portfolio_id: int,
+    current_user: Usuario = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Eliminar un portfolio"""
+    db_portfolio = db.query(Portfolio).filter(
+        Portfolio.id == portfolio_id,
+        Portfolio.user_id == current_user.id
+    ).first()
+    
+    if not db_portfolio:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Portfolio not found"
+        )
+    
+    db.delete(db_portfolio)
+    db.commit()
+    return None

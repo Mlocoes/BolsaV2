@@ -1,0 +1,131 @@
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from typing import List
+from ..core.database import get_db
+from ..models.usuario import Usuario
+from ..models.portfolio import Portfolio
+from ..models.transaction import Transaction
+from ..models.position import Position
+from ..models.asset import Asset
+from ..schemas.portfolio import TransactionCreate, TransactionResponse
+from ..routes.auth import get_current_user
+
+router = APIRouter(prefix="/api/portfolios/{portfolio_id}/transactions", tags=["transactions"])
+
+def get_user_portfolio(portfolio_id: int, user_id: int, db: Session) -> Portfolio:
+    """Helper para verificar que el portfolio pertenece al usuario"""
+    portfolio = db.query(Portfolio).filter(
+        Portfolio.id == portfolio_id,
+        Portfolio.user_id == user_id
+    ).first()
+    
+    if not portfolio:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Portfolio not found"
+        )
+    
+    return portfolio
+
+@router.get("/", response_model=List[TransactionResponse])
+async def list_transactions(
+    portfolio_id: int,
+    current_user: Usuario = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Listar todas las transacciones de un portfolio"""
+    get_user_portfolio(portfolio_id, current_user.id, db)
+    
+    transactions = db.query(Transaction).filter(
+        Transaction.portfolio_id == portfolio_id
+    ).order_by(Transaction.transaction_date.desc()).all()
+    
+    return transactions
+
+@router.post("/", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED)
+async def create_transaction(
+    portfolio_id: int,
+    transaction: TransactionCreate,
+    current_user: Usuario = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Crear una nueva transacción y actualizar posiciones"""
+    portfolio = get_user_portfolio(portfolio_id, current_user.id, db)
+    
+    # Verificar que el asset existe
+    asset = db.query(Asset).filter(Asset.id == transaction.asset_id).first()
+    if not asset:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Asset not found"
+        )
+    
+    # Crear la transacción
+    db_transaction = Transaction(
+        **transaction.dict(),
+        portfolio_id=portfolio_id
+    )
+    db.add(db_transaction)
+    
+    # Actualizar o crear posición
+    position = db.query(Position).filter(
+        Position.portfolio_id == portfolio_id,
+        Position.asset_id == transaction.asset_id
+    ).first()
+    
+    if transaction.transaction_type in ["buy", "deposit"]:
+        if position:
+            # Actualizar posición existente
+            total_cost = (position.quantity * position.average_price) + (transaction.quantity * transaction.price)
+            position.quantity += transaction.quantity
+            position.average_price = total_cost / position.quantity if position.quantity > 0 else 0
+        else:
+            # Crear nueva posición
+            position = Position(
+                portfolio_id=portfolio_id,
+                asset_id=transaction.asset_id,
+                quantity=transaction.quantity,
+                average_price=transaction.price
+            )
+            db.add(position)
+    
+    elif transaction.transaction_type == "sell":
+        if not position or position.quantity < transaction.quantity:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Insufficient quantity to sell"
+            )
+        position.quantity -= transaction.quantity
+        
+        # Si la cantidad es 0, eliminar la posición
+        if position.quantity == 0:
+            db.delete(position)
+    
+    db.commit()
+    db.refresh(db_transaction)
+    return db_transaction
+
+@router.delete("/{transaction_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_transaction(
+    portfolio_id: int,
+    transaction_id: int,
+    current_user: Usuario = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Eliminar una transacción (no revierte posiciones)"""
+    get_user_portfolio(portfolio_id, current_user.id, db)
+    
+    transaction = db.query(Transaction).filter(
+        Transaction.id == transaction_id,
+        Transaction.portfolio_id == portfolio_id
+    ).first()
+    
+    if not transaction:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Transaction not found"
+        )
+    
+    db.delete(transaction)
+    db.commit()
+    return None

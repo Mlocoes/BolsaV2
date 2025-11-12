@@ -86,3 +86,35 @@ async def get_current_user(
 async def logout():
     """Endpoint de logout (el cliente debe eliminar el token)"""
     return {"message": "Logout exitoso"}
+
+async def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db)
+) -> Usuario:
+    """Obtener el usuario actual desde el token JWT"""
+    from ..core.auth import decode_access_token
+    
+    payload = decode_access_token(token)
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token inválido",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    username = payload.get("sub")
+    user = db.query(Usuario).filter(Usuario.username == username).first()
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Usuario no encontrado"
+        )
+    
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Usuario inactivo"
+        )
+    
+    return user
