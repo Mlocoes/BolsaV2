@@ -33,7 +33,12 @@ async def shutdown_event():
 # Permite conexiones desde cualquier IP en la red local
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Permitir todos los orígenes (para desarrollo)
+    allow_origins=settings.cors_origins_list if settings.ENVIRONMENT != "development" else [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://192.168.0.8:3000",
+        "http://192.168.0.10:3000",
+    ],  # En desarrollo, lista explícita de orígenes
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
