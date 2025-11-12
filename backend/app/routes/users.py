@@ -7,7 +7,7 @@ from datetime import datetime
 from ..core.database import get_db
 from ..core.middleware import require_auth
 from ..models.usuario import Usuario
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
 
 router = APIRouter(prefix="/api/users", tags=["users"])
 
@@ -20,6 +20,13 @@ class UserResponse(BaseModel):
     is_active: bool
     is_admin: bool
     created_at: datetime
+    
+    @field_validator('id', mode='before')
+    @classmethod
+    def convert_uuid_to_str(cls, v):
+        if isinstance(v, UUID):
+            return str(v)
+        return v
     
     class Config:
         from_attributes = True
