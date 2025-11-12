@@ -3,13 +3,12 @@ from sqlalchemy.orm import Session
 from typing import List
 from uuid import UUID
 from ..core.database import get_db
-from ..models.usuario import Usuario
+from ..core.middleware import require_auth
 from ..models.portfolio import Portfolio
 from ..models.transaction import Transaction
 from ..models.position import Position
 from ..models.asset import Asset
 from ..schemas.portfolio import TransactionCreate, TransactionResponse
-from ..routes.auth import get_current_user
 
 router = APIRouter(prefix="/api/portfolios/{portfolio_id}/transactions", tags=["transactions"])
 
@@ -31,11 +30,11 @@ def get_user_portfolio(portfolio_id: UUID, user_id: UUID, db: Session) -> Portfo
 @router.get("/", response_model=List[TransactionResponse])
 async def list_transactions(
     portfolio_id: UUID,
-    current_user: Usuario = Depends(get_current_user),
+    user: dict = Depends(require_auth),
     db: Session = Depends(get_db)
 ):
     """Listar todas las transacciones de un portfolio"""
-    get_user_portfolio(portfolio_id, current_user.id, db)
+    get_user_portfolio(portfolio_id, UUID(user["user_id"]), db)
     
     transactions = db.query(Transaction).filter(
         Transaction.portfolio_id == portfolio_id
@@ -47,11 +46,11 @@ async def list_transactions(
 async def create_transaction(
     portfolio_id: UUID,
     transaction: TransactionCreate,
-    current_user: Usuario = Depends(get_current_user),
+    user: dict = Depends(require_auth),
     db: Session = Depends(get_db)
 ):
     """Crear una nueva transacción y actualizar posiciones"""
-    portfolio = get_user_portfolio(portfolio_id, current_user.id, db)
+    portfolio = get_user_portfolio(portfolio_id, UUID(user["user_id"]), db)
     
     # Verificar que el asset existe
     asset = db.query(Asset).filter(Asset.id == transaction.asset_id).first()
@@ -110,11 +109,11 @@ async def create_transaction(
 async def delete_transaction(
     portfolio_id: UUID,
     transaction_id: UUID,
-    current_user: Usuario = Depends(get_current_user),
+    user: dict = Depends(require_auth),
     db: Session = Depends(get_db)
 ):
     """Eliminar una transacción (no revierte posiciones)"""
-    get_user_portfolio(portfolio_id, current_user.id, db)
+    get_user_portfolio(portfolio_id, UUID(user["user_id"]), db)
     
     transaction = db.query(Transaction).filter(
         Transaction.id == transaction_id,
