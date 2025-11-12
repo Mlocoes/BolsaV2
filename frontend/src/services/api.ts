@@ -20,15 +20,11 @@ console.log('API_BASE_URL configured as:', API_BASE_URL)
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 30000,
+  withCredentials: true, // Habilitar cookies
 })
 
-api.interceptors.request.use((config) => {
-  const token = sessionStorage.getItem('auth_token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
-})
+// Ya no necesitamos el interceptor de tokens
+// Las cookies se envían automáticamente
 
 export const authAPI = {
   login: async (username: string, password: string) => {
@@ -51,8 +47,9 @@ export const authAPI = {
       
       console.log('Login response received:', response.data)
       
+      // Ya no retornamos token, solo mensaje y user
       return {
-        token: response.data.access_token,
+        message: response.data.message,
         user: response.data.user,
       }
     } catch (error: any) {
@@ -61,8 +58,14 @@ export const authAPI = {
       throw error
     }
   },
+  
   logout: async () => {
     const response = await api.post('/auth/logout')
+    return response.data
+  },
+  
+  me: async () => {
+    const response = await api.get('/auth/me')
     return response.data
   },
 }

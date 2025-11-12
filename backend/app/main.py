@@ -1,13 +1,27 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
+from app.core.session import session_manager
 from app.routes import auth, portfolios, transactions, assets, prices
 
 app = FastAPI(
     title="BolsaV2",
     description="Portfolio Management System",
-    version="1.0.0"
+    version="2.0.0"
 )
+
+# Eventos de inicio y cierre
+@app.on_event("startup")
+async def startup_event():
+    """Inicializar conexiones al arrancar"""
+    await session_manager.connect()
+    print("✓ Session manager conectado a Redis")
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Cerrar conexiones al apagar"""
+    await session_manager.disconnect()
+    print("✓ Session manager desconectado")
 
 # Configuración de CORS más permisiva para desarrollo
 # Permite conexiones desde cualquier IP en la red local

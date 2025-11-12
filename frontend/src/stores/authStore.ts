@@ -3,15 +3,14 @@ import { authAPI } from '../services/api'
 
 interface AuthState {
   user: any
-  token: string | null
   isAuthenticated: boolean
   login: (username: string, password: string) => Promise<void>
   logout: () => Promise<void>
+  checkAuth: () => Promise<void>
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
-  token: null,
   isAuthenticated: false,
 
   login: async (username: string, password: string) => {
@@ -19,8 +18,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const response = await authAPI.login(username, password)
       console.log('authAPI.login response:', response)
-      sessionStorage.setItem('auth_token', response.token)
-      set({ user: response.user, token: response.token, isAuthenticated: true })
+      // La cookie se setea automáticamente por el servidor
+      set({ user: response.user, isAuthenticated: true })
       console.log('authStore state updated successfully')
     } catch (error) {
       console.error('authStore.login error:', error)
@@ -30,7 +29,16 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   logout: async () => {
     await authAPI.logout()
-    sessionStorage.removeItem('auth_token')
-    set({ user: null, token: null, isAuthenticated: false })
+    // La cookie se elimina automáticamente por el servidor
+    set({ user: null, isAuthenticated: false })
+  },
+
+  checkAuth: async () => {
+    try {
+      const user = await authAPI.me()
+      set({ user, isAuthenticated: true })
+    } catch (error) {
+      set({ user: null, isAuthenticated: false })
+    }
   },
 }))

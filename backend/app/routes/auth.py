@@ -1,120 +1,189 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from datetime import timedelta
+from datetime import datetime
+from uuid import UUID
 from ..core.database import get_db
-from ..core.auth import verify_password, create_access_token, decode_access_token, get_password_hash
-from ..core.config import settings
+from ..core.security import verify_password, hash_password
+from ..core.session import session_manager
+from ..core.middleware import require_auth, optional_auth
 from ..models.usuario import Usuario
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
-
 class UserResponse(BaseModel):
-    id: int
+    id: str  # UUID as string
     username: str
     email: str
-    is_admin: bool
+    is_active: bool
+    created_at: datetime
     
     class Config:
         from_attributes = True
 
 class LoginResponse(BaseModel):
-    access_token: str
-    token_type: str
+    message: str
     user: UserResponse
+
+class RegisterRequest(BaseModel):
+    username: str
+    email: EmailStr
+    password: str
 
 @router.post("/login", response_model=LoginResponse)
 async def login(
+    response: Response,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
-    """Endpoint de login"""
+    """
+    Login con sesión en cookie HttpOnly
+    
+    Args:
+        response: Response de FastAPI para setear cookie
+        form_data: Credenciales del usuario
+        db: Sesión de base de datos
+    
+    Returns:
+        LoginResponse con datos del usuario
+    """
+    # Buscar usuario
     user = db.query(Usuario).filter(Usuario.username == form_data.username).first()
     
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Usuario o contraseña incorrectos",
-            headers={"WWW-Authenticate": "Bearer"},
         )
     
     if not user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Usuario inactivo"
         )
     
-    access_token = create_access_token(
-        data={"sub": user.username, "user_id": user.id}
+    # Actualizar último login
+    user.last_login_at = datetime.utcnow()
+    db.commit()
+    
+    # Crear sesión en Redis
+    session_id = await session_manager.create_session(
+        user_id=str(user.id),
+        user_data={
+            "username": user.username,
+            "email": user.email,
+            "is_active": user.is_active,
+            "created_at": user.created_at.isoformat() if user.created_at else None,
+        }
+    )
+    
+    # Setear cookie HttpOnly segura
+    response.set_cookie(
+        key="session_id",
+        value=session_id,
+        httponly=True,  # No accesible desde JavaScript
+        secure=True,    # Solo HTTPS en producción
+        samesite="lax", # Protección CSRF
+        max_age=86400,  # 24 horas
     )
     
     return {
-        "access_token": access_token,
-        "token_type": "bearer",
+        "message": "Login exitoso",
         "user": user
     }
 
-@router.get("/me", response_model=UserResponse)
-async def get_current_user(
-    token: str = Depends(oauth2_scheme),
-    db: Session = Depends(get_db)
-):
-    """Obtener usuario actual"""
-    payload = decode_access_token(token)
-    if not payload:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token inválido",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    username = payload.get("sub")
-    user = db.query(Usuario).filter(Usuario.username == username).first()
-    
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Usuario no encontrado"
-        )
-    
-    return user
-
 @router.post("/logout")
-async def logout():
-    """Endpoint de logout (el cliente debe eliminar el token)"""
+async def logout(
+    response: Response,
+    request: Request,
+    user: dict = Depends(require_auth)
+):
+    """
+    Logout - destruir sesión
+    
+    Args:
+        response: Response de FastAPI para eliminar cookie
+        request: Request para obtener session_id
+        user: Usuario actual (dependency)
+    
+    Returns:
+        Mensaje de confirmación
+    """
+    # Obtener session_id de la cookie
+    session_id = request.cookies.get("session_id")
+    
+    if session_id:
+        # Eliminar sesión de Redis
+        await session_manager.delete_session(session_id)
+    
+    # Eliminar cookie
+    response.delete_cookie(key="session_id")
+    
     return {"message": "Logout exitoso"}
 
+@router.get("/me", response_model=UserResponse)
 async def get_current_user(
-    token: str = Depends(oauth2_scheme),
+    user: dict = Depends(require_auth),
     db: Session = Depends(get_db)
-) -> Usuario:
-    """Obtener el usuario actual desde el token JWT"""
-    from ..core.auth import decode_access_token
+):
+    """
+    Obtener usuario actual desde sesión
     
-    payload = decode_access_token(token)
-    if not payload:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token inválido",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    Args:
+        user: Datos del usuario desde sesión
+        db: Sesión de base de datos
     
-    username = payload.get("sub")
-    user = db.query(Usuario).filter(Usuario.username == username).first()
+    Returns:
+        UserResponse con datos actualizados
+    """
+    # Obtener usuario actualizado de la BD
+    db_user = db.query(Usuario).filter(Usuario.id == UUID(user["user_id"])).first()
     
-    if not user:
+    if not db_user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Usuario no encontrado"
         )
     
-    if not user.is_active:
+    return db_user
+
+@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+async def register(
+    user_data: RegisterRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Registrar nuevo usuario
+    
+    Args:
+        user_data: Datos del nuevo usuario
+        db: Sesión de base de datos
+    
+    Returns:
+        UserResponse con datos del usuario creado
+    """
+    # Verificar si el usuario ya existe
+    existing_user = db.query(Usuario).filter(
+        (Usuario.username == user_data.username) | (Usuario.email == user_data.email)
+    ).first()
+    
+    if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Usuario inactivo"
+            detail="Usuario o email ya registrado"
         )
     
-    return user
+    # Crear nuevo usuario
+    new_user = Usuario(
+        username=user_data.username,
+        email=user_data.email,
+        hashed_password=hash_password(user_data.password),
+        is_active=True
+    )
+    
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    
+    return new_user
