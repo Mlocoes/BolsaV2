@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { portfolioService } from '../services/portfolioService';
 import type { Portfolio, PositionWithPrice } from '../types/portfolio';
-import { Wallet, TrendingUp, TrendingDown } from 'lucide-react';
+import { Wallet, TrendingUp, TrendingDown, Plus } from 'lucide-react';
+import AddTransactionModal from './AddTransactionModal';
+import CreatePortfolioModal from './CreatePortfolioModal';
 
 export default function Dashboard() {
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
@@ -9,6 +11,8 @@ export default function Dashboard() {
   const [positions, setPositions] = useState<PositionWithPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showTransactionModal, setShowTransactionModal] = useState(false);
+  const [showCreatePortfolioModal, setShowCreatePortfolioModal] = useState(false);
 
   useEffect(() => {
     loadPortfolios();
@@ -95,6 +99,7 @@ export default function Dashboard() {
         <div className="mt-6">
           <button
             type="button"
+            onClick={() => setShowCreatePortfolioModal(true)}
             className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
           >
             Crear Portfolio
@@ -116,26 +121,38 @@ export default function Dashboard() {
         </p>
       </div>
 
-      {/* Portfolio Selector */}
-      <div className="flex items-center space-x-4">
-        <label htmlFor="portfolio" className="text-sm font-medium text-gray-700">
-          Portfolio:
-        </label>
-        <select
-          id="portfolio"
-          value={selectedPortfolio?.id || ''}
-          onChange={(e) => {
-            const portfolio = portfolios.find(p => p.id === Number(e.target.value));
-            setSelectedPortfolio(portfolio || null);
-          }}
-          className="block w-64 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-        >
-          {portfolios.map(portfolio => (
-            <option key={portfolio.id} value={portfolio.id}>
-              {portfolio.name}
-            </option>
-          ))}
-        </select>
+      {/* Portfolio Selector and Actions */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <label htmlFor="portfolio" className="text-sm font-medium text-gray-700">
+            Portfolio:
+          </label>
+          <select
+            id="portfolio"
+            value={selectedPortfolio?.id || ''}
+            onChange={(e) => {
+              const portfolio = portfolios.find(p => p.id === Number(e.target.value));
+              setSelectedPortfolio(portfolio || null);
+            }}
+            className="block w-64 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          >
+            {portfolios.map(portfolio => (
+              <option key={portfolio.id} value={portfolio.id}>
+                {portfolio.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        
+        {selectedPortfolio && (
+          <button
+            onClick={() => setShowTransactionModal(true)}
+            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+          >
+            <Plus className="h-5 w-5 mr-2" />
+            Nueva Transacción
+          </button>
+        )}
       </div>
 
       {/* Summary Cards */}
@@ -316,6 +333,27 @@ export default function Dashboard() {
           </table>
         </div>
       </div>
+
+      {/* Modals */}
+      {selectedPortfolio && (
+        <AddTransactionModal
+          isOpen={showTransactionModal}
+          onClose={() => setShowTransactionModal(false)}
+          portfolioId={selectedPortfolio.id}
+          onSuccess={() => {
+            loadPositions(selectedPortfolio.id);
+          }}
+        />
+      )}
+
+      <CreatePortfolioModal
+        isOpen={showCreatePortfolioModal}
+        onClose={() => setShowCreatePortfolioModal(false)}
+        onSubmit={async (data) => {
+          await portfolioService.createPortfolio(data);
+          await loadPortfolios();
+        }}
+      />
     </div>
   );
 }

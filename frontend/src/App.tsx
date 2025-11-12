@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
+import Portfolios from './pages/Portfolios'
 
 function App() {
   console.log('App component rendering...')
@@ -12,6 +13,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<Dashboard />} />
+        <Route path="/portfolios" element={<Portfolios />} />
       </Routes>
     </BrowserRouter>
   )
