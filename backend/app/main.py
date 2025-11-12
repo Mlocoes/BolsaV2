@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.session import session_manager
-from app.routes import auth, portfolios, transactions, assets, prices, worker, quotes
+from app.routes import auth, portfolios, transactions, assets, prices, worker, quotes, import_export
 
 app = FastAPI(
     title="BolsaV2",
@@ -49,6 +49,7 @@ app.include_router(assets.router)
 app.include_router(prices.router)
 app.include_router(worker.router)
 app.include_router(quotes.router)
+app.include_router(import_export.router)
 
 @app.get("/")
 def root():
