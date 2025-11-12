@@ -2,12 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.session import session_manager
-from app.routes import auth, portfolios, transactions, assets, prices, worker
-# NOTE: Quote routes disabled - Pydantic V2.12.4 + FastAPI 0.115.0 
-# Error: field name 'date' clashes with type annotation
-# URL: https://errors.pydantic.dev/2.12/u/unevaluable-type-annotation
-# TODO: Rename 'date' field to 'quote_date' or use string literals
-# from app.routes import quotes
+from app.routes import auth, portfolios, transactions, assets, prices, worker, quotes
 
 app = FastAPI(
     title="BolsaV2",
@@ -53,8 +48,7 @@ app.include_router(transactions.router)
 app.include_router(assets.router)
 app.include_router(prices.router)
 app.include_router(worker.router)
-# NOTE: Quote routes disabled - see comment above
-# app.include_router(quotes.router)
+app.include_router(quotes.router)
 
 @app.get("/")
 def root():

@@ -2,7 +2,7 @@
 Schemas para cotizaciones históricas
 """
 from pydantic import BaseModel, Field, ConfigDict
-from datetime import date, datetime
+from datetime import date as DateType, datetime
 from typing import Optional, List
 from uuid import UUID
 
@@ -10,7 +10,7 @@ from uuid import UUID
 class QuoteBase(BaseModel):
     """Schema base para Quote"""
     symbol: str = Field(..., max_length=20, description="Símbolo del activo")
-    date: date = Field(..., description="Fecha de la cotización")
+    date: DateType = Field(..., description="Fecha de la cotización")
     open: float = Field(..., gt=0, description="Precio de apertura")
     high: float = Field(..., gt=0, description="Precio máximo")
     low: float = Field(..., gt=0, description="Precio mínimo")
@@ -22,7 +22,7 @@ class QuoteBase(BaseModel):
 class QuoteCreate(BaseModel):
     """Schema para crear una cotización"""
     symbol: str = Field(..., max_length=20)
-    date: date
+    date: DateType
     open: float = Field(..., gt=0)
     high: float = Field(..., gt=0)
     low: float = Field(..., gt=0)
@@ -47,7 +47,7 @@ class QuoteResponse(BaseModel):
     
     id: UUID
     symbol: str
-    date: date
+    date: DateType
     open: float
     high: float
     low: float
@@ -76,6 +76,6 @@ class QuoteBulkResponse(BaseModel):
 class QuoteHistoricalRequest(BaseModel):
     """Schema para solicitar datos históricos"""
     symbol: str = Field(..., max_length=20)
-    start_date: date
-    end_date: date
+    start_date: DateType
+    end_date: DateType
     source: Optional[str] = Field("finnhub", description="Fuente de datos")

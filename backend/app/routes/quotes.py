@@ -21,7 +21,7 @@ from app.schemas.quote import (
 router = APIRouter(prefix="/api/quotes", tags=["quotes"])
 
 
-@router.get("/", response_model=List[QuoteResponse])
+@router.get("", response_model=List[QuoteResponse])
 async def get_quotes(
     symbol: Optional[str] = Query(None, description="Filtrar por símbolo"),
     start_date: Optional[date] = Query(None, description="Fecha de inicio"),
@@ -92,7 +92,7 @@ async def get_quote_by_date(
     return quote
 
 
-@router.post("/", response_model=QuoteResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=QuoteResponse, status_code=status.HTTP_201_CREATED)
 async def create_quote(
     quote_data: QuoteCreate,
     db: Session = Depends(get_db),
