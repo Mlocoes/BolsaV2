@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.routes import auth, portfolios, transactions, assets
+from app.routes import auth, portfolios, transactions, assets, prices
 
 app = FastAPI(
     title="BolsaV2",
@@ -24,6 +24,7 @@ app.include_router(auth.router)
 app.include_router(portfolios.router)
 app.include_router(transactions.router)
 app.include_router(assets.router)
+app.include_router(prices.router)
 
 @app.get("/")
 def root():
