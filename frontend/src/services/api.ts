@@ -23,6 +23,21 @@ const api = axios.create({
   withCredentials: true, // Habilitar cookies
 })
 
+// Interceptor para agregar el session_id como header
+// Esto es necesario para desarrollo cross-port cuando las cookies no funcionan
+api.interceptors.request.use(
+  (config) => {
+    const sessionId = localStorage.getItem('session_id')
+    if (sessionId) {
+      config.headers['X-Session-ID'] = sessionId
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
+
 // Ya no necesitamos el interceptor de tokens
 // Las cookies se envían automáticamente
 
@@ -47,6 +62,12 @@ export const authAPI = {
       
       console.log('Login response received:', response.data)
       
+      // Guardar session_id en localStorage para desarrollo cross-port
+      if (response.data.session_id) {
+        localStorage.setItem('session_id', response.data.session_id)
+        console.log('Session ID saved to localStorage:', response.data.session_id)
+      }
+      
       // Ya no retornamos token, solo mensaje y user
       return {
         message: response.data.message,
@@ -61,6 +82,8 @@ export const authAPI = {
   
   logout: async () => {
     const response = await api.post('/auth/logout')
+    // Limpiar session_id del localStorage
+    localStorage.removeItem('session_id')
     return response.data
   },
   

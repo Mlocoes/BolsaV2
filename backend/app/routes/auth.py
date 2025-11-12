@@ -83,21 +83,23 @@ async def login(
     )
     
     # Setear cookie HttpOnly segura
-    # Setear cookie HttpOnly segura
     response.set_cookie(
         key="session_id",
         value=session_id,
         domain=settings.COOKIE_DOMAIN if settings.ENVIRONMENT == "development" else None,
         httponly=True,  # No accesible desde JavaScript
         secure=False,   # False para desarrollo HTTP, True para producción HTTPS
-        samesite="lax", # Protección CSRF - lax permite cookies en navegación top-level
+        samesite="none" if settings.ENVIRONMENT == "development" else "lax",  # none permite cross-port en desarrollo
         max_age=86400,  # 24 horas
         path="/",       # Cookie válida para toda la aplicación
     )
     
+    # En desarrollo, también devolver el session_id en el body para permitir
+    # autenticación cross-port cuando las cookies no funcionan
     return {
         "message": "Login exitoso",
-        "user": user
+        "user": user,
+        "session_id": session_id if settings.ENVIRONMENT == "development" else None
     }
 
 @router.post("/logout")
@@ -129,6 +131,7 @@ async def logout(
         key="session_id",
         domain=settings.COOKIE_DOMAIN if settings.ENVIRONMENT == "development" else None,
         path="/",
+        samesite="none" if settings.ENVIRONMENT == "development" else "lax",
     )
     
     return {"message": "Logout exitoso"}
