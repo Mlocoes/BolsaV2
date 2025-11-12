@@ -3,9 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.session import session_manager
 from app.routes import auth, portfolios, transactions, assets, prices, worker
-# NOTE: Quote routes disabled due to Pydantic V2 RecursionError
-# Issue: https://github.com/pydantic/pydantic/issues/7111
-# TODO: Upgrade to Pydantic V2.6+ or redesign schemas
+# NOTE: Quote routes disabled - Pydantic V2.12.4 + FastAPI 0.115.0 
+# Error: field name 'date' clashes with type annotation
+# URL: https://errors.pydantic.dev/2.12/u/unevaluable-type-annotation
+# TODO: Rename 'date' field to 'quote_date' or use string literals
 # from app.routes import quotes
 
 app = FastAPI(
