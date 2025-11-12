@@ -82,6 +82,7 @@ async def login(
     )
     
     # Setear cookie HttpOnly segura
+    # Setear cookie HttpOnly segura
     response.set_cookie(
         key="session_id",
         value=session_id,
@@ -90,8 +91,6 @@ async def login(
         samesite="lax", # Protección CSRF - lax permite cookies en navegación top-level
         max_age=86400,  # 24 horas
         path="/",       # Cookie válida para toda la aplicación
-    )
-        max_age=86400,  # 24 horas
     )
     
     return {
