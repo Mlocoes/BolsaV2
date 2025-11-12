@@ -50,9 +50,7 @@ async def list_transactions(
     return transactions
 
 
-@router.post(
-    "/", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED
-)
+@router.post("", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED)
 async def create_transaction(
     portfolio_id: UUID,
     transaction: TransactionCreate,
