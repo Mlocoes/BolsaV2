@@ -86,8 +86,11 @@ async def login(
         key="session_id",
         value=session_id,
         httponly=True,  # No accesible desde JavaScript
-        secure=True,    # Solo HTTPS en producción
-        samesite="lax", # Protección CSRF
+        secure=False,   # False para desarrollo HTTP, True para producción HTTPS
+        samesite="lax", # Protección CSRF - lax permite cookies en navegación top-level
+        max_age=86400,  # 24 horas
+        path="/",       # Cookie válida para toda la aplicación
+    )
         max_age=86400,  # 24 horas
     )
     
@@ -121,7 +124,10 @@ async def logout(
         await session_manager.delete_session(session_id)
     
     # Eliminar cookie
-    response.delete_cookie(key="session_id")
+    response.delete_cookie(
+        key="session_id",
+        path="/",
+    )
     
     return {"message": "Logout exitoso"}
 
