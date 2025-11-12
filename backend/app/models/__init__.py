@@ -4,6 +4,7 @@ from .portfolio import Portfolio, AssetType
 from .asset import Asset
 from .position import Position
 from .transaction import Transaction, TransactionType
+from .quote import Quote
 
 __all__ = [
     "Usuario",
@@ -11,6 +12,7 @@ __all__ = [
     "Asset",
     "Position",
     "Transaction",
+    "Quote",
     "AssetType",
     "TransactionType",
 ]

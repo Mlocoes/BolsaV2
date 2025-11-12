@@ -7,7 +7,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.core.database import engine, Base
-from app.models import usuario, portfolio, asset, position, transaction
+from app.models import usuario, portfolio, asset, position, transaction, quote
 
 def recreate_database():
     print("⚠️  ADVERTENCIA: Esta operación eliminará todos los datos existentes")

@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.session import session_manager
 from app.routes import auth, portfolios, transactions, assets, prices
+# TODO: Fix Pydantic recursion error in quotes routes
+# from app.routes import quotes
 
 app = FastAPI(
     title="BolsaV2",
@@ -39,6 +41,8 @@ app.include_router(portfolios.router)
 app.include_router(transactions.router)
 app.include_router(assets.router)
 app.include_router(prices.router)
+# TODO: Fix Pydantic recursion error in quotes routes
+# app.include_router(quotes.router)
 
 @app.get("/")
 def root():
