@@ -12,7 +12,7 @@ from ..schemas.portfolio import PortfolioCreate, PortfolioUpdate, PortfolioRespo
 
 router = APIRouter(prefix="/api/portfolios", tags=["portfolios"])
 
-@router.get("/", response_model=List[PortfolioResponse])
+@router.get("", response_model=List[PortfolioResponse])
 async def list_portfolios(
     user: dict = Depends(require_auth),
     db: Session = Depends(get_db)
@@ -21,7 +21,7 @@ async def list_portfolios(
     portfolios = db.query(Portfolio).filter(Portfolio.user_id == UUID(user["user_id"])).all()
     return portfolios
 
-@router.post("/", response_model=PortfolioResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=PortfolioResponse, status_code=status.HTTP_201_CREATED)
 async def create_portfolio(
     portfolio: PortfolioCreate,
     user: dict = Depends(require_auth),

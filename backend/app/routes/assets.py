@@ -8,7 +8,7 @@ from ..schemas.portfolio import AssetCreate, AssetResponse
 
 router = APIRouter(prefix="/api/assets", tags=["assets"])
 
-@router.get("/", response_model=List[AssetResponse])
+@router.get("", response_model=List[AssetResponse])
 async def list_assets(
     skip: int = 0,
     limit: int = 100,
@@ -29,7 +29,7 @@ async def search_assets(
     ).limit(20).all()
     return assets
 
-@router.post("/", response_model=AssetResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=AssetResponse, status_code=status.HTTP_201_CREATED)
 async def create_asset(
     asset: AssetCreate,
     db: Session = Depends(get_db)

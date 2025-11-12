@@ -31,7 +31,7 @@ def get_user_portfolio(portfolio_id: UUID, user_id: UUID, db: Session) -> Portfo
     return portfolio
 
 
-@router.get("/", response_model=List[TransactionResponse])
+@router.get("", response_model=List[TransactionResponse])
 async def list_transactions(
     portfolio_id: UUID,
     user: dict = Depends(require_auth),
