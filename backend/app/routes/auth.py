@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import datetime
+from typing import Optional
 from uuid import UUID
 from ..core.database import get_db
 from ..core.security import verify_password, hash_password
@@ -29,6 +30,7 @@ class UserResponse(BaseModel):
 class LoginResponse(BaseModel):
     message: str
     user: UserResponse
+    session_id: Optional[str] = None  # Solo en desarrollo
 
 class RegisterRequest(BaseModel):
     username: str
