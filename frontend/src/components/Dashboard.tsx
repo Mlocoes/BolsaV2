@@ -4,6 +4,8 @@ import type { Portfolio, PositionWithPrice } from '../types/portfolio';
 import { Wallet, TrendingUp, TrendingDown, Plus } from 'lucide-react';
 import AddTransactionModal from './AddTransactionModal';
 import CreatePortfolioModal from './CreatePortfolioModal';
+import PortfolioDistributionChart from './PortfolioDistributionChart';
+import PerformanceChart from './PerformanceChart';
 
 export default function Dashboard() {
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
@@ -245,6 +247,33 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Charts */}
+      {positions.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white shadow rounded-lg overflow-hidden">
+            <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
+              <h3 className="text-lg leading-6 font-medium text-gray-900">
+                Distribución del Portfolio
+              </h3>
+            </div>
+            <div className="p-6">
+              <PortfolioDistributionChart positions={positions} />
+            </div>
+          </div>
+
+          <div className="bg-white shadow rounded-lg overflow-hidden">
+            <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
+              <h3 className="text-lg leading-6 font-medium text-gray-900">
+                Rendimiento por Activo
+              </h3>
+            </div>
+            <div className="p-6">
+              <PerformanceChart positions={positions} />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Positions Table */}
       <div className="bg-white shadow rounded-lg overflow-hidden">
