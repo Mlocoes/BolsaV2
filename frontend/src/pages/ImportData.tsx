@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import api from '../services/api'
+import Layout from '../components/Layout'
 
 interface ImportStats {
   total: number
@@ -99,7 +100,8 @@ export default function ImportData() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <Layout>
+      <div className="container mx-auto p-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Import Data</h1>
         <p className="text-gray-600">Import transactions and quotes from CSV files</p>
@@ -265,6 +267,7 @@ export default function ImportData() {
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </Layout>
   )
 }

@@ -1,21 +1,13 @@
-import { useEffect } from 'react'
-import { useAuthStore } from '../stores/authStore'
 import { useNavigate } from 'react-router-dom'
-import DashboardComponent from '../components/Dashboard'
+import { useAuthStore } from '../stores/authStore'
 
-export default function Dashboard() {
+interface LayoutProps {
+  children: React.ReactNode
+}
+
+export default function Layout({ children }: LayoutProps) {
   const { user, logout } = useAuthStore()
   const navigate = useNavigate()
-
-  console.log('Dashboard rendering, user:', user)
-
-  useEffect(() => {
-    console.log('Dashboard useEffect, checking user:', user)
-    if (!user) {
-      console.log('No user found, redirecting to login')
-      navigate('/login')
-    }
-  }, [user, navigate])
 
   const handleLogout = async () => {
     await logout()
@@ -35,7 +27,7 @@ export default function Dashboard() {
             <div className="flex space-x-4">
               <button
                 onClick={() => navigate('/')}
-                className="text-indigo-600 font-medium"
+                className="text-gray-600 hover:text-gray-900"
               >
                 Dashboard
               </button>
@@ -77,7 +69,7 @@ export default function Dashboard() {
         </div>
       </nav>
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <DashboardComponent />
+        {children}
       </main>
     </div>
   )

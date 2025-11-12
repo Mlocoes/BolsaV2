@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { portfolioService } from '../services/portfolioService';
 import CreatePortfolioModal from '../components/CreatePortfolioModal';
+import Layout from '../components/Layout';
 import type { Portfolio } from '../types/portfolio';
 import { Plus, Wallet, Trash2 } from 'lucide-react';
 
 export default function Portfolios() {
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
   const navigate = useNavigate();
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,48 +51,11 @@ export default function Portfolios() {
     }
   };
 
-  const handleLogout = async () => {
-    await logout();
-    navigate('/login');
-  };
-
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-8">
-            <h1 className="text-2xl font-bold text-gray-900">BolsaV2</h1>
-            <div className="flex space-x-4">
-              <button
-                onClick={() => navigate('/')}
-                className="text-gray-600 hover:text-gray-900"
-              >
-                Dashboard
-              </button>
-              <button
-                onClick={() => navigate('/portfolios')}
-                className="text-indigo-600 font-medium"
-              >
-                Portfolios
-              </button>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <span className="text-gray-700">{user.username}</span>
-            <button
-              onClick={handleLogout}
-              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-6 flex justify-between items-center">
+    <Layout>
+      <div className="mb-6 flex justify-between items-center">
           <div>
             <h2 className="text-3xl font-bold text-gray-900">Mis Portfolios</h2>
             <p className="mt-2 text-sm text-gray-600">
@@ -180,13 +144,12 @@ export default function Portfolios() {
             ))}
           </div>
         )}
-      </main>
 
       <CreatePortfolioModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onSubmit={handleCreatePortfolio}
       />
-    </div>
+    </Layout>
   );
 }

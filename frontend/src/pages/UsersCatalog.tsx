@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import api from '../services/api'
+import Layout from '../components/Layout'
 
 interface User {
   id: string
@@ -81,14 +82,17 @@ export default function UsersCatalog() {
 
   if (isLoading) {
     return (
-      <div className="flex h-96 items-center justify-center">
-        <div className="text-xl">Loading users...</div>
-      </div>
+      <Layout>
+        <div className="flex h-96 items-center justify-center">
+          <div className="text-xl">Loading users...</div>
+        </div>
+      </Layout>
     )
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <Layout>
+      <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -229,6 +233,7 @@ export default function UsersCatalog() {
           This page is for system administrators only. All operations are logged and audited.
         </p>
       </div>
-    </div>
+      </div>
+    </Layout>
   )
 }

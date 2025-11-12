@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import api from '../services/api'
+import Layout from '../components/Layout'
 
 interface Asset {
   id: string
@@ -116,14 +117,17 @@ export default function AssetsCatalog() {
 
   if (isLoading) {
     return (
-      <div className="flex h-96 items-center justify-center">
-        <div className="text-xl">Loading assets...</div>
-      </div>
+      <Layout>
+        <div className="flex h-96 items-center justify-center">
+          <div className="text-xl">Loading assets...</div>
+        </div>
+      </Layout>
     )
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <Layout>
+      <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -291,6 +295,7 @@ export default function AssetsCatalog() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </Layout>
   )
 }
