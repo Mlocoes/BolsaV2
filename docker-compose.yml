@@ -47,12 +47,27 @@ services:
     container_name: bolsav2_worker
     restart: unless-stopped
     env_file: .env
+    working_dir: /app
     depends_on:
       - db
       - redis
     networks:
       - bolsav2_network
-    command: celery -A app.services.celery_app worker --loglevel=info
+    command: python -m celery -A app.celery_config worker --loglevel=info --queues=prices,maintenance
+
+  beat:
+    build: ./backend
+    container_name: bolsav2_beat
+    restart: unless-stopped
+    env_file: .env
+    working_dir: /app
+    depends_on:
+      - db
+      - redis
+      - worker
+    networks:
+      - bolsav2_network
+    command: python -m celery -A app.celery_config beat --loglevel=info
 
   frontend:
     build: ./frontend
