@@ -15,9 +15,17 @@ export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
 
   login: async (username: string, password: string) => {
-    const response = await authAPI.login(username, password)
-    sessionStorage.setItem('auth_token', response.token)
-    set({ user: response.user, token: response.token, isAuthenticated: true })
+    console.log('authStore.login called with username:', username)
+    try {
+      const response = await authAPI.login(username, password)
+      console.log('authAPI.login response:', response)
+      sessionStorage.setItem('auth_token', response.token)
+      set({ user: response.user, token: response.token, isAuthenticated: true })
+      console.log('authStore state updated successfully')
+    } catch (error) {
+      console.error('authStore.login error:', error)
+      throw error
+    }
   },
 
   logout: async () => {

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useAuthStore } from '../stores/authStore'
 import { useNavigate } from 'react-router-dom'
 
@@ -5,13 +6,22 @@ export default function Dashboard() {
   const { user, logout } = useAuthStore()
   const navigate = useNavigate()
 
+  console.log('Dashboard rendering, user:', user)
+
+  useEffect(() => {
+    console.log('Dashboard useEffect, checking user:', user)
+    if (!user) {
+      console.log('No user found, redirecting to login')
+      navigate('/login')
+    }
+  }, [user, navigate])
+
   const handleLogout = async () => {
     await logout()
     navigate('/login')
   }
 
   if (!user) {
-    navigate('/login')
     return null
   }
 

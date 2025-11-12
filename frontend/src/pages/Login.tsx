@@ -9,13 +9,20 @@ export default function Login() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
+  console.log('Login page rendering')
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
+      console.log('Attempting login with username:', username)
       await login(username, password)
+      console.log('Login successful, navigating to dashboard')
+      toast.success('Login successful!')
       navigate('/')
-    } catch (error) {
-      toast.error('Login failed')
+    } catch (error: any) {
+      console.error('Login error:', error)
+      const message = error.response?.data?.detail || error.message || 'Login failed'
+      toast.error(message)
     }
   }
 

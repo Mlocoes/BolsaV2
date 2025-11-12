@@ -4,6 +4,8 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 
 function App() {
+  console.log('App component rendering...')
+  
   return (
     <BrowserRouter>
       <Toaster position="top-right" />
