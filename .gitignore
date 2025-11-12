@@ -1,0 +1,15 @@
+.env
+.env.local
+__pycache__/
+*.py[cod]
+node_modules/
+/frontend/dist
+/frontend/build
+.venv
+venv/
+postgres-data/
+redis-data/
+*.log
+.DS_Store
+.idea/
+.vscode/
