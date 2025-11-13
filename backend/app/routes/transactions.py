@@ -25,7 +25,7 @@ def get_user_portfolio(portfolio_id: UUID, user_id: UUID, db: Session) -> Portfo
 
     if not portfolio:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Portfolio not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Cartera no encontrada"
         )
 
     return portfolio
@@ -37,7 +37,7 @@ async def list_transactions(
     user: dict = Depends(require_auth),
     db: Session = Depends(get_db),
 ):
-    """Listar todas las transacciones de un portfolio"""
+    """Listar todas las transacciones de una cartera"""
     get_user_portfolio(portfolio_id, UUID(user["user_id"]), db)
 
     transactions = (
@@ -60,11 +60,11 @@ async def create_transaction(
     """Crear una nueva transacción y actualizar posiciones"""
     _ = get_user_portfolio(portfolio_id, UUID(user["user_id"]), db)
 
-    # Verificar que el asset existe
+    # Verificar que el activo existe
     asset = db.query(Asset).filter(Asset.id == transaction.asset_id).first()
     if not asset:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Asset not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Activo no encontrado"
         )
 
     # Crear la transacción
@@ -105,7 +105,7 @@ async def create_transaction(
         if not position or position.quantity < transaction.quantity:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Insufficient quantity to sell",
+                detail="Cantidad insuficiente para vender",
             )
         position.quantity -= transaction.quantity
 
@@ -138,7 +138,7 @@ async def delete_transaction(
 
     if not transaction:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Transacción no encontrada"
         )
 
     db.delete(transaction)
