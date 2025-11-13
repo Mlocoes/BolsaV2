@@ -27,7 +27,7 @@ export default function ImportData() {
 
   const handleImportTransactions = async () => {
     if (!file || !portfolioId) {
-      alert('Please select a file and enter portfolio ID')
+      alert('Por favor selecciona un archivo e introduce el ID de la cartera')
       return
     }
 
@@ -47,7 +47,7 @@ export default function ImportData() {
       )
       setImportResult(response.data)
     } catch (error: any) {
-      alert(error.response?.data?.detail || 'Import failed')
+      alert(error.response?.data?.detail || 'Error al importar')
     } finally {
       setIsImporting(false)
     }
@@ -55,7 +55,7 @@ export default function ImportData() {
 
   const handleImportQuotes = async () => {
     if (!file) {
-      alert('Please select a file')
+      alert('Por favor selecciona un archivo')
       return
     }
 
@@ -75,7 +75,7 @@ export default function ImportData() {
       )
       setImportResult(response.data)
     } catch (error: any) {
-      alert(error.response?.data?.detail || 'Import failed')
+      alert(error.response?.data?.detail || 'Error al importar')
     } finally {
       setIsImporting(false)
     }
@@ -95,7 +95,7 @@ export default function ImportData() {
       link.click()
       link.remove()
     } catch (error) {
-      alert('Failed to download template')
+      alert('Error al descargar la plantilla')
     }
   }
 
@@ -103,11 +103,11 @@ export default function ImportData() {
     <Layout>
       <div className="container mx-auto p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Import Data</h1>
-        <p className="text-gray-600">Import transactions and quotes from CSV files</p>
+        <h1 className="text-3xl font-bold">Importar Datos</h1>
+        <p className="text-gray-600">Importa transacciones y cotizaciones desde archivos CSV</p>
       </div>
 
-      {/* Tabs */}
+      {/* Pestañas */}
       <div className="border-b border-gray-200">
         <nav className="-mb-px flex space-x-8">
           <button
@@ -118,7 +118,7 @@ export default function ImportData() {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            Transactions
+            Transacciones
           </button>
           <button
             onClick={() => setActiveTab('quotes')}
@@ -128,46 +128,46 @@ export default function ImportData() {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            Quotes
+            Cotizaciones
           </button>
         </nav>
       </div>
 
-      {/* Content */}
+      {/* Contenido */}
       <div className="bg-white rounded-lg shadow p-6 space-y-6">
-        {/* Template Download */}
+        {/* Descargar Plantilla */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h3 className="font-semibold mb-2">📄 Download Template</h3>
+          <h3 className="font-semibold mb-2">📄 Descargar Plantilla</h3>
           <p className="text-sm text-gray-600 mb-3">
-            Download a CSV template to see the required format
+            Descarga una plantilla CSV para ver el formato requerido
           </p>
           <button
             onClick={() => handleDownloadTemplate(activeTab)}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
-            Download {activeTab} Template
+            Descargar Plantilla de {activeTab === 'transactions' ? 'Transacciones' : 'Cotizaciones'}
           </button>
         </div>
 
-        {/* Import Form */}
+        {/* Formulario de Importación */}
         <div className="space-y-4">
-          <h3 className="font-semibold text-lg">Import {activeTab}</h3>
+          <h3 className="font-semibold text-lg">Importar {activeTab === 'transactions' ? 'Transacciones' : 'Cotizaciones'}</h3>
 
           {activeTab === 'transactions' && (
             <div>
-              <label className="block text-sm font-medium mb-1">Portfolio ID *</label>
+              <label className="block text-sm font-medium mb-1">ID de Cartera *</label>
               <input
                 type="text"
                 value={portfolioId}
                 onChange={(e) => setPortfolioId(e.target.value)}
-                placeholder="Enter portfolio UUID"
+                placeholder="Introduce el UUID de la cartera"
                 className="w-full px-3 py-2 border rounded"
               />
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium mb-1">CSV File *</label>
+            <label className="block text-sm font-medium mb-1">Archivo CSV *</label>
             <input
               type="file"
               accept=".csv"
@@ -176,7 +176,7 @@ export default function ImportData() {
             />
             {file && (
               <p className="text-sm text-gray-600 mt-1">
-                Selected: {file.name} ({(file.size / 1024).toFixed(2)} KB)
+                Seleccionado: {file.name} ({(file.size / 1024).toFixed(2)} KB)
               </p>
             )}
           </div>
@@ -190,7 +190,7 @@ export default function ImportData() {
               className="h-4 w-4 text-blue-600 rounded"
             />
             <label htmlFor="skipDuplicates" className="ml-2 text-sm">
-              Skip duplicates (recommended)
+              Omitir duplicados (recomendado)
             </label>
           </div>
 
@@ -199,14 +199,14 @@ export default function ImportData() {
             disabled={isImporting || !file || (activeTab === 'transactions' && !portfolioId)}
             className="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400"
           >
-            {isImporting ? 'Importing...' : `Import ${activeTab}`}
+            {isImporting ? 'Importando...' : `Importar ${activeTab === 'transactions' ? 'Transacciones' : 'Cotizaciones'}`}
           </button>
         </div>
 
-        {/* Import Results */}
+        {/* Resultados de la Importación */}
         {importResult && (
           <div className="border-t pt-6">
-            <h3 className="font-semibold text-lg mb-4">Import Results</h3>
+            <h3 className="font-semibold text-lg mb-4">Resultados de la Importación</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
               <div className="bg-gray-50 p-4 rounded">
                 <div className="text-2xl font-bold text-gray-900">{importResult.total}</div>
@@ -214,23 +214,23 @@ export default function ImportData() {
               </div>
               <div className="bg-green-50 p-4 rounded">
                 <div className="text-2xl font-bold text-green-600">{importResult.created}</div>
-                <div className="text-sm text-gray-600">Created</div>
+                <div className="text-sm text-gray-600">Creados</div>
               </div>
               {importResult.updated > 0 && (
                 <div className="bg-blue-50 p-4 rounded">
                   <div className="text-2xl font-bold text-blue-600">{importResult.updated}</div>
-                  <div className="text-sm text-gray-600">Updated</div>
+                  <div className="text-sm text-gray-600">Actualizados</div>
                 </div>
               )}
               <div className="bg-yellow-50 p-4 rounded">
                 <div className="text-2xl font-bold text-yellow-600">{importResult.skipped}</div>
-                <div className="text-sm text-gray-600">Skipped</div>
+                <div className="text-sm text-gray-600">Omitidos</div>
               </div>
             </div>
 
             {importResult.errors.length > 0 && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <h4 className="font-semibold text-red-900 mb-2">Errors ({importResult.errors.length})</h4>
+                <h4 className="font-semibold text-red-900 mb-2">Errores ({importResult.errors.length})</h4>
                 <ul className="list-disc list-inside space-y-1 text-sm text-red-800">
                   {importResult.errors.map((error, idx) => (
                     <li key={idx}>{error}</li>
@@ -241,27 +241,27 @@ export default function ImportData() {
           </div>
         )}
 
-        {/* Format Information */}
+        {/* Información del Formato */}
         <div className="border-t pt-6">
-          <h3 className="font-semibold text-lg mb-3">Format Information</h3>
+          <h3 className="font-semibold text-lg mb-3">Información del Formato</h3>
           
           {activeTab === 'transactions' ? (
             <div className="bg-gray-50 p-4 rounded text-sm space-y-2">
-              <p><strong>Required columns:</strong> date, type, asset_symbol, quantity, price</p>
-              <p><strong>Optional columns:</strong> fees, notes</p>
-              <p><strong>Type values:</strong> BUY, SELL</p>
-              <p><strong>Date format:</strong> YYYY-MM-DD</p>
+              <p><strong>Columnas requeridas:</strong> date, type, asset_symbol, quantity, price</p>
+              <p><strong>Columnas opcionales:</strong> fees, notes</p>
+              <p><strong>Valores de tipo:</strong> BUY, SELL</p>
+              <p><strong>Formato de fecha:</strong> YYYY-MM-DD</p>
               <p className="text-gray-600 italic">
-                Example: 2025-01-15,BUY,AAPL,10,150.50,9.99,Initial purchase
+                Ejemplo: 2025-01-15,BUY,AAPL,10,150.50,9.99,Compra inicial
               </p>
             </div>
           ) : (
             <div className="bg-gray-50 p-4 rounded text-sm space-y-2">
-              <p><strong>Required columns:</strong> symbol, date, open, high, low, close</p>
-              <p><strong>Optional columns:</strong> volume, source</p>
-              <p><strong>Date format:</strong> YYYY-MM-DD</p>
+              <p><strong>Columnas requeridas:</strong> symbol, date, open, high, low, close</p>
+              <p><strong>Columnas opcionales:</strong> volume, source</p>
+              <p><strong>Formato de fecha:</strong> YYYY-MM-DD</p>
               <p className="text-gray-600 italic">
-                Example: AAPL,2025-01-15,150.00,152.00,149.50,151.50,1000000,manual
+                Ejemplo: AAPL,2025-01-15,150.00,152.00,149.50,151.50,1000000,manual
               </p>
             </div>
           )}
