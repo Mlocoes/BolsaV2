@@ -10,35 +10,35 @@ print_success() { echo -e "${GREEN}✓ $1${NC}"; }
 print_error() { echo -e "${RED}✗ $1${NC}"; }
 print_info() { echo -e "${BLUE}ℹ $1${NC}"; }
 
-echo -e "${BLUE}BolsaV2 Installation${NC}"
+echo -e "${BLUE}Instalación de BolsaV2${NC}"
 echo ""
 
-# Check Docker
+# Verificar Docker
 if ! command -v docker &> /dev/null; then
-    print_error "Docker not installed"
+    print_error "Docker no está instalado"
     exit 1
 fi
 
-# Create .env if not exists
+# Crear .env si no existe
 if [ ! -f ".env" ]; then
-    print_info "Creating .env file..."
+    print_info "Creando archivo .env..."
     
-    SECRET_KEY=$(openssl rand -hex 32 2>/dev/null || echo "change-this-secret-key-$(date +%s)")
+    SECRET_KEY=$(openssl rand -hex 32 2>/dev/null || echo "cambiar-esta-clave-secreta-$(date +%s)")
     
-    read -p "Database password [bolsav2pass]: " DB_PASSWORD
+    read -p "Contraseña de base de datos [bolsav2pass]: " DB_PASSWORD
     DB_PASSWORD=${DB_PASSWORD:-bolsav2pass}
     
-    read -p "Admin username [admin]: " ADMIN_USERNAME
+    read -p "Nombre de usuario administrador [admin]: " ADMIN_USERNAME
     ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
     
-    read -p "Admin email [admin@bolsav2.com]: " ADMIN_EMAIL
+    read -p "Correo electrónico del administrador [admin@bolsav2.com]: " ADMIN_EMAIL
     ADMIN_EMAIL=${ADMIN_EMAIL:-admin@bolsav2.com}
     
-    read -sp "Admin password: " ADMIN_PASSWORD
+    read -sp "Contraseña del administrador: " ADMIN_PASSWORD
     echo ""
     [ -z "$ADMIN_PASSWORD" ] && ADMIN_PASSWORD="admin123"
     
-    read -p "Finnhub API Key (get from finnhub.io): " FINNHUB_API_KEY
+    read -p "Clave API de Finnhub (obtenerla en finnhub.io): " FINNHUB_API_KEY
     [ -z "$FINNHUB_API_KEY" ] && FINNHUB_API_KEY="demo-key"
     
     cat > .env << EOF
@@ -56,34 +56,34 @@ ADMIN_PASSWORD=${ADMIN_PASSWORD}
 VITE_API_BASE_URL=http://localhost:8000/api/v1
 EOF
     
-    print_success ".env created"
+    print_success "Archivo .env creado"
 fi
 
-# Build and start
-print_info "Building Docker images..."
+# Construir e iniciar
+print_info "Construyendo imágenes Docker..."
 docker-compose build
 
-print_info "Starting database..."
+print_info "Iniciando base de datos..."
 docker-compose up -d db redis
 sleep 10
 
-print_info "Running migrations..."
+print_info "Ejecutando migraciones..."
 docker-compose run --rm backend alembic upgrade head
 
-print_info "Creating admin user..."
+print_info "Creando usuario administrador..."
 docker-compose run --rm backend python -m app.scripts.create_admin
 
-print_info "Starting all services..."
+print_info "Iniciando todos los servicios..."
 docker-compose up -d
 
 echo ""
-print_success "Installation complete!"
+print_success "¡Instalación completada!"
 echo ""
-print_info "Access the application:"
+print_info "Acceder a la aplicación:"
 echo "  Frontend:  http://localhost:3000"
 echo "  Backend:   http://localhost:8000"
-echo "  API Docs:  http://localhost:8000/docs"
+echo "  Docs API:  http://localhost:8000/docs"
 echo ""
-print_info "Default credentials:"
-echo "  Username: ${ADMIN_USERNAME:-admin}"
-echo "  Password: (the one you entered)"
+print_info "Credenciales por defecto:"
+echo "  Usuario: ${ADMIN_USERNAME:-admin}"
+echo "  Contraseña: (la que has introducido)"

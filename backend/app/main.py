@@ -6,9 +6,9 @@ from app.routes import auth, portfolios, transactions, assets, prices, worker, q
 
 app = FastAPI(
     title="BolsaV2",
-    description="Portfolio Management System",
+    description="Sistema de Gestión de Carteras",
     version="2.0.0",
-    redirect_slashes=False  # Desactivar redirects automáticos de trailing slash
+    redirect_slashes=False  # Desactivar redireccionamientos automáticos de barras finales
 )
 
 # Eventos de inicio y cierre

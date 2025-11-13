@@ -7,12 +7,12 @@ export default function Dashboard() {
   const { user, logout } = useAuthStore()
   const navigate = useNavigate()
 
-  console.log('Dashboard rendering, user:', user)
+  console.log('Panel de control renderizando, usuario:', user)
 
   useEffect(() => {
-    console.log('Dashboard useEffect, checking user:', user)
+    console.log('Dashboard useEffect, comprobando usuario:', user)
     if (!user) {
-      console.log('No user found, redirecting to login')
+      console.log('No se encontró usuario, redirigiendo al inicio de sesión')
       navigate('/login')
     }
   }, [user, navigate])
@@ -37,31 +37,31 @@ export default function Dashboard() {
                 onClick={() => navigate('/')}
                 className="text-indigo-600 font-medium"
               >
-                Dashboard
+                Panel de Control
               </button>
               <button
                 onClick={() => navigate('/portfolios')}
                 className="text-gray-600 hover:text-gray-900"
               >
-                Portfolios
+                Carteras
               </button>
               <button
                 onClick={() => navigate('/assets')}
                 className="text-gray-600 hover:text-gray-900"
               >
-                Assets
+                Activos
               </button>
               <button
                 onClick={() => navigate('/import')}
                 className="text-gray-600 hover:text-gray-900"
               >
-                Import/Export
+                Importar/Exportar
               </button>
               <button
                 onClick={() => navigate('/users')}
                 className="text-gray-600 hover:text-gray-900"
               >
-                Users
+                Usuarios
               </button>
             </div>
           </div>
@@ -71,7 +71,7 @@ export default function Dashboard() {
               onClick={handleLogout}
               className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
             >
-              Logout
+              Cerrar Sesión
             </button>
           </div>
         </div>
