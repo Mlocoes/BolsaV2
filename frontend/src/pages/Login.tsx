@@ -9,19 +9,19 @@ export default function Login() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
-  console.log('Login page rendering')
+  console.log('Página de inicio de sesión renderizando')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      console.log('Attempting login with username:', username)
+      console.log('Intentando iniciar sesión con el usuario:', username)
       await login(username, password)
-      console.log('Login successful, navigating to dashboard')
-      toast.success('Login successful!')
+      console.log('Inicio de sesión exitoso, navegando al panel de control')
+      toast.success('¡Inicio de sesión exitoso!')
       navigate('/')
     } catch (error: any) {
-      console.error('Login error:', error)
-      const message = error.response?.data?.detail || error.message || 'Login failed'
+      console.error('Error de inicio de sesión:', error)
+      const message = error.response?.data?.detail || error.message || 'Error al iniciar sesión'
       toast.error(message)
     }
   }
@@ -32,7 +32,7 @@ export default function Login() {
         <h1 className="text-3xl font-bold text-center mb-6 text-gray-900">BolsaV2</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Username</label>
+            <label className="block text-sm font-medium text-gray-700">Usuario</label>
             <input
               type="text"
               value={username}
@@ -42,7 +42,7 @@ export default function Login() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <label className="block text-sm font-medium text-gray-700">Contraseña</label>
             <input
               type="password"
               value={password}
@@ -55,7 +55,7 @@ export default function Login() {
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
           >
-            Sign In
+            Iniciar Sesión
           </button>
         </form>
       </div>

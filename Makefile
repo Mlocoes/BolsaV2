@@ -1,12 +1,12 @@
 .PHONY: help build up down logs test
 
 help:
-	@echo "BolsaV2 Commands:"
-	@echo "  make build  - Build images"
-	@echo "  make up     - Start services"
-	@echo "  make down   - Stop services"
-	@echo "  make logs   - View logs"
-	@echo "  make test   - Run tests"
+	@echo "Comandos BolsaV2:"
+	@echo "  make build  - Construir imágenes"
+	@echo "  make up     - Iniciar servicios"
+	@echo "  make down   - Detener servicios"
+	@echo "  make logs   - Ver registros"
+	@echo "  make test   - Ejecutar pruebas"
 
 build:
 	docker-compose build

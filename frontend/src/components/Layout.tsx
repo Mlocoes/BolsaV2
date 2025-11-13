@@ -29,31 +29,31 @@ export default function Layout({ children }: LayoutProps) {
                 onClick={() => navigate('/')}
                 className="text-gray-600 hover:text-gray-900"
               >
-                Dashboard
+                Panel de Control
               </button>
               <button
                 onClick={() => navigate('/portfolios')}
                 className="text-gray-600 hover:text-gray-900"
               >
-                Portfolios
+                Carteras
               </button>
               <button
                 onClick={() => navigate('/assets')}
                 className="text-gray-600 hover:text-gray-900"
               >
-                Assets
+                Activos
               </button>
               <button
                 onClick={() => navigate('/import')}
                 className="text-gray-600 hover:text-gray-900"
               >
-                Import/Export
+                Importar/Exportar
               </button>
               <button
                 onClick={() => navigate('/users')}
                 className="text-gray-600 hover:text-gray-900"
               >
-                Users
+                Usuarios
               </button>
             </div>
           </div>
@@ -63,7 +63,7 @@ export default function Layout({ children }: LayoutProps) {
               onClick={handleLogout}
               className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
             >
-              Logout
+              Cerrar Sesión
             </button>
           </div>
         </div>

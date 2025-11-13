@@ -1,72 +1,72 @@
-# BolsaV2 - Complete Project
+# BolsaV2 - Proyecto Completo
 
-## ✅ What's Included
+## ✅ Qué Incluye
 
 ### Backend (Python/FastAPI)
-- FastAPI application with async support
-- SQLAlchemy models (Users, Assets, Quotes, Portfolios, Operations, Results)
-- Alembic migrations
-- Authentication with sessions
-- Argon2 password hashing
-- Docker containerization
+- Aplicación FastAPI con soporte asíncrono
+- Modelos SQLAlchemy (Usuarios, Activos, Cotizaciones, Carteras, Operaciones, Resultados)
+- Migraciones Alembic
+- Autenticación con sesiones
+- Hash de contraseñas con Argon2
+- Contenedorización Docker
 
 ### Frontend (React/TypeScript)
-- React 18 with TypeScript
-- Vite build tool
+- React 18 con TypeScript
+- Herramienta de construcción Vite
 - Tailwind CSS
-- Zustand state management
-- Login and Dashboard pages
+- Gestión de estado con Zustand
+- Páginas de Login y Panel de Control
 - Docker + Nginx
 
 ### DevOps
-- Docker Compose orchestration
-- GitHub Actions CI/CD
-- Installation script
-- Makefile commands
+- Orquestación con Docker Compose
+- CI/CD con GitHub Actions
+- Script de instalación
+- Comandos Makefile
 
-## 🚀 Quick Start
+## 🚀 Inicio Rápido
 
 ```bash
 chmod +x install.sh
 ./install.sh
 ```
 
-Then access:
+Luego acceder a:
 - Frontend: http://localhost:3000
 - Backend: http://localhost:8000
-- API Docs: http://localhost:8000/docs
+- Documentación API: http://localhost:8000/docs
 
-## 📝 Default Login
+## 📝 Credenciales por Defecto
 
-Username: admin (or what you entered)
-Password: admin123 (or what you entered)
+Usuario: admin (o el que hayas introducido)
+Contraseña: admin123 (o la que hayas introducido)
 
-## 🔧 Commands
+## 🔧 Comandos
 
 ```bash
-make build   # Build images
-make up      # Start services
-make down    # Stop services
-make logs    # View logs
+make build   # Construir imágenes
+make up      # Iniciar servicios
+make down    # Detener servicios
+make logs    # Ver registros
 ```
 
-## 📦 What to Add
+## 📦 Qué Añadir
 
-This is a minimal working version. For full features, you can add:
-- More API endpoints (portfolios, operations, quotes)
-- Additional frontend pages
-- Handsontable integration
-- Recharts for analytics
-- Import/export functionality
-- More comprehensive tests
+Esta es una versión mínima funcional. Para características completas, puedes añadir:
+- Más endpoints de API (carteras, operaciones, cotizaciones)
+- Páginas adicionales en el frontend
+- Integración de Handsontable
+- Recharts para análisis
+- Funcionalidad de importación/exportación
+- Pruebas más completas
 
-## 🔐 Security Notes
+## 🔐 Notas de Seguridad
 
-- Change SECRET_KEY in production
-- Use strong passwords
-- Enable HTTPS in production
-- Update Finnhub API key
+- Cambiar SECRET_KEY en producción
+- Usar contraseñas fuertes
+- Habilitar HTTPS en producción
+- Actualizar clave API de Finnhub
 
-## 📄 License
+## 📄 Licencia
 
-MIT License
+Licencia MIT

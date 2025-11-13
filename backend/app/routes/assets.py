@@ -34,13 +34,13 @@ async def create_asset(
     asset: AssetCreate,
     db: Session = Depends(get_db)
 ):
-    """Crear un nuevo asset"""
+    """Crear un nuevo activo"""
     # Verificar si ya existe
     existing = db.query(Asset).filter(Asset.symbol == asset.symbol).first()
     if existing:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Asset with this symbol already exists"
+            detail="Ya existe un activo con este símbolo"
         )
     
     db_asset = Asset(**asset.dict())
@@ -54,11 +54,11 @@ async def get_asset(
     asset_id: UUID,
     db: Session = Depends(get_db)
 ):
-    """Obtener un asset específico"""
+    """Obtener un activo específico"""
     asset = db.query(Asset).filter(Asset.id == asset_id).first()
     if not asset:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Asset not found"
+            detail="Activo no encontrado"
         )
     return asset

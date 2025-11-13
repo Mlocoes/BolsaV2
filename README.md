@@ -1,31 +1,29 @@
-# BolsaV2 - Portfolio Management System
+# BolsaV2 - Sistema de Gestión de Carteras
 
 [![CI](https://github.com/Mlocoes/BolsaV2/workflows/CI/badge.svg)](https://github.com/Mlocoes/BolsaV2/actions)
 
-## Quick Start
+## Inicio Rápido
 
 ```bash
 chmod +x install.sh
 ./install.sh
 ```
 
-Access at:
+Acceder en:
 - Frontend: http://localhost:3000
 - Backend: http://localhost:8000
-- API Docs: http://localhost:8000/docs
+- Documentación API: http://localhost:8000/docs
 
-## Commands
+## Comandos
 
 ```bash
-make help      # Show all commands
-make up        # Start services
-make down      # Stop services
-make logs      # View logs
-make test      # Run tests
+make help      # Mostrar todos los comandos
+make up        # Iniciar servicios
+make down      # Detener servicios
+make logs      # Ver registros
+make test      # Ejecutar pruebas
 ```
 
-## License
+## Licencia
 
-MIT License
-# BolsaV2
-# BolsaV2
+Licencia MIT
