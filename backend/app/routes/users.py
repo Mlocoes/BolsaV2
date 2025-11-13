@@ -57,7 +57,7 @@ async def list_users(
     if not current_user or not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only administrators can list users"
+            detail="Solo los administradores pueden listar usuarios"
         )
     
     users = db.query(Usuario).all()
@@ -80,14 +80,14 @@ async def get_user(
     if str(current_user_id) != str(user_id) and not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied"
+            detail="Acceso denegado"
         )
     
     target_user = db.query(Usuario).filter(Usuario.id == user_id).first()
     if not target_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
+            detail="Usuario no encontrado"
         )
     
     return target_user
@@ -108,7 +108,7 @@ async def update_user(
     if not current_user or not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only administrators can update users"
+            detail="Solo los administradores pueden actualizar usuarios"
         )
     
     # Buscar usuario a actualizar
@@ -116,7 +116,7 @@ async def update_user(
     if not target_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
+            detail="Usuario no encontrado"
         )
     
     # Actualizar campos
@@ -148,14 +148,14 @@ async def delete_user(
     if not current_user or not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only administrators can delete users"
+            detail="Solo los administradores pueden eliminar usuarios"
         )
     
     # No permitir auto-eliminación
     if str(current_user_id) == str(user_id):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot delete your own account"
+            detail="No puedes eliminar tu propia cuenta"
         )
     
     # Buscar usuario a eliminar
@@ -163,10 +163,10 @@ async def delete_user(
     if not target_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
+            detail="Usuario no encontrado"
         )
     
     db.delete(target_user)
     db.commit()
     
-    return {"message": "User deleted successfully"}
+    return {"message": "Usuario eliminado correctamente"}

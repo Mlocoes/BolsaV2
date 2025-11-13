@@ -43,7 +43,7 @@ async def get_portfolio(
     user: dict = Depends(require_auth),
     db: Session = Depends(get_db)
 ):
-    """Obtener un portfolio específico con sus posiciones"""
+    """Obtener una cartera específica con sus posiciones"""
     portfolio = db.query(Portfolio).filter(
         Portfolio.id == portfolio_id,
         Portfolio.user_id == UUID(user["user_id"])
@@ -52,7 +52,7 @@ async def get_portfolio(
     if not portfolio:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Portfolio not found"
+            detail="Cartera no encontrada"
         )
     
     return portfolio
@@ -64,7 +64,7 @@ async def update_portfolio(
     user: dict = Depends(require_auth),
     db: Session = Depends(get_db)
 ):
-    """Actualizar un portfolio"""
+    """Actualizar una cartera"""
     db_portfolio = db.query(Portfolio).filter(
         Portfolio.id == portfolio_id,
         Portfolio.user_id == UUID(user["user_id"])
@@ -73,7 +73,7 @@ async def update_portfolio(
     if not db_portfolio:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Portfolio not found"
+            detail="Cartera no encontrada"
         )
     
     update_data = portfolio_update.dict(exclude_unset=True)
@@ -90,7 +90,7 @@ async def delete_portfolio(
     user: dict = Depends(require_auth),
     db: Session = Depends(get_db)
 ):
-    """Eliminar un portfolio"""
+    """Eliminar una cartera"""
     db_portfolio = db.query(Portfolio).filter(
         Portfolio.id == portfolio_id,
         Portfolio.user_id == UUID(user["user_id"])
@@ -99,7 +99,7 @@ async def delete_portfolio(
     if not db_portfolio:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Portfolio not found"
+            detail="Cartera no encontrada"
         )
     
     db.delete(db_portfolio)
