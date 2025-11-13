@@ -52,7 +52,7 @@ export default function AssetsCatalog() {
       const response = await api.get(`/assets/search?q=${searchTerm}`)
       setAssets(response.data)
     } catch (error) {
-      console.error('Search failed:', error)
+      console.error('Búsqueda fallida:', error)
     }
   }
 
@@ -78,34 +78,34 @@ export default function AssetsCatalog() {
     e.preventDefault()
 
     if (!formData.symbol || !formData.name) {
-      alert('Symbol and name are required')
+      alert('El símbolo y el nombre son obligatorios')
       return
     }
 
     try {
       if (editingAsset) {
         await api.put(`/assets/${editingAsset.id}`, formData)
-        alert('Asset updated successfully')
+        alert('Activo actualizado correctamente')
       } else {
         await api.post('/assets', formData)
-        alert('Asset created successfully')
+        alert('Activo creado correctamente')
       }
       setShowModal(false)
       loadAssets()
     } catch (error: any) {
-      alert(error.response?.data?.detail || 'Operation failed')
+      alert(error.response?.data?.detail || 'Operación fallida')
     }
   }
 
   const handleDelete = async (asset: Asset) => {
-    if (!confirm(`Delete asset ${asset.symbol}?`)) return
+    if (!confirm(`¿Eliminar activo ${asset.symbol}?`)) return
 
     try {
       await api.delete(`/assets/${asset.id}`)
-      alert('Asset deleted successfully')
+      alert('Activo eliminado correctamente')
       loadAssets()
     } catch (error: any) {
-      alert(error.response?.data?.detail || 'Delete failed')
+      alert(error.response?.data?.detail || 'Error al eliminar')
     }
   }
 
@@ -119,7 +119,7 @@ export default function AssetsCatalog() {
     return (
       <Layout>
         <div className="flex h-96 items-center justify-center">
-          <div className="text-xl">Loading assets...</div>
+          <div className="text-xl">Cargando activos...</div>
         </div>
       </Layout>
     )
@@ -128,21 +128,21 @@ export default function AssetsCatalog() {
   return (
     <Layout>
       <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
+      {/* Cabecera */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Assets Catalog</h1>
-          <p className="text-gray-600">Manage stocks, ETFs, and other assets</p>
+          <h1 className="text-3xl font-bold">Catálogo de Activos</h1>
+          <p className="text-gray-600">Gestiona acciones, ETFs y otros activos</p>
         </div>
         <button
           onClick={openCreateModal}
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
-          + Add Asset
+          + Añadir Activo
         </button>
       </div>
 
-      {/* Search */}
+      {/* Búsqueda */}
       <div className="bg-white p-4 rounded-lg shadow">
         <div className="flex gap-2">
           <input
@@ -150,29 +150,29 @@ export default function AssetsCatalog() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-            placeholder="Search by symbol or name..."
+            placeholder="Buscar por símbolo o nombre..."
             className="flex-1 px-4 py-2 border rounded"
           />
           <button
             onClick={handleSearch}
             className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
           >
-            Search
+            Buscar
           </button>
         </div>
       </div>
 
-      {/* Assets Table */}
+      {/* Tabla de Activos */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Symbol</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Market</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Currency</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Símbolo</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mercado</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Moneda</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -188,13 +188,13 @@ export default function AssetsCatalog() {
                     onClick={() => openEditModal(asset)}
                     className="text-blue-600 hover:text-blue-900 mr-3"
                   >
-                    Edit
+                    Editar
                   </button>
                   <button
                     onClick={() => handleDelete(asset)}
                     className="text-red-600 hover:text-red-900"
                   >
-                    Delete
+                    Eliminar
                   </button>
                 </td>
               </tr>
@@ -204,7 +204,7 @@ export default function AssetsCatalog() {
 
         {filteredAssets.length === 0 && (
           <div className="text-center py-12 text-gray-500">
-            No assets found
+            No se encontraron activos
           </div>
         )}
       </div>
@@ -214,11 +214,11 @@ export default function AssetsCatalog() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h2 className="text-2xl font-bold mb-4">
-              {editingAsset ? 'Edit Asset' : 'Create Asset'}
+              {editingAsset ? 'Editar Activo' : 'Crear Activo'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Symbol *</label>
+                <label className="block text-sm font-medium mb-1">Símbolo *</label>
                 <input
                   type="text"
                   value={formData.symbol}
@@ -230,7 +230,7 @@ export default function AssetsCatalog() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Name *</label>
+                <label className="block text-sm font-medium mb-1">Nombre *</label>
                 <input
                   type="text"
                   value={formData.name}
@@ -241,22 +241,22 @@ export default function AssetsCatalog() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Type</label>
+                <label className="block text-sm font-medium mb-1">Tipo</label>
                 <select
                   value={formData.asset_type}
                   onChange={(e) => setFormData({ ...formData, asset_type: e.target.value })}
                   className="w-full px-3 py-2 border rounded"
                 >
-                  <option value="stock">Stock</option>
+                  <option value="stock">Acción</option>
                   <option value="etf">ETF</option>
-                  <option value="crypto">Crypto</option>
-                  <option value="bond">Bond</option>
-                  <option value="fund">Fund</option>
+                  <option value="crypto">Criptomoneda</option>
+                  <option value="bond">Bono</option>
+                  <option value="fund">Fondo</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Market</label>
+                <label className="block text-sm font-medium mb-1">Mercado</label>
                 <input
                   type="text"
                   value={formData.market}
@@ -267,7 +267,7 @@ export default function AssetsCatalog() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Currency</label>
+                <label className="block text-sm font-medium mb-1">Moneda</label>
                 <input
                   type="text"
                   value={formData.currency}
@@ -282,13 +282,13 @@ export default function AssetsCatalog() {
                   onClick={() => setShowModal(false)}
                   className="px-4 py-2 border rounded hover:bg-gray-50"
                 >
-                  Cancel
+                  Cancelar
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                 >
-                  {editingAsset ? 'Update' : 'Create'}
+                  {editingAsset ? 'Actualizar' : 'Crear'}
                 </button>
               </div>
             </form>
