@@ -4,6 +4,7 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Portfolios from './pages/Portfolios'
 import AssetsCatalog from './pages/AssetsCatalog'
+import Quotes from './pages/Quotes'
 import ImportData from './pages/ImportData'
 import UsersCatalog from './pages/UsersCatalog'
 
@@ -18,6 +19,7 @@ function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/portfolios" element={<Portfolios />} />
         <Route path="/assets" element={<AssetsCatalog />} />
+        <Route path="/quotes" element={<Quotes />} />
         <Route path="/import" element={<ImportData />} />
         <Route path="/users" element={<UsersCatalog />} />
       </Routes>

@@ -17,13 +17,21 @@ export default function AssetsCatalog() {
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [showModal, setShowModal] = useState(false)
+  const [showImportModal, setShowImportModal] = useState(false)
   const [editingAsset, setEditingAsset] = useState<Asset | null>(null)
+  const [importingAsset, setImportingAsset] = useState<Asset | null>(null)
+  const [isImporting, setIsImporting] = useState(false)
   const [formData, setFormData] = useState({
     symbol: '',
     name: '',
     asset_type: 'stock',
     market: '',
     currency: 'USD'
+  })
+  const [importData, setImportData] = useState({
+    from_date: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    to_date: new Date().toISOString().split('T')[0],
+    force_refresh: false
   })
 
   useEffect(() => {
@@ -109,6 +117,48 @@ export default function AssetsCatalog() {
     }
   }
 
+  const openImportModal = (asset: Asset) => {
+    setImportingAsset(asset)
+    setImportData({
+      from_date: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      to_date: new Date().toISOString().split('T')[0],
+      force_refresh: false
+    })
+    setShowImportModal(true)
+  }
+
+  const handleImportHistorical = async () => {
+    if (!importingAsset) return
+
+    setIsImporting(true)
+    
+    try {
+      const response = await api.post(
+        `/quotes/import-historical-smart?symbol=${importingAsset.symbol}&start_date=${importData.from_date}&end_date=${importData.to_date}&force_refresh=${importData.force_refresh}`
+      )
+
+      if (response.data) {
+        alert(`Importados ${response.data.created} registros para ${importingAsset.symbol}`)
+        setShowImportModal(false)
+      }
+    } catch (error: any) {
+      alert(error.response?.data?.detail || 'Error en la importación')
+    } finally {
+      setIsImporting(false)
+    }
+  }
+
+  const handleUpdateAllQuotes = async () => {
+    if (!confirm('¿Actualizar cotizaciones de todos los activos? Puede tardar varios minutos.')) return
+
+    try {
+      const response = await api.post('/quotes/update-all-latest')
+      alert(`Actualizados ${response.data.updated} de ${response.data.total_assets} activos`)
+    } catch (error: any) {
+      alert('Error al actualizar cotizaciones')
+    }
+  }
+
   const filteredAssets = assets.filter(
     (asset) =>
       asset.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -134,12 +184,20 @@ export default function AssetsCatalog() {
           <h1 className="text-3xl font-bold">Catálogo de Activos</h1>
           <p className="text-gray-600">Gestiona acciones, ETFs y otros activos</p>
         </div>
-        <button
-          onClick={openCreateModal}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          + Añadir Activo
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleUpdateAllQuotes}
+            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          >
+            📈 Actualizar Cotizaciones
+          </button>
+          <button
+            onClick={openCreateModal}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            + Añadir Activo
+          </button>
+        </div>
       </div>
 
       {/* Búsqueda */}
@@ -184,6 +242,13 @@ export default function AssetsCatalog() {
                 <td className="px-6 py-4">{asset.market || '-'}</td>
                 <td className="px-6 py-4">{asset.currency}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
+                  <button
+                    onClick={() => openImportModal(asset)}
+                    className="text-green-600 hover:text-green-900 mr-3"
+                    title="Importar Histórico"
+                  >
+                    📥
+                  </button>
                   <button
                     onClick={() => openEditModal(asset)}
                     className="text-blue-600 hover:text-blue-900 mr-3"
@@ -292,6 +357,80 @@ export default function AssetsCatalog() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Importación Histórica */}
+      {showImportModal && importingAsset && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h2 className="text-2xl font-bold mb-4">Importar Datos Históricos</h2>
+            <p className="text-gray-600 mb-4">
+              Activo: <span className="font-semibold">{importingAsset.symbol}</span>
+            </p>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Fecha Inicio</label>
+                <input
+                  type="date"
+                  value={importData.from_date}
+                  onChange={(e) => setImportData({ ...importData, from_date: e.target.value })}
+                  className="w-full px-3 py-2 border rounded"
+                  max={importData.to_date}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Fecha Fin</label>
+                <input
+                  type="date"
+                  value={importData.to_date}
+                  onChange={(e) => setImportData({ ...importData, to_date: e.target.value })}
+                  className="w-full px-3 py-2 border rounded"
+                  min={importData.from_date}
+                  max={new Date().toISOString().split('T')[0]}
+                />
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="force_refresh"
+                  checked={importData.force_refresh}
+                  onChange={(e) => setImportData({ ...importData, force_refresh: e.target.checked })}
+                  className="mr-2"
+                />
+                <label htmlFor="force_refresh" className="text-sm">
+                  Forzar re-importación (sobrescribir existentes)
+                </label>
+              </div>
+
+              <div className="bg-yellow-50 border border-yellow-200 rounded p-3 text-sm">
+                <p className="text-yellow-800">
+                  ℹ️ Máximo: 2 años por solicitud. La importación inteligente solo descarga datos faltantes.
+                </p>
+              </div>
+
+              <div className="flex gap-2 justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowImportModal(false)}
+                  className="px-4 py-2 border rounded hover:bg-gray-50"
+                  disabled={isImporting}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleImportHistorical}
+                  disabled={isImporting}
+                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400"
+                >
+                  {isImporting ? 'Importando...' : 'Importar'}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

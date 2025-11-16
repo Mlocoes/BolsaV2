@@ -44,6 +44,12 @@ export default function Layout({ children }: LayoutProps) {
                 Activos
               </button>
               <button
+                onClick={() => navigate('/quotes')}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                Cotizaciones
+              </button>
+              <button
                 onClick={() => navigate('/import')}
                 className="text-gray-600 hover:text-gray-900"
               >

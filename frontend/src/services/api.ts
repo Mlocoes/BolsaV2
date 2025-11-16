@@ -24,12 +24,20 @@ const api = axios.create({
 })
 
 // Interceptor para agregar el session_id como header
-// Esto es necesario para desarrollo cross-port cuando las cookies no funcionan
+// Solo lo enviamos cuando estamos en desarrollo cross-port
+// (diferentes puertos = cookies no se comparten automáticamente)
 api.interceptors.request.use(
   (config) => {
-    const sessionId = localStorage.getItem('session_id')
-    if (sessionId) {
-      config.headers['X-Session-ID'] = sessionId
+    // Detectar si estamos en cross-origin (diferentes puertos)
+    const apiUrl = new URL(config.baseURL || API_BASE_URL)
+    const isCrossPort = window.location.port !== apiUrl.port
+    
+    // Solo enviar X-Session-ID si es cross-port y tenemos session_id
+    if (isCrossPort) {
+      const sessionId = localStorage.getItem('session_id')
+      if (sessionId) {
+        config.headers['X-Session-ID'] = sessionId
+      }
     }
     return config
   },

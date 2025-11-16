@@ -6,6 +6,8 @@ from ..core.database import get_db
 from ..core.middleware import require_auth
 from ..models.usuario import Usuario
 from ..models.portfolio import Portfolio
+from sqlalchemy.orm import joinedload
+from app.utils.portfolio_utils import get_user_portfolio_or_404
 from ..models.position import Position
 from ..models.asset import Asset
 from ..schemas.portfolio import PortfolioCreate, PortfolioUpdate, PortfolioResponse, PortfolioDetail
@@ -44,9 +46,12 @@ async def get_portfolio(
     db: Session = Depends(get_db)
 ):
     """Obtener una cartera específica con sus posiciones"""
-    portfolio = db.query(Portfolio).filter(
+    # Cargar posiciones y activos asociados en una sola consulta
+    portfolio = db.query(Portfolio).options(
+        joinedload(Portfolio.positions).joinedload("asset")
+    ).filter(
         Portfolio.id == portfolio_id,
-        Portfolio.user_id == UUID(user["user_id"])
+        Portfolio.user_id == UUID(user["user_id"]) 
     ).first()
     
     if not portfolio:
@@ -65,10 +70,7 @@ async def update_portfolio(
     db: Session = Depends(get_db)
 ):
     """Actualizar una cartera"""
-    db_portfolio = db.query(Portfolio).filter(
-        Portfolio.id == portfolio_id,
-        Portfolio.user_id == UUID(user["user_id"])
-    ).first()
+    db_portfolio = get_user_portfolio_or_404(db, portfolio_id, UUID(user["user_id"]))
     
     if not db_portfolio:
         raise HTTPException(
@@ -91,16 +93,7 @@ async def delete_portfolio(
     db: Session = Depends(get_db)
 ):
     """Eliminar una cartera"""
-    db_portfolio = db.query(Portfolio).filter(
-        Portfolio.id == portfolio_id,
-        Portfolio.user_id == UUID(user["user_id"])
-    ).first()
-    
-    if not db_portfolio:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Cartera no encontrada"
-        )
+    db_portfolio = get_user_portfolio_or_404(db, portfolio_id, UUID(user["user_id"]))
     
     db.delete(db_portfolio)
     db.commit()
