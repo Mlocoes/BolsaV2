@@ -12,11 +12,27 @@ def _read_secret(env_name: str, default: str | None = None) -> str | None:
             return f.read().strip()
     return os.getenv(env_name, default)
 
+def _get_database_url() -> str:
+    """Construir DATABASE_URL desde env o secret"""
+    # Si hay DATABASE_URL directo, usarlo
+    db_url = _read_secret("DATABASE_URL")
+    if db_url:
+        return db_url
+    
+    # Si no, construirlo desde componentes individuales
+    db_password = _read_secret("DB_PASSWORD") or os.getenv("POSTGRES_PASSWORD", "")
+    db_user = os.getenv("POSTGRES_USER", "bolsav2_user")
+    db_name = os.getenv("POSTGRES_DB", "bolsav2")
+    db_host = os.getenv("DB_HOST", "db")
+    db_port = os.getenv("DB_PORT", "5432")
+    
+    return f"postgresql+asyncpg://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+
 class Settings(BaseSettings):
     APP_NAME: str = "BolsaV2"
     # Soporte para Docker Secrets: *_FILE
     SECRET_KEY: str = _read_secret("SECRET_KEY", "changeme")  # type: ignore
-    DATABASE_URL: str = _read_secret("DATABASE_URL", "")  # type: ignore
+    DATABASE_URL: str = _get_database_url()  # type: ignore
     REDIS_URL: str = _read_secret("REDIS_URL", "redis://redis:6379/0") or "redis://redis:6379/0"  # type: ignore
     FINNHUB_API_KEY: str = _read_secret("FINNHUB_API_KEY", "") or ""
     ALPHA_VANTAGE_API_KEY: str = _read_secret("ALPHA_VANTAGE_API_KEY", "demo") or "demo"  # API key de Alpha Vantage
