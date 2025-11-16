@@ -4,22 +4,30 @@ import { useNavigate } from 'react-router-dom'
 import DashboardComponent from '../components/Dashboard'
 
 export default function Dashboard() {
-  const { user, logout } = useAuthStore()
+  const { user, isLoading, logout } = useAuthStore()
   const navigate = useNavigate()
 
-  console.log('Panel de control renderizando, usuario:', user)
+  console.log('Panel de control renderizando, usuario:', user, 'isLoading:', isLoading)
 
   useEffect(() => {
-    console.log('Dashboard useEffect, comprobando usuario:', user)
-    if (!user) {
+    console.log('Dashboard useEffect, comprobando usuario:', user, 'isLoading:', isLoading)
+    if (!isLoading && !user) {
       console.log('No se encontró usuario, redirigiendo al inicio de sesión')
       navigate('/login')
     }
-  }, [user, navigate])
+  }, [user, isLoading, navigate])
 
   const handleLogout = async () => {
     await logout()
     navigate('/login')
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-gray-500">Cargando...</div>
+      </div>
+    )
   }
 
   if (!user) {
