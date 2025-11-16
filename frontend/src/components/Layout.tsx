@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
 
@@ -8,6 +9,13 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   const { user, logout } = useAuthStore()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!user) {
+      console.log('Layout: No user found, redirecting to login')
+      navigate('/login')
+    }
+  }, [user, navigate])
 
   const handleLogout = async () => {
     await logout()
