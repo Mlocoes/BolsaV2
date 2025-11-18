@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
 
@@ -7,29 +6,16 @@ interface LayoutProps {
 }
 
 export default function Layout({ children }: LayoutProps) {
-  const { user, isLoading, logout } = useAuthStore()
+  const { user, logout } = useAuthStore()
   const navigate = useNavigate()
-
-  useEffect(() => {
-    if (!isLoading && !user) {
-      console.log('Layout: No user found, redirecting to login')
-      navigate('/login')
-    }
-  }, [user, isLoading, navigate])
 
   const handleLogout = async () => {
     await logout()
-    navigate('/login')
+    navigate('/login', { replace: true })
   }
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-gray-500">Cargando...</div>
-      </div>
-    )
-  }
-
+  // ProtectedRoute ya maneja la verificación de usuario
+  // Aquí solo renderizamos el layout
   if (!user) {
     return null
   }
