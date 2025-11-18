@@ -8,7 +8,7 @@ import type { Portfolio } from '../types/portfolio';
 import { Plus, Wallet, Trash2 } from 'lucide-react';
 
 export default function Portfolios() {
-  const { user } = useAuthStore();
+  const { user, isLoading } = useAuthStore();
   const navigate = useNavigate();
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [loading, setLoading] = useState(true);
@@ -16,12 +16,14 @@ export default function Portfolios() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) {
+    if (!isLoading && !user) {
       navigate('/login');
       return;
     }
-    loadPortfolios();
-  }, [user, navigate]);
+    if (user) {
+      loadPortfolios();
+    }
+  }, [user, isLoading, navigate]);
 
   const loadPortfolios = async () => {
     try {
@@ -51,7 +53,7 @@ export default function Portfolios() {
     }
   };
 
-  if (!user) return null;
+  if (isLoading || !user) return null;
 
   return (
     <Layout>

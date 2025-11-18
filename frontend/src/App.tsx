@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
+import { useAuthStore } from './stores/authStore'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Portfolios from './pages/Portfolios'
@@ -9,7 +11,14 @@ import ImportData from './pages/ImportData'
 import UsersCatalog from './pages/UsersCatalog'
 
 function App() {
+  const { checkAuth } = useAuthStore()
+  
   console.log('App component rendering...')
+  
+  useEffect(() => {
+    console.log('App mounted - checking authentication status')
+    checkAuth()
+  }, [])
   
   return (
     <BrowserRouter>
