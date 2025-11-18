@@ -88,10 +88,10 @@ async def login(
     response.set_cookie(
         key="session_id",
         value=session_id,
-        domain=settings.COOKIE_DOMAIN if settings.ENVIRONMENT == "development" else None,
+        domain=None,  # Sin dominio para que funcione en misma IP
         httponly=True,  # No accesible desde JavaScript
         secure=False,   # False para desarrollo HTTP, True para producción HTTPS
-        samesite="none" if settings.ENVIRONMENT == "development" else "lax",  # none permite cross-port en desarrollo
+        samesite="lax",  # lax funciona en HTTP y permite navegación normal
         max_age=86400,  # 24 horas
         path="/",       # Cookie válida para toda la aplicación
     )
@@ -131,9 +131,9 @@ async def logout(
     # Eliminar cookie
     response.delete_cookie(
         key="session_id",
-        domain=settings.COOKIE_DOMAIN if settings.ENVIRONMENT == "development" else None,
+        domain=None,
         path="/",
-        samesite="none" if settings.ENVIRONMENT == "development" else "lax",
+        samesite="lax",
     )
     
     return {"message": "Logout exitoso"}
