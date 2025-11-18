@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { HotTable } from '@handsontable/react-wrapper'
 import { registerAllModules } from 'handsontable/registry'
+import { registerLanguageDictionary, esMX } from 'handsontable/i18n'
 import 'handsontable/dist/handsontable.full.min.css'
 import '../styles/handsontable-custom.css'
 import api from '../services/api'
@@ -8,6 +9,8 @@ import Layout from '../components/Layout'
 
 // Registrar todos los módulos de Handsontable
 registerAllModules()
+// Registrar idioma español
+registerLanguageDictionary(esMX)
 
 interface Asset {
   id: string
