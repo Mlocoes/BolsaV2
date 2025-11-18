@@ -36,12 +36,18 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   checkAuth: async () => {
+    console.log('checkAuth: Starting authentication check...')
     set({ isLoading: true })
     try {
       const user = await authAPI.me()
+      console.log('checkAuth: User authenticated:', user)
       set({ user, isAuthenticated: true, isLoading: false })
     } catch (error) {
+      console.log('checkAuth: No valid session found')
       set({ user: null, isAuthenticated: false, isLoading: false })
     }
   },
 }))
+
+// Inicializar verificación de autenticación al cargar el store
+useAuthStore.getState().checkAuth()

@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
 
@@ -7,15 +6,8 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, isLoading, checkAuth } = useAuthStore()
+  const { user, isLoading } = useAuthStore()
   const location = useLocation()
-
-  useEffect(() => {
-    // Verificar autenticación al montar el componente
-    if (!user && !isLoading) {
-      checkAuth()
-    }
-  }, [user, isLoading, checkAuth])
 
   // Mostrar loading mientras se verifica la autenticación
   if (isLoading) {
@@ -23,7 +15,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <div className="text-gray-500">Cargando...</div>
+          <div className="text-gray-500">Verificando autenticación...</div>
         </div>
       </div>
     )
