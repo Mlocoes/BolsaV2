@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { HotTable } from '@handsontable/react-wrapper'
 import { registerAllModules } from 'handsontable/registry'
 import 'handsontable/dist/handsontable.full.min.css'
+import '../styles/handsontable-custom.css'
 import api from '../services/api'
 import Layout from '../components/Layout'
 
@@ -356,7 +357,7 @@ export default function AssetsCatalog() {
 
         {/* Modal Crear/Editar */}
         {showModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
               <h2 className="text-2xl font-bold mb-4">
                 {editingAsset ? 'Editar Activo' : 'Crear Activo'}
@@ -443,7 +444,7 @@ export default function AssetsCatalog() {
 
         {/* Modal de Importación Histórica */}
         {showImportModal && importingAsset && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
               <h2 className="text-2xl font-bold mb-4">Importar Datos Históricos</h2>
               <p className="text-gray-600 mb-4">
