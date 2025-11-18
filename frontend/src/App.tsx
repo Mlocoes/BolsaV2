@@ -12,7 +12,7 @@ import ImportData from './pages/ImportData'
 import UsersCatalog from './pages/UsersCatalog'
 
 function App() {
-  const { checkAuth } = useAuthStore()
+  const { checkAuth, user } = useAuthStore()
   const [isInitialized, setIsInitialized] = useState(false)
   
   useEffect(() => {
@@ -89,8 +89,8 @@ function App() {
             </ProtectedRoute>
           } 
         />
-        {/* Redirigir cualquier ruta no encontrada al dashboard */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* Redirigir rutas no encontradas según estado de autenticación */}
+        <Route path="*" element={<Navigate to={user ? "/" : "/login"} replace />} />
       </Routes>
     </BrowserRouter>
   )
