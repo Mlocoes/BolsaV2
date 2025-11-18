@@ -3,7 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
     <title>BolsaV2</title>
+    <script>
+      // Forzar el puerto correcto si se accede sin él
+      (function() {
+        const correctPort = '3000';
+        const currentPort = window.location.port;
+        const currentHost = window.location.hostname;
+        
+        // Si no estamos en el puerto correcto (o sin puerto), redirigir
+        if (currentPort !== correctPort && currentHost !== 'localhost' && currentHost !== '127.0.0.1') {
+          const newUrl = window.location.protocol + '//' + currentHost + ':' + correctPort + window.location.pathname + window.location.search + window.location.hash;
+          console.log('Redirecting to correct port:', newUrl);
+          window.location.href = newUrl;
+        }
+      })();
+    </script>
     <style>
       #root:empty::before {
         content: "Loading BolsaV2...";
