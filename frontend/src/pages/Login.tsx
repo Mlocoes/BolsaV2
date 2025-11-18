@@ -12,11 +12,11 @@ export default function Login() {
 
   console.log('Página de inicio de sesión renderizando')
 
-  // Si el usuario ya está autenticado, redirigir al dashboard
+  // Redirigir a dashboard después del login exitoso
   useEffect(() => {
     if (user) {
-      console.log('Usuario ya autenticado, redirigiendo al dashboard')
-      navigate('/', { replace: true })
+      console.log('Usuario autenticado, redirigiendo al dashboard')
+      navigate('/dashboard', { replace: true })
     }
   }, [user, navigate])
 

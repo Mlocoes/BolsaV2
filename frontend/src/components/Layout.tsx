@@ -28,7 +28,7 @@ export default function Layout({ children }: LayoutProps) {
             <h1 className="text-2xl font-bold text-gray-900">BolsaV2</h1>
             <div className="flex space-x-4">
               <button
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/dashboard')}
                 className="text-gray-600 hover:text-gray-900"
               >
                 Panel de Control
