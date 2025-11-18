@@ -16,7 +16,7 @@ export default function Login() {
   useEffect(() => {
     if (user) {
       console.log('Usuario autenticado, redirigiendo al dashboard')
-      navigate('/dashboard', { replace: true })
+      navigate('/', { replace: true })
     }
   }, [user, navigate])
 

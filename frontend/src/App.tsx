@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { useAuthStore } from './stores/authStore'
@@ -12,25 +12,43 @@ import ImportData from './pages/ImportData'
 import UsersCatalog from './pages/UsersCatalogHandsontable'
 
 function App() {
-  const { logout } = useAuthStore()
+  const { checkAuth } = useAuthStore()
+  const [isInitialized, setIsInitialized] = useState(false)
   
   useEffect(() => {
-    console.log('App: Forzando logout al iniciar (F5 o inicio)')
-    // Siempre hacer logout al montar/recargar
-    // Esto limpia cualquier sesión previa
-    logout().catch(() => {
-      // Ignorar errores de logout (puede no haber sesión)
-      console.log('App: No había sesión previa para limpiar')
+    console.log('App: Verificando autenticación...')
+    // Verificar si hay sesión activa al cargar
+    checkAuth().finally(() => {
+      console.log('App: Verificación completada')
+      setIsInitialized(true)
     })
   }, []) // Solo se ejecuta una vez al montar
+  
+  // Mostrar loading mientras verifica la sesión
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="text-gray-500">Cargando aplicación...</div>
+        </div>
+      </div>
+    )
+  }
   
   return (
     <BrowserRouter>
       <Toaster position="top-right" />
       <Routes>
-        {/* Siempre redirigir raíz a login */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
+        <Route 
+          path="/" 
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } 
+        />
         <Route 
           path="/dashboard" 
           element={
