@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
+import { useAuthStore } from './stores/authStore'
 import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
@@ -10,7 +12,29 @@ import ImportData from './pages/ImportData'
 import UsersCatalog from './pages/UsersCatalog'
 
 function App() {
-  console.log('App component rendering...')
+  const { checkAuth } = useAuthStore()
+  const [isInitialized, setIsInitialized] = useState(false)
+  
+  useEffect(() => {
+    console.log('App: Initializing authentication check...')
+    // Verificar autenticación una sola vez al montar la app
+    checkAuth().finally(() => {
+      console.log('App: Authentication check completed')
+      setIsInitialized(true)
+    })
+  }, []) // Solo se ejecuta una vez al montar
+  
+  // Mostrar loading mientras se inicializa
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="text-gray-500">Iniciando aplicación...</div>
+        </div>
+      </div>
+    )
+  }
   
   return (
     <BrowserRouter>

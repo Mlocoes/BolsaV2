@@ -13,7 +13,7 @@ interface AuthState {
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
-  isLoading: true, // Start with loading true to prevent premature redirects
+  isLoading: false, // Empezar en false, App.tsx llamará checkAuth
 
   login: async (username: string, password: string) => {
     console.log('authStore.login called with username:', username)
@@ -48,6 +48,3 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 }))
-
-// Inicializar verificación de autenticación al cargar el store
-useAuthStore.getState().checkAuth()
