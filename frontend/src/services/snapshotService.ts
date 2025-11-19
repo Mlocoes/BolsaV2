@@ -15,14 +15,18 @@ export interface SnapshotPosition {
 
 export interface PortfolioSnapshot {
   id: string;
-  portfolio_id: string;
-  snapshot_date: string;
+  portfolio_id?: string;
+  date: string;
+  snapshot_date?: string;
   total_value: number;
-  total_cost: number;
-  total_profit_loss: number;
-  total_profit_loss_percent: number;
+  total_invested: number;
+  total_cost?: number;
+  total_pnl: number;
+  total_profit_loss?: number;
+  total_pnl_percent: number;
+  total_profit_loss_percent?: number;
   positions: SnapshotPosition[];
-  created_at: string;
+  created_at?: string;
 }
 
 export const snapshotService = {

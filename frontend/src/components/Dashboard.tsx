@@ -222,15 +222,15 @@ export default function Dashboard() {
   const calculateTotals = () => {
     if (selectedSnapshot) {
       return {
-        totalValue: selectedSnapshot.total_value,
-        totalCost: selectedSnapshot.total_cost,
-        totalProfitLoss: selectedSnapshot.total_profit_loss,
-        totalProfitLossPercent: selectedSnapshot.total_profit_loss_percent
+        totalValue: selectedSnapshot.total_value || 0,
+        totalCost: selectedSnapshot.total_invested || selectedSnapshot.total_cost || 0,
+        totalProfitLoss: selectedSnapshot.total_pnl || selectedSnapshot.total_profit_loss || 0,
+        totalProfitLossPercent: selectedSnapshot.total_pnl_percent || selectedSnapshot.total_profit_loss_percent || 0
       };
     }
     
-    const totalValue = positions.reduce((sum, p) => sum + p.current_value, 0);
-    const totalCost = positions.reduce((sum, p) => sum + p.cost_basis, 0);
+    const totalValue = positions.reduce((sum, p) => sum + (p.current_value || 0), 0);
+    const totalCost = positions.reduce((sum, p) => sum + (p.cost_basis || 0), 0);
     const totalProfitLoss = totalValue - totalCost;
     const totalProfitLossPercent = totalCost > 0 ? (totalProfitLoss / totalCost) * 100 : 0;
 
@@ -250,7 +250,8 @@ export default function Dashboard() {
     }).format(value);
   };
 
-  const formatPercent = (value: number) => {
+  const formatPercent = (value: number | undefined) => {
+    if (value === undefined || value === null || isNaN(value)) return '0.00%';
     return value.toFixed(2) + '%';
   };
 
@@ -500,7 +501,7 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-blue-900">
-                      📸 Visualizando snapshot del {new Date(selectedSnapshot.snapshot_date).toLocaleDateString('es-ES', {
+                      📸 Visualizando snapshot del {new Date(selectedSnapshot.date || selectedSnapshot.snapshot_date || '').toLocaleDateString('es-ES', {
                         weekday: 'long',
                         year: 'numeric',
                         month: 'long',
@@ -510,13 +511,15 @@ export default function Dashboard() {
                     <p className="text-xs text-blue-700 mt-1">
                       {selectedSnapshot.positions.length} posiciones | 
                       Valor Total: ${selectedSnapshot.total_value.toLocaleString('es-ES', {minimumFractionDigits: 2})} | 
-                      G/P: ${selectedSnapshot.total_profit_loss.toLocaleString('es-ES', {minimumFractionDigits: 2})} 
-                      ({selectedSnapshot.total_profit_loss_percent >= 0 ? '+' : ''}{selectedSnapshot.total_profit_loss_percent.toFixed(2)}%)
+                      G/P: ${(selectedSnapshot.total_pnl || selectedSnapshot.total_profit_loss || 0).toLocaleString('es-ES', {minimumFractionDigits: 2})} 
+                      ({(selectedSnapshot.total_pnl_percent || selectedSnapshot.total_profit_loss_percent || 0) >= 0 ? '+' : ''}{(selectedSnapshot.total_pnl_percent || selectedSnapshot.total_profit_loss_percent || 0).toFixed(2)}%)
                     </p>
                   </div>
-                  <div className="text-xs text-blue-600">
-                    Creado: {new Date(selectedSnapshot.created_at).toLocaleTimeString('es-ES')}
-                  </div>
+                  {selectedSnapshot.created_at && (
+                    <div className="text-xs text-blue-600">
+                      Creado: {new Date(selectedSnapshot.created_at).toLocaleTimeString('es-ES')}
+                    </div>
+                  )}
                 </div>
               </div>
               <div ref={hotTableRef} />

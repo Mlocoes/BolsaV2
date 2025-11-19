@@ -55,13 +55,13 @@ export default function PortfolioHistory({ portfolioId }: PortfolioHistoryProps)
       
       // Mapear PortfolioSnapshot a Snapshot
       const mappedSnapshots: Snapshot[] = historyResponse.map(s => ({
-        date: s.snapshot_date,
-        total_value: s.total_value,
-        total_invested: s.total_cost,
-        total_pnl: s.total_profit_loss,
-        total_pnl_percent: s.total_profit_loss_percent,
+        date: s.date || s.snapshot_date || '',
+        total_value: s.total_value || 0,
+        total_invested: s.total_invested || s.total_cost || 0,
+        total_pnl: s.total_pnl || s.total_profit_loss || 0,
+        total_pnl_percent: s.total_pnl_percent || s.total_profit_loss_percent || 0,
         daily_pnl_percent: 0, // Calcular si es necesario
-        number_of_positions: s.positions.length
+        number_of_positions: s.positions?.length || 0
       }));
       
       setSnapshots(mappedSnapshots);
@@ -71,10 +71,10 @@ export default function PortfolioHistory({ portfolioId }: PortfolioHistoryProps)
         const latest = mappedSnapshots[0];
         
         setMetrics({
-          period_return: latest.total_pnl_percent,
-          current_value: latest.total_value,
-          total_pnl: latest.total_pnl,
-          total_pnl_percent: latest.total_pnl_percent,
+          period_return: latest.total_pnl_percent || 0,
+          current_value: latest.total_value || 0,
+          total_pnl: latest.total_pnl || 0,
+          total_pnl_percent: latest.total_pnl_percent || 0,
           best_day: { date: '', return_percent: 0 },
           worst_day: { date: '', return_percent: 0 },
           volatility: 0,
