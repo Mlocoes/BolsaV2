@@ -101,11 +101,11 @@ class SnapshotService:
                 select(Quote)
                 .where(
                     and_(
-                        Quote.asset_id == UUID(asset_id),
-                        func.date(Quote.timestamp) <= target_date
+                        Quote.symbol == asset.symbol,
+                        Quote.date <= target_date
                     )
                 )
-                .order_by(desc(Quote.timestamp))
+                .order_by(desc(Quote.date))
                 .limit(1)
             )
             quote = quote_result.scalar_one_or_none()
@@ -114,7 +114,7 @@ class SnapshotService:
                 # No quote available, use average cost
                 current_price = total_cost / quantity if quantity > 0 else Decimal("0")
             else:
-                current_price = quote.close
+                current_price = Decimal(str(quote.close))
             
             avg_buy_price = total_cost / quantity if quantity > 0 else Decimal("0")
             current_value = quantity * current_price
@@ -125,7 +125,7 @@ class SnapshotService:
             
             position_details.append({
                 "asset_id": UUID(asset_id),
-                "ticker": asset.ticker,
+                "ticker": asset.symbol,
                 "asset_name": asset.name,
                 "quantity": quantity,
                 "average_buy_price": avg_buy_price,
