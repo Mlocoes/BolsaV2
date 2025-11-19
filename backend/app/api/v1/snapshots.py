@@ -6,7 +6,7 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query, BackgroundTasks
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
 from app.routes.auth import get_current_user, get_current_admin_user
 from app.db.models import User
@@ -25,7 +25,7 @@ router = APIRouter()
 async def create_snapshot(
     portfolio_id: UUID,
     target_date: date = Query(None, description="Date for snapshot (default: yesterday)"),
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -44,7 +44,7 @@ async def create_snapshot(
         target_date = (datetime.now() - timedelta(days=1)).date()
     
     try:
-        snapshot = await snapshot_service.create_snapshot(
+        snapshot = snapshot_service.create_snapshot(
             db,
             portfolio_id,
             target_date
@@ -79,7 +79,7 @@ async def backfill_snapshots(
     from_date: date = Query(..., description="Start date"),
     to_date: date = Query(None, description="End date (default: yesterday)"),
     background_tasks: BackgroundTasks = None,
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -114,7 +114,7 @@ async def backfill_snapshots(
         )
     
     try:
-        result = await snapshot_service.create_daily_snapshots_for_portfolio(
+        result = snapshot_service.create_daily_snapshots_for_portfolio(
             db,
             portfolio_id,
             from_date,
@@ -147,7 +147,7 @@ async def backfill_snapshots(
 @router.get("/dates/{portfolio_id}")
 async def get_available_dates(
     portfolio_id: UUID,
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -160,7 +160,7 @@ async def get_available_dates(
         from sqlalchemy import select, distinct
         from app.db.models_snapshots import PortfolioSnapshot
         
-        result = await db.execute(
+        result = db.execute(
             select(distinct(PortfolioSnapshot.snapshot_date))
             .where(PortfolioSnapshot.portfolio_id == portfolio_id)
             .order_by(PortfolioSnapshot.snapshot_date.desc())
@@ -186,7 +186,7 @@ async def get_snapshot_history(
     from_date: date = Query(..., description="Start date"),
     to_date: date = Query(None, description="End date (default: today)"),
     include_positions: bool = Query(False, description="Include position details"),
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -207,7 +207,7 @@ async def get_snapshot_history(
         to_date = datetime.now().date()
     
     try:
-        history = await snapshot_service.get_snapshot_history(
+        history = snapshot_service.get_snapshot_history(
             db,
             portfolio_id,
             from_date,
@@ -235,7 +235,7 @@ async def get_snapshot_history(
 async def get_latest_snapshot(
     portfolio_id: UUID,
     include_positions: bool = Query(False),
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -251,7 +251,7 @@ async def get_latest_snapshot(
     try:
         # Get last 1 day of history
         today = datetime.now().date()
-        history = await snapshot_service.get_snapshot_history(
+        history = snapshot_service.get_snapshot_history(
             db,
             portfolio_id,
             today - timedelta(days=30),  # Look back 30 days to find most recent
@@ -284,7 +284,7 @@ async def get_latest_snapshot(
 async def get_performance_metrics(
     portfolio_id: UUID,
     period: str = Query("30d", description="Period: 7d, 30d, 90d, 1y, ytd, all"),
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -314,7 +314,7 @@ async def get_performance_metrics(
         from_date = today - timedelta(days=365 * 3)  # 3 years max
     
     try:
-        history = await snapshot_service.get_snapshot_history(
+        history = snapshot_service.get_snapshot_history(
             db,
             portfolio_id,
             from_date,

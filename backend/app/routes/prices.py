@@ -2,7 +2,7 @@
 Rutas para obtener precios de activos en tiempo real
 """
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 from sqlalchemy import select
 from typing import List, Dict
 from uuid import UUID
@@ -13,10 +13,10 @@ from ..services.finnhub_service import finnhub_service
 router = APIRouter(prefix="/api/prices", tags=["prices"])
 
 @router.get("/{symbol}")
-async def get_asset_price(symbol: str, db: AsyncSession = Depends(get_db)):
+async def get_asset_price(symbol: str, db: Session = Depends(get_db)):
     """Obtener precio actual de un activo por su símbolo"""
     # Buscar el asset en la base de datos
-    result = await db.execute(
+    result = db.execute(
         select(Asset).where(Asset.symbol == symbol.upper())
     )
     asset = result.scalar_one_or_none()
@@ -38,7 +38,7 @@ async def get_asset_price(symbol: str, db: AsyncSession = Depends(get_db)):
     }
 
 @router.get("")
-async def get_multiple_prices(symbols: str, db: AsyncSession = Depends(get_db)):
+async def get_multiple_prices(symbols: str, db: Session = Depends(get_db)):
     """
     Obtener precios de múltiples activos
     Parámetro symbols: lista de símbolos separados por coma (ej: AAPL,GOOGL,BTC)
@@ -46,7 +46,7 @@ async def get_multiple_prices(symbols: str, db: AsyncSession = Depends(get_db)):
     symbol_list = [s.strip().upper() for s in symbols.split(",")]
     
     # Buscar assets en la base de datos
-    result = await db.execute(
+    result = db.execute(
         select(Asset).where(Asset.symbol.in_(symbol_list))
     )
     assets = result.scalars().all()
@@ -70,12 +70,12 @@ async def get_multiple_prices(symbols: str, db: AsyncSession = Depends(get_db)):
     return results
 
 @router.get("/portfolio/{portfolio_id}")
-async def get_portfolio_prices(portfolio_id: UUID, db: AsyncSession = Depends(get_db)):
+async def get_portfolio_prices(portfolio_id: UUID, db: Session = Depends(get_db)):
     """Obtener precios actuales de todos los activos en un portfolio"""
     from ..models.position import Position
     from sqlalchemy.orm import selectinload
     
-    result = await db.execute(
+    result = db.execute(
         select(Position).options(
             selectinload(Position.asset)
         ).where(

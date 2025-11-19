@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 from sqlalchemy import select
 from typing import List
 from uuid import UUID
@@ -13,20 +13,20 @@ router = APIRouter(prefix="/api/assets", tags=["assets"])
 async def list_assets(
     skip: int = 0,
     limit: int = 100,
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     """Listar todos los assets disponibles"""
-    result = await db.execute(select(Asset).offset(skip).limit(limit))
+    result = db.execute(select(Asset).offset(skip).limit(limit))
     assets = result.scalars().all()
     return assets
 
 @router.get("/search", response_model=List[AssetResponse])
 async def search_assets(
     q: str,
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     """Buscar assets por símbolo o nombre"""
-    result = await db.execute(
+    result = db.execute(
         select(Asset).where(
             (Asset.symbol.ilike(f"%{q}%")) | (Asset.name.ilike(f"%{q}%"))
         ).limit(20)
@@ -37,11 +37,11 @@ async def search_assets(
 @router.post("", response_model=AssetResponse, status_code=status.HTTP_201_CREATED)
 async def create_asset(
     asset: AssetCreate,
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     """Crear un nuevo activo"""
     # Verificar si ya existe
-    result = await db.execute(select(Asset).where(Asset.symbol == asset.symbol))
+    result = db.execute(select(Asset).where(Asset.symbol == asset.symbol))
     existing = result.scalar_one_or_none()
     if existing:
         raise HTTPException(
@@ -51,17 +51,17 @@ async def create_asset(
     
     db_asset = Asset(**asset.dict())
     db.add(db_asset)
-    await db.commit()
-    await db.refresh(db_asset)
+    db.commit()
+    db.refresh(db_asset)
     return db_asset
 
 @router.get("/{asset_id}", response_model=AssetResponse)
 async def get_asset(
     asset_id: UUID,
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     """Obtener un activo específico"""
-    result = await db.execute(select(Asset).where(Asset.id == asset_id))
+    result = db.execute(select(Asset).where(Asset.id == asset_id))
     asset = result.scalar_one_or_none()
     if not asset:
         raise HTTPException(

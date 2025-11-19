@@ -26,7 +26,7 @@ def _get_database_url() -> str:
     db_host = os.getenv("DB_HOST", "db")
     db_port = os.getenv("DB_PORT", "5432")
     
-    return f"postgresql+asyncpg://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+    return f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
 
 class Settings(BaseSettings):
     APP_NAME: str = "BolsaV2"

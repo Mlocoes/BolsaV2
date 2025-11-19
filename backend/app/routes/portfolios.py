@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from typing import List
@@ -19,10 +19,10 @@ router = APIRouter(prefix="/api/portfolios", tags=["portfolios"])
 @router.get("", response_model=List[PortfolioResponse])
 async def list_portfolios(
     user: dict = Depends(require_auth),
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     """Listar todos los portfolios del usuario actual"""
-    result = await db.execute(
+    result = db.execute(
         select(Portfolio).where(Portfolio.user_id == UUID(user["user_id"]))
     )
     portfolios = result.scalars().all()
@@ -32,7 +32,7 @@ async def list_portfolios(
 async def create_portfolio(
     portfolio: PortfolioCreate,
     user: dict = Depends(require_auth),
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     """Crear un nuevo portfolio"""
     db_portfolio = Portfolio(
@@ -40,19 +40,19 @@ async def create_portfolio(
         user_id=UUID(user["user_id"])
     )
     db.add(db_portfolio)
-    await db.commit()
-    await db.refresh(db_portfolio)
+    db.commit()
+    db.refresh(db_portfolio)
     return db_portfolio
 
 @router.get("/{portfolio_id}", response_model=PortfolioDetail)
 async def get_portfolio(
     portfolio_id: UUID,
     user: dict = Depends(require_auth),
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     """Obtener una cartera específica con sus posiciones"""
     # Cargar posiciones y activos asociados en una sola consulta
-    result = await db.execute(
+    result = db.execute(
         select(Portfolio).options(
             selectinload(Portfolio.positions)
         ).where(
@@ -75,10 +75,10 @@ async def update_portfolio(
     portfolio_id: UUID,
     portfolio_update: PortfolioUpdate,
     user: dict = Depends(require_auth),
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     """Actualizar una cartera"""
-    result = await db.execute(
+    result = db.execute(
         select(Portfolio).where(
             Portfolio.id == portfolio_id,
             Portfolio.user_id == UUID(user["user_id"])
@@ -96,18 +96,18 @@ async def update_portfolio(
     for field, value in update_data.items():
         setattr(db_portfolio, field, value)
     
-    await db.commit()
-    await db.refresh(db_portfolio)
+    db.commit()
+    db.refresh(db_portfolio)
     return db_portfolio
 
 @router.delete("/{portfolio_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_portfolio(
     portfolio_id: UUID,
     user: dict = Depends(require_auth),
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     """Eliminar una cartera"""
-    result = await db.execute(
+    result = db.execute(
         select(Portfolio).where(
             Portfolio.id == portfolio_id,
             Portfolio.user_id == UUID(user["user_id"])
@@ -121,6 +121,6 @@ async def delete_portfolio(
             detail="Cartera no encontrada"
         )
     
-    await db.delete(db_portfolio)
-    await db.commit()
+    db.delete(db_portfolio)
+    db.commit()
     return None

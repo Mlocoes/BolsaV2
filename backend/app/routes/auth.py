@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 from sqlalchemy import select
 from datetime import datetime
 from typing import Optional
@@ -48,7 +48,7 @@ class RegisterRequest(BaseModel):
 async def login(
     response: Response,
     form_data: OAuth2PasswordRequestForm = Depends(),
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     """
     Login con sesión en cookie HttpOnly
@@ -62,7 +62,7 @@ async def login(
         LoginResponse con datos del usuario
     """
     # Buscar usuario
-    result = await db.execute(
+    result = db.execute(
         select(Usuario).where(Usuario.username == form_data.username)
     )
     user = result.scalar_one_or_none()
@@ -81,7 +81,7 @@ async def login(
     
     # Actualizar último login
     user.last_login_at = datetime.utcnow()
-    await db.commit()
+    db.commit()
     
     # Crear sesión en Redis
     session_id = await session_manager.create_session(
@@ -151,7 +151,7 @@ async def logout(
 @router.get("/me", response_model=UserResponse)
 async def get_current_user(
     user: dict = Depends(require_auth),
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     """
     Obtener usuario actual desde sesión
@@ -164,7 +164,7 @@ async def get_current_user(
         UserResponse con datos actualizados
     """
     # Obtener usuario actualizado de la BD
-    result = await db.execute(
+    result = db.execute(
         select(Usuario).where(Usuario.id == UUID(user["user_id"]))
     )
     db_user = result.scalar_one_or_none()
@@ -180,7 +180,7 @@ async def get_current_user(
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def register(
     user_data: UserCreate,
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     """
     Registrar nuevo usuario
@@ -193,7 +193,7 @@ async def register(
         UserResponse con datos del usuario creado
     """
     # Verificar si el usuario ya existe
-    result = await db.execute(
+    result = db.execute(
         select(Usuario).where(
             (Usuario.username == user_data.username) | (Usuario.email == user_data.email)
         )
@@ -215,8 +215,9 @@ async def register(
     )
     
     db.add(new_user)
-    await db.commit()
-    await db.refresh(new_user)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
     
     return new_user
 

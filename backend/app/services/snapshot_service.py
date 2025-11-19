@@ -7,7 +7,7 @@ from typing import Dict, List, Optional
 from uuid import UUID
 
 from sqlalchemy import select, and_, desc, func
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
 from app.db.models import Portfolio, Operation, Asset, Quote, OperationSide
 from app.db.models_snapshots import PortfolioSnapshot, PositionSnapshot, SnapshotMetrics
@@ -17,8 +17,8 @@ class SnapshotService:
     """Service for creating and managing portfolio snapshots"""
 
     @staticmethod
-    async def calculate_portfolio_state(
-        db: AsyncSession,
+    def calculate_portfolio_state(
+        db: Session,
         portfolio_id: UUID,
         target_date: date
     ) -> Dict:
@@ -34,7 +34,7 @@ class SnapshotService:
             Dictionary with portfolio state
         """
         # Get all operations up to target date
-        result = await db.execute(
+        result = db.execute(
             select(Operation, Asset)
             .join(Asset, Operation.asset_id == Asset.id)
             .where(
@@ -97,7 +97,7 @@ class SnapshotService:
             total_cost = pos_data["total_cost"]
             
             # Get quote for target date or most recent before
-            quote_result = await db.execute(
+            quote_result = db.execute(
                 select(Quote)
                 .where(
                     and_(
@@ -153,8 +153,8 @@ class SnapshotService:
         }
 
     @staticmethod
-    async def create_snapshot(
-        db: AsyncSession,
+    def create_snapshot(
+        db: Session,
         portfolio_id: UUID,
         target_date: date
     ) -> PortfolioSnapshot:
@@ -170,7 +170,7 @@ class SnapshotService:
             Created PortfolioSnapshot
         """
         # Check if snapshot already exists
-        existing = await db.execute(
+        existing = db.execute(
             select(PortfolioSnapshot).where(
                 and_(
                     PortfolioSnapshot.portfolio_id == portfolio_id,
@@ -183,12 +183,12 @@ class SnapshotService:
             raise ValueError(f"Snapshot already exists for {target_date}")
 
         # Calculate portfolio state
-        state = await SnapshotService.calculate_portfolio_state(
+        state = SnapshotService.calculate_portfolio_state(
             db, portfolio_id, target_date
         )
 
         # Get previous snapshot for daily change
-        prev_snapshot = await db.execute(
+        prev_snapshot = db.execute(
             select(PortfolioSnapshot)
             .where(
                 and_(
@@ -224,12 +224,12 @@ class SnapshotService:
         )
         
         db.add(portfolio_snapshot)
-        await db.flush()
+        db.flush()
 
         # Create position snapshots
         for position in state["positions"]:
             # Get previous position for daily change
-            prev_position_result = await db.execute(
+            prev_position_result = db.execute(
                 select(PositionSnapshot)
                 .join(PortfolioSnapshot)
                 .where(
@@ -277,14 +277,14 @@ class SnapshotService:
             
             db.add(position_snapshot)
 
-        await db.commit()
-        await db.refresh(portfolio_snapshot)
+        db.commit()
+        db.refresh(portfolio_snapshot)
 
         return portfolio_snapshot
 
     @staticmethod
-    async def create_daily_snapshots_for_portfolio(
-        db: AsyncSession,
+    def create_daily_snapshots_for_portfolio(
+        db: Session,
         portfolio_id: UUID,
         from_date: date,
         to_date: date
@@ -308,7 +308,7 @@ class SnapshotService:
         current_date = from_date
         while current_date <= to_date:
             try:
-                await SnapshotService.create_snapshot(db, portfolio_id, current_date)
+                SnapshotService.create_snapshot(db, portfolio_id, current_date)
                 created += 1
             except ValueError as e:
                 # Snapshot already exists
@@ -329,8 +329,8 @@ class SnapshotService:
         }
 
     @staticmethod
-    async def get_snapshot_history(
-        db: AsyncSession,
+    def get_snapshot_history(
+        db: Session,
         portfolio_id: UUID,
         from_date: date,
         to_date: date,
@@ -350,7 +350,7 @@ class SnapshotService:
             List of snapshots
         """
         # Get snapshots
-        result = await db.execute(
+        result = db.execute(
             select(PortfolioSnapshot)
             .where(
                 and_(
@@ -380,7 +380,7 @@ class SnapshotService:
 
             if include_positions:
                 # Get positions for this snapshot
-                positions_result = await db.execute(
+                positions_result = db.execute(
                     select(PositionSnapshot, Asset)
                     .join(Asset, PositionSnapshot.asset_id == Asset.id)
                     .where(PositionSnapshot.portfolio_snapshot_id == snapshot.id)

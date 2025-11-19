@@ -6,8 +6,8 @@ import logging
 from datetime import date, datetime, time, timedelta
 
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, Session
 
 from app.core.config import settings
 from app.db.models import Portfolio
@@ -33,19 +33,19 @@ class SnapshotScheduler:
         self.run_time = run_time
         self.is_running = False
         self.engine = None
-        self.AsyncSessionLocal = None
+        self.SessionLocal = None
         
-    async def initialize(self):
+    def initialize(self):
         """Initialize database connection"""
-        self.engine = create_async_engine(
+        self.engine = create_engine(
             settings.DATABASE_URL,
             echo=False,
             pool_pre_ping=True
         )
         
-        self.AsyncSessionLocal = sessionmaker(
+        self.SessionLocal = sessionmaker(
             self.engine,
-            class_=AsyncSession,
+            class_=Session,
             expire_on_commit=False
         )
         
@@ -58,7 +58,7 @@ class SnapshotScheduler:
         Args:
             target_date: Date to create snapshots for (default: yesterday)
         """
-        if not self.AsyncSessionLocal:
+        if not self.SessionLocal:
             logger.error("Scheduler not initialized")
             return
         
@@ -66,10 +66,10 @@ class SnapshotScheduler:
             # Use yesterday (market close)
             target_date = (datetime.now() - timedelta(days=1)).date()
 
-        async with self.AsyncSessionLocal() as session:
+        with self.SessionLocal() as session:
             try:
                 # Get all active portfolios
-                result = await session.execute(select(Portfolio))
+                result = session.execute(select(Portfolio))
                 portfolios = result.scalars().all()
                 
                 if not portfolios:
@@ -87,7 +87,7 @@ class SnapshotScheduler:
 
                 for portfolio in portfolios:
                     try:
-                        await snapshot_service.create_snapshot(
+                        snapshot_service.create_snapshot(
                             session,
                             portfolio.id,
                             target_date
@@ -144,7 +144,7 @@ class SnapshotScheduler:
         
         This method runs indefinitely and creates snapshots daily
         """
-        await self.initialize()
+        self.initialize()
         self.is_running = True
         
         logger.info(
@@ -171,7 +171,7 @@ class SnapshotScheduler:
         self.is_running = False
         
         if self.engine:
-            await self.engine.dispose()
+            self.engine.dispose()
     
     async def run_now(self, target_date: date = None):
         """
@@ -197,8 +197,8 @@ class SnapshotScheduler:
             from_date: Start date (None = 30 days ago)
             to_date: End date (None = yesterday)
         """
-        if not self.AsyncSessionLocal:
-            await self.initialize()
+        if not self.SessionLocal:
+            self.initialize()
 
         if not from_date:
             from_date = (datetime.now() - timedelta(days=30)).date()
@@ -206,7 +206,7 @@ class SnapshotScheduler:
         if not to_date:
             to_date = (datetime.now() - timedelta(days=1)).date()
 
-        async with self.AsyncSessionLocal() as session:
+        with self.SessionLocal() as session:
             if portfolio_id:
                 # Backfill specific portfolio
                 logger.info(
@@ -214,7 +214,7 @@ class SnapshotScheduler:
                     f"from {from_date} to {to_date}"
                 )
                 
-                result = await snapshot_service.create_daily_snapshots_for_portfolio(
+                result = snapshot_service.create_daily_snapshots_for_portfolio(
                     session,
                     portfolio_id,
                     from_date,
@@ -228,7 +228,7 @@ class SnapshotScheduler:
                 
             else:
                 # Backfill all portfolios
-                result = await session.execute(select(Portfolio))
+                result = session.execute(select(Portfolio))
                 portfolios = result.scalars().all()
                 
                 logger.info(
@@ -240,7 +240,7 @@ class SnapshotScheduler:
                 total_skipped = 0
                 
                 for portfolio in portfolios:
-                    result = await snapshot_service.create_daily_snapshots_for_portfolio(
+                    result = snapshot_service.create_daily_snapshots_for_portfolio(
                         session,
                         portfolio.id,
                         from_date,
