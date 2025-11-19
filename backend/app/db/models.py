@@ -64,7 +64,7 @@ class Portfolio(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
 class Operation(Base):
-    __tablename__ = "operations"
+    __tablename__ = "transactions"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     portfolio_id = Column(UUID(as_uuid=True), ForeignKey("portfolios.id"))
     date = Column(DateTime(timezone=True), nullable=False)
