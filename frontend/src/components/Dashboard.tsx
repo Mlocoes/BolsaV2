@@ -141,9 +141,14 @@ export default function Dashboard() {
           type: 'numeric', 
           readOnly: true, 
           numericFormat: { pattern: '$0,0.00' },
-          className: (row: number, col: number) => {
-            const value = data[row]?.profit_loss || 0;
-            return value >= 0 ? 'htPositive' : 'htNegative';
+          renderer: function(instance: any, td: HTMLTableCellElement, row: number, col: number, prop: any, value: any, cellProperties: any) {
+            Handsontable.renderers.NumericRenderer.apply(this, [instance, td, row, col, prop, value, cellProperties]);
+            if (value >= 0) {
+              td.classList.add('htPositive');
+            } else {
+              td.classList.add('htNegative');
+            }
+            return td;
           }
         },
         { 
@@ -151,9 +156,14 @@ export default function Dashboard() {
           type: 'numeric', 
           readOnly: true, 
           numericFormat: { pattern: '0.00%' },
-          className: (row: number, col: number) => {
-            const value = data[row]?.profit_loss_percent || 0;
-            return value >= 0 ? 'htPositive' : 'htNegative';
+          renderer: function(instance: any, td: HTMLTableCellElement, row: number, col: number, prop: any, value: any, cellProperties: any) {
+            Handsontable.renderers.NumericRenderer.apply(this, [instance, td, row, col, prop, value, cellProperties]);
+            if (value >= 0) {
+              td.classList.add('htPositive');
+            } else {
+              td.classList.add('htNegative');
+            }
+            return td;
           }
         }
       ],
@@ -418,7 +428,7 @@ export default function Dashboard() {
             </div>
             <div className="p-6">
               <PortfolioDistributionChart 
-                positions={selectedSnapshot ? selectedSnapshot.positions : positions} 
+                positions={selectedSnapshot ? selectedSnapshot.positions.map(p => ({...p, position_id: '', asset_id: '', change_percent: 0})) : positions} 
               />
             </div>
           </div>
@@ -431,7 +441,7 @@ export default function Dashboard() {
             </div>
             <div className="p-6">
               <PerformanceChart 
-                positions={selectedSnapshot ? selectedSnapshot.positions : positions} 
+                positions={selectedSnapshot ? selectedSnapshot.positions.map(p => ({...p, position_id: '', asset_id: '', change_percent: 0})) : positions} 
               />
             </div>
           </div>

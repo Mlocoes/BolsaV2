@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { snapshotsAPI } from '@/services/api'
+import { snapshotService } from '../services/snapshotService'
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { TrendingUp, TrendingDown, Calendar, BarChart3, RefreshCw } from 'lucide-react'
 import { toast } from 'react-hot-toast'
@@ -50,21 +50,40 @@ export default function PortfolioHistory({ portfolioId }: PortfolioHistoryProps)
   const loadHistory = async () => {
     setIsLoading(true)
     try {
-      // Calculate date range
-      const toDate = new Date()
-      const fromDate = calculateFromDate(period)
-
       // Load snapshots
-      const [historyResponse, metricsResponse] = await Promise.all([
-        snapshotsAPI.getHistory(portfolioId, fromDate.toISOString().split('T')[0], toDate.toISOString().split('T')[0]),
-        snapshotsAPI.getPerformance(portfolioId, period)
-      ])
-
-      setSnapshots(historyResponse.snapshots)
-      setMetrics(metricsResponse.metrics)
+      const historyResponse = await snapshotService.getHistory(portfolioId);
+      
+      // Mapear PortfolioSnapshot a Snapshot
+      const mappedSnapshots: Snapshot[] = historyResponse.map(s => ({
+        date: s.snapshot_date,
+        total_value: s.total_value,
+        total_invested: s.total_cost,
+        total_pnl: s.total_profit_loss,
+        total_pnl_percent: s.total_profit_loss_percent,
+        daily_pnl_percent: 0, // Calcular si es necesario
+        number_of_positions: s.positions.length
+      }));
+      
+      setSnapshots(mappedSnapshots);
+      
+      // Calcular métricas básicas
+      if (mappedSnapshots.length > 0) {
+        const latest = mappedSnapshots[0];
+        
+        setMetrics({
+          period_return: latest.total_pnl_percent,
+          current_value: latest.total_value,
+          total_pnl: latest.total_pnl,
+          total_pnl_percent: latest.total_pnl_percent,
+          best_day: { date: '', return_percent: 0 },
+          worst_day: { date: '', return_percent: 0 },
+          volatility: 0,
+          number_of_days: mappedSnapshots.length
+        });
+      }
     } catch (error: any) {
       if (error.response?.status === 404) {
-        toast.error('No historical data available. Run backfill to generate snapshots.')
+        toast.error('No historical data available. Create a snapshot first.')
       } else {
         toast.error('Failed to load portfolio history')
       }
@@ -73,7 +92,7 @@ export default function PortfolioHistory({ portfolioId }: PortfolioHistoryProps)
     }
   }
 
-  const calculateFromDate = (period: string): Date => {
+  /* const calculateFromDate = (period: string): Date => {
     const today = new Date()
     switch (period) {
       case '7d':
@@ -89,9 +108,14 @@ export default function PortfolioHistory({ portfolioId }: PortfolioHistoryProps)
       default:
         return new Date(today.setFullYear(today.getFullYear() - 3))
     }
-  }
+  } */
 
   const handleBackfill = async () => {
+    setIsBackfilling(true);
+    toast.error('Backfill feature coming soon');
+    setIsBackfilling(false);
+    return;
+    /*
     const fromDate = calculateFromDate(period).toISOString().split('T')[0]
     const toDate = new Date().toISOString().split('T')[0]
 
@@ -101,10 +125,10 @@ export default function PortfolioHistory({ portfolioId }: PortfolioHistoryProps)
     const toastId = toast.loading('Creating historical snapshots...')
 
     try {
-      const response = await snapshotsAPI.backfill(portfolioId, fromDate, toDate)
+      const response = await snapshotService.createSnapshot(portfolioId)
       
       toast.success(
-        `Backfill complete: ${response.created} snapshots created`,
+        `Snapshot created`,
         { id: toastId, duration: 5000 }
       )
 
@@ -115,6 +139,7 @@ export default function PortfolioHistory({ portfolioId }: PortfolioHistoryProps)
     } finally {
       setIsBackfilling(false)
     }
+    */
   }
 
   const formatCurrency = (value: number) => {
