@@ -2,20 +2,24 @@
 Rutas para obtener precios de activos en tiempo real
 """
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from typing import List, Dict
 from uuid import UUID
-from ..core.database import get_db
+from ..db.session import get_db
 from ..models.asset import Asset
 from ..services.finnhub_service import finnhub_service
 
 router = APIRouter(prefix="/api/prices", tags=["prices"])
 
 @router.get("/{symbol}")
-async def get_asset_price(symbol: str, db: Session = Depends(get_db)):
+async def get_asset_price(symbol: str, db: AsyncSession = Depends(get_db)):
     """Obtener precio actual de un activo por su símbolo"""
     # Buscar el asset en la base de datos
-    asset = db.query(Asset).filter(Asset.symbol == symbol.upper()).first()
+    result = await db.execute(
+        select(Asset).where(Asset.symbol == symbol.upper())
+    )
+    asset = result.scalar_one_or_none()
     if not asset:
         raise HTTPException(status_code=404, detail="Asset no encontrado")
     
@@ -34,7 +38,7 @@ async def get_asset_price(symbol: str, db: Session = Depends(get_db)):
     }
 
 @router.get("")
-async def get_multiple_prices(symbols: str, db: Session = Depends(get_db)):
+async def get_multiple_prices(symbols: str, db: AsyncSession = Depends(get_db)):
     """
     Obtener precios de múltiples activos
     Parámetro symbols: lista de símbolos separados por coma (ej: AAPL,GOOGL,BTC)
@@ -42,7 +46,10 @@ async def get_multiple_prices(symbols: str, db: Session = Depends(get_db)):
     symbol_list = [s.strip().upper() for s in symbols.split(",")]
     
     # Buscar assets en la base de datos
-    assets = db.query(Asset).filter(Asset.symbol.in_(symbol_list)).all()
+    result = await db.execute(
+        select(Asset).where(Asset.symbol.in_(symbol_list))
+    )
+    assets = result.scalars().all()
     
     if not assets:
         raise HTTPException(status_code=404, detail="No se encontraron assets")
@@ -63,14 +70,20 @@ async def get_multiple_prices(symbols: str, db: Session = Depends(get_db)):
     return results
 
 @router.get("/portfolio/{portfolio_id}")
-async def get_portfolio_prices(portfolio_id: UUID, db: Session = Depends(get_db)):
+async def get_portfolio_prices(portfolio_id: UUID, db: AsyncSession = Depends(get_db)):
     """Obtener precios actuales de todos los activos en un portfolio"""
     from ..models.position import Position
+    from sqlalchemy.orm import selectinload
     
-    positions = db.query(Position).filter(
-        Position.portfolio_id == portfolio_id,
-        Position.quantity > 0
-    ).all()
+    result = await db.execute(
+        select(Position).options(
+            selectinload(Position.asset)
+        ).where(
+            Position.portfolio_id == portfolio_id,
+            Position.quantity > 0
+        )
+    )
+    positions = result.scalars().all()
     
     if not positions:
         return []

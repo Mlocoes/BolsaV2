@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from datetime import datetime
 from typing import Optional
 from uuid import UUID
-from ..core.database import get_db
-from ..core.security import verify_password, hash_password
+from ..db.session import get_db
+from ..core.auth import verify_password, get_password_hash
 from ..core.session import session_manager
 from ..core.middleware import require_auth, optional_auth
 from ..models.usuario import Usuario
@@ -27,6 +28,12 @@ class UserResponse(BaseModel):
     def serialize_id(self, value: UUID) -> str:
         return str(value)
 
+
+class UserCreate(BaseModel):
+    username: str
+    email: EmailStr
+    password: str
+
 class LoginResponse(BaseModel):
     message: str
     user: UserResponse
@@ -41,7 +48,7 @@ class RegisterRequest(BaseModel):
 async def login(
     response: Response,
     form_data: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Login con sesión en cookie HttpOnly
@@ -55,7 +62,10 @@ async def login(
         LoginResponse con datos del usuario
     """
     # Buscar usuario
-    user = db.query(Usuario).filter(Usuario.username == form_data.username).first()
+    result = await db.execute(
+        select(Usuario).where(Usuario.username == form_data.username)
+    )
+    user = result.scalar_one_or_none()
     
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
@@ -71,7 +81,7 @@ async def login(
     
     # Actualizar último login
     user.last_login_at = datetime.utcnow()
-    db.commit()
+    await db.commit()
     
     # Crear sesión en Redis
     session_id = await session_manager.create_session(
@@ -141,7 +151,7 @@ async def logout(
 @router.get("/me", response_model=UserResponse)
 async def get_current_user(
     user: dict = Depends(require_auth),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Obtener usuario actual desde sesión
@@ -154,7 +164,10 @@ async def get_current_user(
         UserResponse con datos actualizados
     """
     # Obtener usuario actualizado de la BD
-    db_user = db.query(Usuario).filter(Usuario.id == UUID(user["user_id"])).first()
+    result = await db.execute(
+        select(Usuario).where(Usuario.id == UUID(user["user_id"]))
+    )
+    db_user = result.scalar_one_or_none()
     
     if not db_user:
         raise HTTPException(
@@ -166,8 +179,8 @@ async def get_current_user(
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def register(
-    user_data: RegisterRequest,
-    db: Session = Depends(get_db)
+    user_data: UserCreate,
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Registrar nuevo usuario
@@ -180,9 +193,12 @@ async def register(
         UserResponse con datos del usuario creado
     """
     # Verificar si el usuario ya existe
-    existing_user = db.query(Usuario).filter(
-        (Usuario.username == user_data.username) | (Usuario.email == user_data.email)
-    ).first()
+    result = await db.execute(
+        select(Usuario).where(
+            (Usuario.username == user_data.username) | (Usuario.email == user_data.email)
+        )
+    )
+    existing_user = result.scalar_one_or_none()
     
     if existing_user:
         raise HTTPException(
@@ -194,12 +210,35 @@ async def register(
     new_user = Usuario(
         username=user_data.username,
         email=user_data.email,
-        hashed_password=hash_password(user_data.password),
+        hashed_password=get_password_hash(user_data.password),
         is_active=True
     )
     
     db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
+    await db.commit()
+    await db.refresh(new_user)
     
     return new_user
+
+
+async def get_current_admin_user(
+    current_user: Usuario = Depends(get_current_user)
+):
+    """
+    Verificar que el usuario actual es administrador
+    
+    Args:
+        current_user: Usuario actual
+    
+    Returns:
+        Usuario si es admin
+        
+    Raises:
+        HTTPException: Si el usuario no es admin
+    """
+    if not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Se requieren privilegios de administrador"
+        )
+    return current_user

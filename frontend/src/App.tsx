@@ -20,6 +20,12 @@ function App() {
     logout().catch(() => {
       // Ignorar errores si no hay sesión
     })
+    
+    // Forzar navegación a login SIN cambiar la URL completa
+    // Solo si no estamos ya en login
+    if (window.location.pathname !== '/login') {
+      window.history.replaceState(null, '', '/login')
+    }
   }, [])
   
   return (

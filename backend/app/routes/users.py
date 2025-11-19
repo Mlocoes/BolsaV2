@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from typing import List
 from uuid import UUID
 from datetime import datetime
 
-from ..core.database import get_db
+from ..db.session import get_db
 from ..core.middleware import require_auth
 from ..models.usuario import Usuario
 from pydantic import BaseModel, EmailStr, field_validator
@@ -46,35 +47,38 @@ class UserUpdate(BaseModel):
 # Endpoints
 @router.get("", response_model=List[UserResponse])
 async def list_users(
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     user: dict = Depends(require_auth)
 ):
     """
     Listar todos los usuarios (solo admin)
     """
     # Verificar si el usuario es admin
-    current_user = db.query(Usuario).filter(Usuario.id == UUID(user["user_id"])).first()
+    result = await db.execute(select(Usuario).where(Usuario.id == UUID(user["user_id"])))
+    current_user = result.scalar_one_or_none()
     if not current_user or not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Solo los administradores pueden listar usuarios"
         )
     
-    users = db.query(Usuario).all()
+    result = await db.execute(select(Usuario))
+    users = result.scalars().all()
     return users
 
 
 @router.get("/{user_id}", response_model=UserResponse)
 async def get_user(
     user_id: UUID,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     user: dict = Depends(require_auth)
 ):
     """
     Obtener un usuario por ID (solo admin o el mismo usuario)
     """
     current_user_id = UUID(user["user_id"])
-    current_user = db.query(Usuario).filter(Usuario.id == current_user_id).first()
+    result = await db.execute(select(Usuario).where(Usuario.id == current_user_id))
+    current_user = result.scalar_one_or_none()
     
     # Solo admin puede ver otros usuarios
     if str(current_user_id) != str(user_id) and not current_user.is_admin:
@@ -83,7 +87,8 @@ async def get_user(
             detail="Acceso denegado"
         )
     
-    target_user = db.query(Usuario).filter(Usuario.id == user_id).first()
+    result = await db.execute(select(Usuario).where(Usuario.id == user_id))
+    target_user = result.scalar_one_or_none()
     if not target_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -97,14 +102,15 @@ async def get_user(
 async def update_user(
     user_id: UUID,
     user_update: UserUpdate,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     user: dict = Depends(require_auth)
 ):
     """
     Actualizar un usuario (solo admin)
     """
     # Verificar si el usuario actual es admin
-    current_user = db.query(Usuario).filter(Usuario.id == UUID(user["user_id"])).first()
+    result = await db.execute(select(Usuario).where(Usuario.id == UUID(user["user_id"])))
+    current_user = result.scalar_one_or_none()
     if not current_user or not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -112,7 +118,8 @@ async def update_user(
         )
     
     # Buscar usuario a actualizar
-    target_user = db.query(Usuario).filter(Usuario.id == user_id).first()
+    result = await db.execute(select(Usuario).where(Usuario.id == user_id))
+    target_user = result.scalar_one_or_none()
     if not target_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -125,8 +132,8 @@ async def update_user(
     if user_update.is_admin is not None:
         target_user.is_admin = user_update.is_admin
     
-    db.commit()
-    db.refresh(target_user)
+    await db.commit()
+    await db.refresh(target_user)
     
     return target_user
 
@@ -134,7 +141,7 @@ async def update_user(
 @router.delete("/{user_id}")
 async def delete_user(
     user_id: UUID,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     user: dict = Depends(require_auth)
 ):
     """
@@ -143,7 +150,8 @@ async def delete_user(
     """
     # Verificar si el usuario actual es admin
     current_user_id = UUID(user["user_id"])
-    current_user = db.query(Usuario).filter(Usuario.id == current_user_id).first()
+    result = await db.execute(select(Usuario).where(Usuario.id == current_user_id))
+    current_user = result.scalar_one_or_none()
     
     if not current_user or not current_user.is_admin:
         raise HTTPException(
@@ -159,14 +167,15 @@ async def delete_user(
         )
     
     # Buscar usuario a eliminar
-    target_user = db.query(Usuario).filter(Usuario.id == user_id).first()
+    result = await db.execute(select(Usuario).where(Usuario.id == user_id))
+    target_user = result.scalar_one_or_none()
     if not target_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Usuario no encontrado"
         )
     
-    db.delete(target_user)
-    db.commit()
+    await db.delete(target_user)
+    await db.commit()
     
     return {"message": "Usuario eliminado correctamente"}

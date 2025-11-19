@@ -7,6 +7,8 @@ from app.core.config import settings
 from app.core.session import session_manager
 from app.routes import auth, portfolios, transactions, assets, prices, worker, quotes, import_export, users
 from app.services.quote_scheduler import quote_scheduler
+# from app.services.snapshot_scheduler import snapshot_scheduler
+from app.api.v1 import snapshots
 
 app = FastAPI(
     title="BolsaV2",
@@ -55,13 +57,24 @@ async def startup_event():
         print("✓ Quote scheduler iniciado")
     except Exception as e:
         print(f"⚠ Warning: Quote scheduler no pudo iniciar: {e}")
+    
+    # Iniciar scheduler de snapshots
+    # try:
+    #     import asyncio
+    #     asyncio.create_task(snapshot_scheduler.run())
+    #     print("✓ Snapshot scheduler iniciado")
+    # except Exception as e:
+    #     print(f"⚠ Warning: Snapshot scheduler no pudo iniciar: {e}")
 
 @app.on_event("shutdown")
 async def shutdown_event():
     """Cerrar conexiones y servicios al apagar"""
-    # Detener scheduler
+    # Detener schedulers
     quote_scheduler.stop()
     print("✓ Quote scheduler detenido")
+    
+    # await snapshot_scheduler.stop()
+    # print("✓ Snapshot scheduler detenido")
     
     await session_manager.disconnect()
     print("✓ Session manager desconectado")
@@ -70,7 +83,13 @@ async def shutdown_event():
 # Permite conexiones desde cualquier IP en la red local
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"http://(localhost|127\.0\.0\.1|192\.168\.\d{1,3}\.\d{1,3})(:\d+)?",
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://192.168.0.8:3000",
+        "http://192.168.0.8:8000",
+    ],
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1|192\.168\.\d{1,3}\.\d{1,3})(:\d+)?",
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=[
@@ -82,7 +101,7 @@ app.add_middleware(
         "X-Requested-With",
         "X-Session-ID",
     ],
-    expose_headers=["Content-Disposition"],
+    expose_headers=["Content-Disposition", "X-Session-ID"],
     max_age=3600,
 )
 
@@ -96,6 +115,7 @@ app.include_router(worker.router)
 app.include_router(quotes.router)
 app.include_router(import_export.router)
 app.include_router(users.router)
+app.include_router(snapshots.router, prefix="/api/v1/snapshots", tags=["snapshots"])
 
 @app.get("/")
 def root():

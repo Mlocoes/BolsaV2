@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from typing import List
 from uuid import UUID
-from ..core.database import get_db
+from ..db.session import get_db
 from ..core.middleware import require_auth
 from ..models.usuario import Usuario
 from ..models.portfolio import Portfolio
@@ -17,17 +19,20 @@ router = APIRouter(prefix="/api/portfolios", tags=["portfolios"])
 @router.get("", response_model=List[PortfolioResponse])
 async def list_portfolios(
     user: dict = Depends(require_auth),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Listar todos los portfolios del usuario actual"""
-    portfolios = db.query(Portfolio).filter(Portfolio.user_id == UUID(user["user_id"])).all()
+    result = await db.execute(
+        select(Portfolio).where(Portfolio.user_id == UUID(user["user_id"]))
+    )
+    portfolios = result.scalars().all()
     return portfolios
 
 @router.post("", response_model=PortfolioResponse, status_code=status.HTTP_201_CREATED)
 async def create_portfolio(
     portfolio: PortfolioCreate,
     user: dict = Depends(require_auth),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Crear un nuevo portfolio"""
     db_portfolio = Portfolio(
@@ -35,24 +40,27 @@ async def create_portfolio(
         user_id=UUID(user["user_id"])
     )
     db.add(db_portfolio)
-    db.commit()
-    db.refresh(db_portfolio)
+    await db.commit()
+    await db.refresh(db_portfolio)
     return db_portfolio
 
 @router.get("/{portfolio_id}", response_model=PortfolioDetail)
 async def get_portfolio(
     portfolio_id: UUID,
     user: dict = Depends(require_auth),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Obtener una cartera específica con sus posiciones"""
     # Cargar posiciones y activos asociados en una sola consulta
-    portfolio = db.query(Portfolio).options(
-        joinedload(Portfolio.positions).joinedload("asset")
-    ).filter(
-        Portfolio.id == portfolio_id,
-        Portfolio.user_id == UUID(user["user_id"]) 
-    ).first()
+    result = await db.execute(
+        select(Portfolio).options(
+            selectinload(Portfolio.positions)
+        ).where(
+            Portfolio.id == portfolio_id,
+            Portfolio.user_id == UUID(user["user_id"]) 
+        )
+    )
+    portfolio = result.scalar_one_or_none()
     
     if not portfolio:
         raise HTTPException(
@@ -67,10 +75,16 @@ async def update_portfolio(
     portfolio_id: UUID,
     portfolio_update: PortfolioUpdate,
     user: dict = Depends(require_auth),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Actualizar una cartera"""
-    db_portfolio = get_user_portfolio_or_404(db, portfolio_id, UUID(user["user_id"]))
+    result = await db.execute(
+        select(Portfolio).where(
+            Portfolio.id == portfolio_id,
+            Portfolio.user_id == UUID(user["user_id"])
+        )
+    )
+    db_portfolio = result.scalar_one_or_none()
     
     if not db_portfolio:
         raise HTTPException(
@@ -82,19 +96,31 @@ async def update_portfolio(
     for field, value in update_data.items():
         setattr(db_portfolio, field, value)
     
-    db.commit()
-    db.refresh(db_portfolio)
+    await db.commit()
+    await db.refresh(db_portfolio)
     return db_portfolio
 
 @router.delete("/{portfolio_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_portfolio(
     portfolio_id: UUID,
     user: dict = Depends(require_auth),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Eliminar una cartera"""
-    db_portfolio = get_user_portfolio_or_404(db, portfolio_id, UUID(user["user_id"]))
+    result = await db.execute(
+        select(Portfolio).where(
+            Portfolio.id == portfolio_id,
+            Portfolio.user_id == UUID(user["user_id"])
+        )
+    )
+    db_portfolio = result.scalar_one_or_none()
     
-    db.delete(db_portfolio)
-    db.commit()
+    if not db_portfolio:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Cartera no encontrada"
+        )
+    
+    await db.delete(db_portfolio)
+    await db.commit()
     return None
