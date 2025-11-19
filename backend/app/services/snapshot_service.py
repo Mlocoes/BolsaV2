@@ -40,10 +40,10 @@ class SnapshotService:
             .where(
                 and_(
                     Operation.portfolio_id == portfolio_id,
-                    func.date(Operation.date) <= target_date
+                    func.date(Operation.transaction_date) <= target_date
                 )
             )
-            .order_by(Operation.date)
+            .order_by(Operation.transaction_date)
         )
         operations = result.all()
 
