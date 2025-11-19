@@ -79,10 +79,14 @@ export default function Dashboard() {
   const loadSnapshots = async (portfolioId: string) => {
     try {
       const history = await snapshotService.getHistory(portfolioId);
-      setSnapshots(history);
+      // Ordenar por fecha descendente (más reciente primero)
+      const sortedHistory = history.sort((a, b) => 
+        new Date(b.snapshot_date).getTime() - new Date(a.snapshot_date).getTime()
+      );
+      setSnapshots(sortedHistory);
       // Seleccionar el snapshot más reciente por defecto
-      if (history.length > 0) {
-        setSelectedSnapshot(history[0]);
+      if (sortedHistory.length > 0) {
+        setSelectedSnapshot(sortedHistory[0]);
       }
     } catch (err: any) {
       console.error('Error loading snapshots:', err);
@@ -452,29 +456,42 @@ export default function Dashboard() {
       <div className="bg-white shadow rounded-lg overflow-hidden">
         <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg leading-6 font-medium text-gray-900">
-              Posiciones - Snapshot
-            </h3>
+            <div>
+              <h3 className="text-lg leading-6 font-medium text-gray-900">
+                Histórico de Posiciones
+              </h3>
+              <p className="mt-1 text-sm text-gray-500">
+                Selecciona una fecha para ver el estado de la cartera en ese momento
+              </p>
+            </div>
             <div className="flex items-center space-x-4">
               {snapshots.length > 0 && (
-                <select
-                  value={selectedSnapshot?.snapshot_date || ''}
-                  onChange={(e) => {
-                    const snapshot = snapshots.find(s => s.snapshot_date === e.target.value);
-                    setSelectedSnapshot(snapshot || null);
-                  }}
-                  className="block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                >
-                  {snapshots.map(snapshot => (
-                    <option key={snapshot.id} value={snapshot.snapshot_date}>
-                      {new Date(snapshot.snapshot_date).toLocaleDateString('es-ES')}
-                    </option>
-                  ))}
-                </select>
+                <div className="flex flex-col">
+                  <label className="text-xs text-gray-500 mb-1">Fecha del Snapshot:</label>
+                  <select
+                    value={selectedSnapshot?.snapshot_date || ''}
+                    onChange={(e) => {
+                      const snapshot = snapshots.find(s => s.snapshot_date === e.target.value);
+                      setSelectedSnapshot(snapshot || null);
+                    }}
+                    className="block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  >
+                    {snapshots.map(snapshot => (
+                      <option key={snapshot.id} value={snapshot.snapshot_date}>
+                        {new Date(snapshot.snapshot_date).toLocaleDateString('es-ES', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })} - ${snapshot.total_value.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               )}
               <button
                 onClick={handleCreateSnapshot}
                 className="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+                title="Crear un snapshot del estado actual de la cartera"
               >
                 <Camera className="h-4 w-4 mr-1.5" />
                 Crear Snapshot
@@ -485,6 +502,29 @@ export default function Dashboard() {
         <div className="p-4">
           {selectedSnapshot ? (
             <div>
+              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-blue-900">
+                      📸 Visualizando snapshot del {new Date(selectedSnapshot.snapshot_date).toLocaleDateString('es-ES', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </p>
+                    <p className="text-xs text-blue-700 mt-1">
+                      {selectedSnapshot.positions.length} posiciones | 
+                      Valor Total: ${selectedSnapshot.total_value.toLocaleString('es-ES', {minimumFractionDigits: 2})} | 
+                      G/P: ${selectedSnapshot.total_profit_loss.toLocaleString('es-ES', {minimumFractionDigits: 2})} 
+                      ({selectedSnapshot.total_profit_loss_percent >= 0 ? '+' : ''}{selectedSnapshot.total_profit_loss_percent.toFixed(2)}%)
+                    </p>
+                  </div>
+                  <div className="text-xs text-blue-600">
+                    Creado: {new Date(selectedSnapshot.created_at).toLocaleTimeString('es-ES')}
+                  </div>
+                </div>
+              </div>
               <div ref={hotTableRef} />
               <style>{`
                 .htPositive { color: #059669; font-weight: 600; }
@@ -493,7 +533,7 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="text-center py-8 text-gray-500">
-              No hay snapshots disponibles. Crea uno para ver el historial.
+              No hay snapshots disponibles. Crea uno para ver el histórico de tu cartera.
             </div>
           )}
         </div>
