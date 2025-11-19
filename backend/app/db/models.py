@@ -16,8 +16,11 @@ class AssetType(str, PyEnum):
     OTHER = "other"
 
 class OperationSide(str, PyEnum):
-    BUY = "buy"
-    SELL = "sell"
+    BUY = "BUY"
+    SELL = "SELL"
+    DIVIDEND = "DIVIDEND"
+    DEPOSIT = "DEPOSIT"
+    WITHDRAWAL = "WITHDRAWAL"
 
 class User(Base):
     __tablename__ = "users"
@@ -67,15 +70,29 @@ class Operation(Base):
     __tablename__ = "transactions"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     portfolio_id = Column(UUID(as_uuid=True), ForeignKey("portfolios.id"))
-    date = Column(DateTime(timezone=True), nullable=False)
     asset_id = Column(UUID(as_uuid=True), ForeignKey("assets.id"))
-    side = Column(Enum(OperationSide), nullable=False)
+    transaction_type = Column(Enum(OperationSide, name='transactiontype', create_type=False), nullable=False)
     quantity = Column(Numeric(24, 8), nullable=False)
     price = Column(Numeric(18, 6), nullable=False)
-    fee = Column(Numeric(18, 6), default=0)
+    fees = Column(Numeric(18, 6), default=0)
     currency = Column(String(10), default="USD")
     notes = Column(Text)
+    transaction_date = Column(DateTime(timezone=True), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True))
+    
+    # Alias properties para compatibilidad con el código existente
+    @property
+    def date(self):
+        return self.transaction_date
+    
+    @property
+    def side(self):
+        return self.transaction_type
+    
+    @property
+    def fee(self):
+        return self.fees
 
 class Result(Base):
     __tablename__ = "results"
