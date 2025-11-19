@@ -3,8 +3,11 @@ Servicio para obtener precios de activos usando Finnhub API
 """
 import os
 import httpx
+import logging
 from typing import Optional, Dict
 from ..core.config import settings
+
+logger = logging.getLogger(__name__)
 
 class FinnhubService:
     def __init__(self):
@@ -34,7 +37,7 @@ class FinnhubService:
                         }
                 return None
         except Exception as e:
-            print(f"Error fetching stock quote for {symbol}: {e}")
+            logger.error(f"Error fetching stock quote for {symbol}: {e}")
             return None
     
     async def get_crypto_price(self, symbol: str) -> Optional[Dict]:
@@ -62,7 +65,7 @@ class FinnhubService:
                         }
                 return None
         except Exception as e:
-            print(f"Error fetching crypto price for {symbol}: {e}")
+            logger.error(f"Error fetching crypto price for {symbol}: {e}")
             return None
     
     async def get_asset_price(self, symbol: str, asset_type: str) -> Optional[Dict]:

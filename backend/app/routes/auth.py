@@ -5,6 +5,8 @@ from sqlalchemy import select
 from datetime import datetime
 from typing import Optional
 from uuid import UUID
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from ..db.session import get_db
 from ..core.auth import verify_password, get_password_hash
 from ..core.session import session_manager
@@ -12,6 +14,9 @@ from ..core.middleware import require_auth, optional_auth
 from ..models.usuario import Usuario
 from ..core.config import settings
 from pydantic import BaseModel, EmailStr, ConfigDict, field_serializer
+
+# Configurar rate limiter
+limiter = Limiter(key_func=get_remote_address)
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -45,7 +50,9 @@ class RegisterRequest(BaseModel):
     password: str
 
 @router.post("/login", response_model=LoginResponse)
+@limiter.limit("5/minute")  # Máximo 5 intentos de login por minuto
 async def login(
+    request: Request,
     response: Response,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
@@ -178,7 +185,9 @@ async def get_current_user(
     return db_user
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit("3/hour")  # Máximo 3 registros por hora desde la misma IP
 async def register(
+    request: Request,
     user_data: UserCreate,
     db: Session = Depends(get_db)
 ):

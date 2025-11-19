@@ -4,6 +4,9 @@ from sqlalchemy.orm import sessionmaker, Session
 from app.core.config import settings
 from app.core.security import hash_password
 from app.models.usuario import Usuario
+import logging
+
+logger = logging.getLogger(__name__)
 
 def create_admin():
     engine = create_engine(settings.DATABASE_URL)
@@ -12,7 +15,7 @@ def create_admin():
     with SessionLocal() as session:
         result = session.execute(select(Usuario).where(Usuario.username == "admin"))
         if result.scalar_one_or_none():
-            print("Admin already exists")
+            logger.info("Admin already exists")
             return
         
         admin = Usuario(
@@ -23,7 +26,7 @@ def create_admin():
         )
         session.add(admin)
         session.commit()
-        print("Admin created successfully")
+        logger.info("Admin created successfully")
 
 if __name__ == "__main__":
     create_admin()
