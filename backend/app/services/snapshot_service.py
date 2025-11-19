@@ -381,24 +381,29 @@ class SnapshotService:
             if include_positions:
                 # Get positions for this snapshot
                 positions_result = await db.execute(
-                    select(PositionSnapshot)
+                    select(PositionSnapshot, Asset)
+                    .join(Asset, PositionSnapshot.asset_id == Asset.id)
                     .where(PositionSnapshot.portfolio_snapshot_id == snapshot.id)
                     .order_by(desc(PositionSnapshot.current_value))
                 )
-                positions = positions_result.scalars().all()
+                positions_with_assets = positions_result.all()
 
                 snapshot_dict["positions"] = [
                     {
-                        "ticker": pos.ticker,
+                        "symbol": pos.ticker,
+                        "name": asset.name or pos.ticker,
+                        "asset_type": asset.asset_type.value if asset.asset_type else "STOCK",
                         "quantity": float(pos.quantity),
+                        "average_price": float(pos.average_buy_price),
                         "current_price": float(pos.current_price),
                         "current_value": float(pos.current_value),
-                        "position_pnl": float(pos.position_pnl),
-                        "position_pnl_percent": float(pos.position_pnl_percent),
+                        "cost_basis": float(pos.total_cost),
+                        "profit_loss": float(pos.position_pnl),
+                        "profit_loss_percent": float(pos.position_pnl_percent),
                         "daily_change_percent": float(pos.daily_change_percent),
                         "portfolio_weight": float(pos.portfolio_weight),
                     }
-                    for pos in positions
+                    for pos, asset in positions_with_assets
                 ]
 
             history.append(snapshot_dict)
