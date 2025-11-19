@@ -54,7 +54,7 @@ export const snapshotService = {
   },
 
   async createSnapshot(portfolioId: string): Promise<PortfolioSnapshot> {
-    const response = await api.post('/v1/snapshots/create', { portfolio_id: portfolioId });
+    const response = await api.post(`/v1/snapshots/create/${portfolioId}`);
     return response.data;
   }
 };

@@ -114,8 +114,8 @@ export default function Quotes() {
       const response = await api.get('/quotes', {
         params: {
           symbol: asset.symbol,
-          from_date: startDate,
-          to_date: endDate,
+          start_date: startDate,
+          end_date: endDate,
           limit: 10000
         }
       })
