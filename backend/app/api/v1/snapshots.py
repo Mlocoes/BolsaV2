@@ -144,6 +144,42 @@ async def backfill_snapshots(
 # Snapshot Query Endpoints
 # ============================================
 
+@router.get("/dates/{portfolio_id}")
+async def get_available_dates(
+    portfolio_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Get all available snapshot dates for a portfolio
+    
+    Returns:
+        List of dates with snapshot data available
+    """
+    try:
+        from sqlalchemy import select, distinct
+        from app.db.models_snapshots import PortfolioSnapshot
+        
+        result = await db.execute(
+            select(distinct(PortfolioSnapshot.snapshot_date))
+            .where(PortfolioSnapshot.portfolio_id == portfolio_id)
+            .order_by(PortfolioSnapshot.snapshot_date.desc())
+        )
+        dates = result.scalars().all()
+        
+        return {
+            "success": True,
+            "portfolio_id": str(portfolio_id),
+            "dates": [d.isoformat() for d in dates],
+            "count": len(dates)
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to retrieve dates: {str(e)}"
+        )
+
+
 @router.get("/history/{portfolio_id}")
 async def get_snapshot_history(
     portfolio_id: UUID,

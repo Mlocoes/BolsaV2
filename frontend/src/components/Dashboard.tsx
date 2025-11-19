@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { portfolioService } from '../services/portfolioService';
 import { snapshotService, type PortfolioSnapshot } from '../services/snapshotService';
 import type { Portfolio, PositionWithPrice } from '../types/portfolio';
-import { Wallet, TrendingUp, TrendingDown, Plus, Camera } from 'lucide-react';
+import { Wallet, TrendingUp, TrendingDown, Plus } from 'lucide-react';
 import AddTransactionModal from './AddTransactionModal';
 import CreatePortfolioModal from './CreatePortfolioModal';
 import PortfolioDistributionChart from './PortfolioDistributionChart';
@@ -14,7 +14,8 @@ export default function Dashboard() {
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [selectedPortfolio, setSelectedPortfolio] = useState<Portfolio | null>(null);
   const [positions, setPositions] = useState<PositionWithPrice[]>([]);
-  const [snapshots, setSnapshots] = useState<PortfolioSnapshot[]>([]);
+  const [availableDates, setAvailableDates] = useState<string[]>([]);
+  const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedSnapshot, setSelectedSnapshot] = useState<PortfolioSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,9 +31,15 @@ export default function Dashboard() {
   useEffect(() => {
     if (selectedPortfolio) {
       loadPositions(selectedPortfolio.id);
-      loadSnapshots(selectedPortfolio.id);
+      loadAvailableDates(selectedPortfolio.id);
     }
   }, [selectedPortfolio]);
+
+  useEffect(() => {
+    if (selectedDate && selectedPortfolio) {
+      loadSnapshotByDate(selectedPortfolio.id, selectedDate);
+    }
+  }, [selectedDate]);
 
   useEffect(() => {
     if (selectedSnapshot && hotTableRef.current && !hotInstance.current) {
@@ -76,28 +83,38 @@ export default function Dashboard() {
     }
   };
 
-  const loadSnapshots = async (portfolioId: string) => {
+  const loadAvailableDates = async (portfolioId: string) => {
     try {
-      const history = await snapshotService.getHistory(portfolioId);
-      // Ordenar por fecha descendente (más reciente primero)
-      const sortedHistory = history.sort((a, b) => 
-        new Date(b.snapshot_date).getTime() - new Date(a.snapshot_date).getTime()
-      );
-      setSnapshots(sortedHistory);
-      // Seleccionar el snapshot más reciente por defecto
-      if (sortedHistory.length > 0) {
-        setSelectedSnapshot(sortedHistory[0]);
+      const dates = await snapshotService.getAvailableDates(portfolioId);
+      setAvailableDates(dates);
+      // Seleccionar la fecha más reciente por defecto
+      if (dates.length > 0) {
+        setSelectedDate(dates[0]);
+      } else {
+        // Si no hay fechas, intentar crear un snapshot para hoy
+        try {
+          await snapshotService.createSnapshot(portfolioId);
+          // Recargar fechas
+          const updatedDates = await snapshotService.getAvailableDates(portfolioId);
+          setAvailableDates(updatedDates);
+          if (updatedDates.length > 0) {
+            setSelectedDate(updatedDates[0]);
+          }
+        } catch (createErr) {
+          console.error('Error creating initial snapshot:', createErr);
+        }
       }
     } catch (err: any) {
-      console.error('Error loading snapshots:', err);
-      // Si no hay snapshots, intentar crear uno
-      try {
-        const newSnapshot = await snapshotService.createSnapshot(portfolioId);
-        setSnapshots([newSnapshot]);
-        setSelectedSnapshot(newSnapshot);
-      } catch (createErr) {
-        console.error('Error creating snapshot:', createErr);
-      }
+      console.error('Error loading available dates:', err);
+    }
+  };
+
+  const loadSnapshotByDate = async (portfolioId: string, date: string) => {
+    try {
+      const snapshot = await snapshotService.getByDate(portfolioId, date);
+      setSelectedSnapshot(snapshot);
+    } catch (err: any) {
+      console.error('Error loading snapshot by date:', err);
     }
   };
 
@@ -200,18 +217,6 @@ export default function Dashboard() {
     }));
 
     hotInstance.current.loadData(data);
-  };
-
-  const handleCreateSnapshot = async () => {
-    if (!selectedPortfolio) return;
-    try {
-      const newSnapshot = await snapshotService.createSnapshot(selectedPortfolio.id);
-      await loadSnapshots(selectedPortfolio.id);
-      setSelectedSnapshot(newSnapshot);
-    } catch (err: any) {
-      console.error('Error creating snapshot:', err);
-      alert('Error al crear snapshot: ' + err.message);
-    }
   };
 
   const calculateTotals = () => {
@@ -461,41 +466,30 @@ export default function Dashboard() {
                 Histórico de Posiciones
               </h3>
               <p className="mt-1 text-sm text-gray-500">
-                Selecciona una fecha para ver el estado de la cartera en ese momento
+                Visualiza el estado de tu cartera en diferentes fechas
               </p>
             </div>
             <div className="flex items-center space-x-4">
-              {snapshots.length > 0 && (
+              {availableDates.length > 0 && (
                 <div className="flex flex-col">
-                  <label className="text-xs text-gray-500 mb-1">Fecha del Snapshot:</label>
+                  <label className="text-xs text-gray-500 mb-1">Fecha:</label>
                   <select
-                    value={selectedSnapshot?.snapshot_date || ''}
-                    onChange={(e) => {
-                      const snapshot = snapshots.find(s => s.snapshot_date === e.target.value);
-                      setSelectedSnapshot(snapshot || null);
-                    }}
-                    className="block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2"
                   >
-                    {snapshots.map(snapshot => (
-                      <option key={snapshot.id} value={snapshot.snapshot_date}>
-                        {new Date(snapshot.snapshot_date).toLocaleDateString('es-ES', {
+                    {availableDates.map(date => (
+                      <option key={date} value={date}>
+                        {new Date(date).toLocaleDateString('es-ES', {
                           year: 'numeric',
                           month: 'long',
                           day: 'numeric'
-                        })} - ${snapshot.total_value.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                        })}
                       </option>
                     ))}
                   </select>
                 </div>
               )}
-              <button
-                onClick={handleCreateSnapshot}
-                className="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
-                title="Crear un snapshot del estado actual de la cartera"
-              >
-                <Camera className="h-4 w-4 mr-1.5" />
-                Crear Snapshot
-              </button>
             </div>
           </div>
         </div>
@@ -533,7 +527,8 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="text-center py-8 text-gray-500">
-              No hay snapshots disponibles. Crea uno para ver el histórico de tu cartera.
+              <p className="mb-2">No hay datos históricos disponibles para esta cartera.</p>
+              <p className="text-sm">El sistema crea automáticamente snapshots diarios de tus posiciones.</p>
             </div>
           )}
         </div>

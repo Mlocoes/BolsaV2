@@ -59,12 +59,13 @@ async def startup_event():
         print(f"⚠ Warning: Quote scheduler no pudo iniciar: {e}")
     
     # Iniciar scheduler de snapshots
-    # try:
-    #     import asyncio
-    #     asyncio.create_task(snapshot_scheduler.run())
-    #     print("✓ Snapshot scheduler iniciado")
-    # except Exception as e:
-    #     print(f"⚠ Warning: Snapshot scheduler no pudo iniciar: {e}")
+    try:
+        import asyncio
+        from app.services.snapshot_scheduler import snapshot_scheduler
+        asyncio.create_task(snapshot_scheduler.run())
+        print("✓ Snapshot scheduler iniciado - creará snapshots automáticamente cada día")
+    except Exception as e:
+        print(f"⚠ Warning: Snapshot scheduler no pudo iniciar: {e}")
 
 @app.on_event("shutdown")
 async def shutdown_event():

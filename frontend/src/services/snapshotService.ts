@@ -26,6 +26,23 @@ export interface PortfolioSnapshot {
 }
 
 export const snapshotService = {
+  async getAvailableDates(portfolioId: string): Promise<string[]> {
+    const response = await api.get(`/v1/snapshots/dates/${portfolioId}`);
+    return response.data.dates || [];
+  },
+
+  async getByDate(portfolioId: string, date: string): Promise<PortfolioSnapshot | null> {
+    const response = await api.get(`/v1/snapshots/history/${portfolioId}`, {
+      params: {
+        from_date: date,
+        to_date: date,
+        include_positions: true
+      }
+    });
+    const snapshots = response.data.snapshots as PortfolioSnapshot[];
+    return snapshots.length > 0 ? snapshots[0] : null;
+  },
+
   async getHistory(portfolioId: string): Promise<PortfolioSnapshot[]> {
     const response = await api.get(`/v1/snapshots/history/${portfolioId}`);
     return response.data;
@@ -39,11 +56,5 @@ export const snapshotService = {
   async createSnapshot(portfolioId: string): Promise<PortfolioSnapshot> {
     const response = await api.post('/v1/snapshots/create', { portfolio_id: portfolioId });
     return response.data;
-  },
-
-  async getByDate(portfolioId: string, date: string): Promise<PortfolioSnapshot | null> {
-    const response = await api.get(`/v1/snapshots/history/${portfolioId}`);
-    const snapshots = response.data as PortfolioSnapshot[];
-    return snapshots.find(s => s.snapshot_date === date) || null;
   }
 };
