@@ -1,11 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from typing import List
 from uuid import UUID
-from ..core.database import get_db
+from ..db.session import get_db
 from ..core.middleware import require_auth
 from ..models.usuario import Usuario
 from ..models.portfolio import Portfolio
+from sqlalchemy.orm import joinedload
+from app.utils.portfolio_utils import get_user_portfolio_or_404
 from ..models.position import Position
 from ..models.asset import Asset
 from ..schemas.portfolio import PortfolioCreate, PortfolioUpdate, PortfolioResponse, PortfolioDetail
@@ -18,7 +22,10 @@ async def list_portfolios(
     db: Session = Depends(get_db)
 ):
     """Listar todos los portfolios del usuario actual"""
-    portfolios = db.query(Portfolio).filter(Portfolio.user_id == UUID(user["user_id"])).all()
+    result = db.execute(
+        select(Portfolio).where(Portfolio.user_id == UUID(user["user_id"]))
+    )
+    portfolios = result.scalars().all()
     return portfolios
 
 @router.post("", response_model=PortfolioResponse, status_code=status.HTTP_201_CREATED)
@@ -44,10 +51,16 @@ async def get_portfolio(
     db: Session = Depends(get_db)
 ):
     """Obtener una cartera específica con sus posiciones"""
-    portfolio = db.query(Portfolio).filter(
-        Portfolio.id == portfolio_id,
-        Portfolio.user_id == UUID(user["user_id"])
-    ).first()
+    # Cargar posiciones y activos asociados en una sola consulta
+    result = db.execute(
+        select(Portfolio).options(
+            selectinload(Portfolio.positions)
+        ).where(
+            Portfolio.id == portfolio_id,
+            Portfolio.user_id == UUID(user["user_id"])
+        )
+    )
+    portfolio = result.scalar_one_or_none()
     
     if not portfolio:
         raise HTTPException(
@@ -65,10 +78,13 @@ async def update_portfolio(
     db: Session = Depends(get_db)
 ):
     """Actualizar una cartera"""
-    db_portfolio = db.query(Portfolio).filter(
-        Portfolio.id == portfolio_id,
-        Portfolio.user_id == UUID(user["user_id"])
-    ).first()
+    result = db.execute(
+        select(Portfolio).where(
+            Portfolio.id == portfolio_id,
+            Portfolio.user_id == UUID(user["user_id"])
+        )
+    )
+    db_portfolio = result.scalar_one_or_none()
     
     if not db_portfolio:
         raise HTTPException(
@@ -91,10 +107,13 @@ async def delete_portfolio(
     db: Session = Depends(get_db)
 ):
     """Eliminar una cartera"""
-    db_portfolio = db.query(Portfolio).filter(
-        Portfolio.id == portfolio_id,
-        Portfolio.user_id == UUID(user["user_id"])
-    ).first()
+    result = db.execute(
+        select(Portfolio).where(
+            Portfolio.id == portfolio_id,
+            Portfolio.user_id == UUID(user["user_id"])
+        )
+    )
+    db_portfolio = result.scalar_one_or_none()
     
     if not db_portfolio:
         raise HTTPException(

@@ -1,28 +1,45 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
 import { toast } from 'react-hot-toast'
 
 export default function Login() {
   const navigate = useNavigate()
-  const { login } = useAuthStore()
+  const { user, login } = useAuthStore()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   console.log('Página de inicio de sesión renderizando')
 
+  // Redirigir a dashboard después del login exitoso
+  useEffect(() => {
+    if (user) {
+      console.log('Usuario autenticado, redirigiendo al dashboard')
+      navigate('/dashboard', { replace: true })
+    }
+  }, [user, navigate])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (isSubmitting) return
+
+    setIsSubmitting(true)
     try {
-      console.log('Intentando iniciar sesión con el usuario:', username)
-      await login(username, password)
+      const trimmedUsername = username.trim()
+      const trimmedPassword = password.trim()
+      console.log('Intentando iniciar sesión con el usuario:', trimmedUsername)
+      await login(trimmedUsername, trimmedPassword)
       console.log('Inicio de sesión exitoso, navegando al panel de control')
       toast.success('¡Inicio de sesión exitoso!')
-      navigate('/')
+      // La redirección se hará automáticamente por el useEffect
     } catch (error: any) {
       console.error('Error de inicio de sesión:', error)
       const message = error.response?.data?.detail || error.message || 'Error al iniciar sesión'
       toast.error(message)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -53,9 +70,10 @@ export default function Login() {
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
+            disabled={isSubmitting}
+            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Iniciar Sesión
+            {isSubmitting ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </button>
         </form>
       </div>

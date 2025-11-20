@@ -1,16 +1,22 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 from datetime import datetime
 from typing import Optional
 from uuid import UUID
-from ..core.database import get_db
-from ..core.security import verify_password, hash_password
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from ..db.session import get_db
+from ..core.auth import verify_password, get_password_hash
 from ..core.session import session_manager
 from ..core.middleware import require_auth, optional_auth
 from ..models.usuario import Usuario
 from ..core.config import settings
 from pydantic import BaseModel, EmailStr, ConfigDict, field_serializer
+
+# Configurar rate limiter
+limiter = Limiter(key_func=get_remote_address)
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -27,6 +33,12 @@ class UserResponse(BaseModel):
     def serialize_id(self, value: UUID) -> str:
         return str(value)
 
+
+class UserCreate(BaseModel):
+    username: str
+    email: EmailStr
+    password: str
+
 class LoginResponse(BaseModel):
     message: str
     user: UserResponse
@@ -38,7 +50,9 @@ class RegisterRequest(BaseModel):
     password: str
 
 @router.post("/login", response_model=LoginResponse)
+@limiter.limit("5/minute")  # Máximo 5 intentos de login por minuto
 async def login(
+    request: Request,
     response: Response,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
@@ -55,7 +69,13 @@ async def login(
         LoginResponse con datos del usuario
     """
     # Buscar usuario
-    user = db.query(Usuario).filter(Usuario.username == form_data.username).first()
+    # Normalizar username (trim y lowercase) para hacer el login insensible a mayúsculas/espacios
+    username = form_data.username.strip().lower() if form_data.username else ""
+
+    result = db.execute(
+        select(Usuario).where(Usuario.username == username)
+    )
+    user = result.scalar_one_or_none()
     
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
@@ -88,10 +108,10 @@ async def login(
     response.set_cookie(
         key="session_id",
         value=session_id,
-        domain=settings.COOKIE_DOMAIN if settings.ENVIRONMENT == "development" else None,
+        domain=None,  # Sin dominio para que funcione en misma IP
         httponly=True,  # No accesible desde JavaScript
         secure=False,   # False para desarrollo HTTP, True para producción HTTPS
-        samesite="none" if settings.ENVIRONMENT == "development" else "lax",  # none permite cross-port en desarrollo
+        samesite="lax",  # lax funciona en HTTP y permite navegación normal
         max_age=86400,  # 24 horas
         path="/",       # Cookie válida para toda la aplicación
     )
@@ -131,9 +151,9 @@ async def logout(
     # Eliminar cookie
     response.delete_cookie(
         key="session_id",
-        domain=settings.COOKIE_DOMAIN if settings.ENVIRONMENT == "development" else None,
+        domain=None,
         path="/",
-        samesite="none" if settings.ENVIRONMENT == "development" else "lax",
+        samesite="lax",
     )
     
     return {"message": "Logout exitoso"}
@@ -154,7 +174,10 @@ async def get_current_user(
         UserResponse con datos actualizados
     """
     # Obtener usuario actualizado de la BD
-    db_user = db.query(Usuario).filter(Usuario.id == UUID(user["user_id"])).first()
+    result = db.execute(
+        select(Usuario).where(Usuario.id == UUID(user["user_id"]))
+    )
+    db_user = result.scalar_one_or_none()
     
     if not db_user:
         raise HTTPException(
@@ -165,8 +188,10 @@ async def get_current_user(
     return db_user
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit("3/hour")  # Máximo 3 registros por hora desde la misma IP
 async def register(
-    user_data: RegisterRequest,
+    request: Request,
+    user_data: UserCreate,
     db: Session = Depends(get_db)
 ):
     """
@@ -180,9 +205,12 @@ async def register(
         UserResponse con datos del usuario creado
     """
     # Verificar si el usuario ya existe
-    existing_user = db.query(Usuario).filter(
-        (Usuario.username == user_data.username) | (Usuario.email == user_data.email)
-    ).first()
+    result = db.execute(
+        select(Usuario).where(
+            (Usuario.username == user_data.username) | (Usuario.email == user_data.email)
+        )
+    )
+    existing_user = result.scalar_one_or_none()
     
     if existing_user:
         raise HTTPException(
@@ -194,12 +222,36 @@ async def register(
     new_user = Usuario(
         username=user_data.username,
         email=user_data.email,
-        hashed_password=hash_password(user_data.password),
+        hashed_password=get_password_hash(user_data.password),
         is_active=True
     )
     
+    db.add(new_user)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
     
     return new_user
+
+
+async def get_current_admin_user(
+    current_user: Usuario = Depends(get_current_user)
+):
+    """
+    Verificar que el usuario actual es administrador
+
+    Args:
+        current_user: Usuario actual
+
+    Returns:
+        Usuario si es admin
+
+    Raises:
+        HTTPException: Si el usuario no es admin
+    """
+    if not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Se requieren privilegios de administrador"
+        )
+    return current_user

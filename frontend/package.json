@@ -8,16 +8,25 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@handsontable/react-wrapper": "^16.1.1",
+    "@typescript-eslint/eslint-plugin": "^8.47.0",
+    "@typescript-eslint/parser": "^8.47.0",
+    "axios": "^1.7.7",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react": "^7.37.5",
+    "handsontable": "^16.1.1",
+    "jscpd": "^4.0.5",
+    "lucide-react": "^0.294.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.0",
-    "axios": "^1.6.2",
-    "zustand": "^4.4.7",
     "react-hot-toast": "^2.4.1",
-    "lucide-react": "^0.294.0",
-    "recharts": "^2.10.3"
+    "react-router-dom": "^6.20.0",
+    "recharts": "^2.10.3",
+    "zustand": "^4.4.7"
   },
   "devDependencies": {
+    "@types/node": "^24.10.1",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
     "@vitejs/plugin-react": "^4.2.1",

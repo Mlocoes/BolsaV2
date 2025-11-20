@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 from typing import List
 from uuid import UUID
 from datetime import datetime
 
-from ..core.database import get_db
+from ..db.session import get_db
 from ..core.middleware import require_auth
 from ..models.usuario import Usuario
 from pydantic import BaseModel, EmailStr, field_validator
@@ -53,14 +54,16 @@ async def list_users(
     Listar todos los usuarios (solo admin)
     """
     # Verificar si el usuario es admin
-    current_user = db.query(Usuario).filter(Usuario.id == UUID(user["user_id"])).first()
+    result = db.execute(select(Usuario).where(Usuario.id == UUID(user["user_id"])))
+    current_user = result.scalar_one_or_none()
     if not current_user or not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Solo los administradores pueden listar usuarios"
         )
     
-    users = db.query(Usuario).all()
+    result = db.execute(select(Usuario))
+    users = result.scalars().all()
     return users
 
 
@@ -74,7 +77,8 @@ async def get_user(
     Obtener un usuario por ID (solo admin o el mismo usuario)
     """
     current_user_id = UUID(user["user_id"])
-    current_user = db.query(Usuario).filter(Usuario.id == current_user_id).first()
+    result = db.execute(select(Usuario).where(Usuario.id == current_user_id))
+    current_user = result.scalar_one_or_none()
     
     # Solo admin puede ver otros usuarios
     if str(current_user_id) != str(user_id) and not current_user.is_admin:
@@ -83,7 +87,8 @@ async def get_user(
             detail="Acceso denegado"
         )
     
-    target_user = db.query(Usuario).filter(Usuario.id == user_id).first()
+    result = db.execute(select(Usuario).where(Usuario.id == user_id))
+    target_user = result.scalar_one_or_none()
     if not target_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -104,7 +109,8 @@ async def update_user(
     Actualizar un usuario (solo admin)
     """
     # Verificar si el usuario actual es admin
-    current_user = db.query(Usuario).filter(Usuario.id == UUID(user["user_id"])).first()
+    result = db.execute(select(Usuario).where(Usuario.id == UUID(user["user_id"])))
+    current_user = result.scalar_one_or_none()
     if not current_user or not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -112,7 +118,8 @@ async def update_user(
         )
     
     # Buscar usuario a actualizar
-    target_user = db.query(Usuario).filter(Usuario.id == user_id).first()
+    result = db.execute(select(Usuario).where(Usuario.id == user_id))
+    target_user = result.scalar_one_or_none()
     if not target_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -143,7 +150,8 @@ async def delete_user(
     """
     # Verificar si el usuario actual es admin
     current_user_id = UUID(user["user_id"])
-    current_user = db.query(Usuario).filter(Usuario.id == current_user_id).first()
+    result = db.execute(select(Usuario).where(Usuario.id == current_user_id))
+    current_user = result.scalar_one_or_none()
     
     if not current_user or not current_user.is_admin:
         raise HTTPException(
@@ -159,7 +167,8 @@ async def delete_user(
         )
     
     # Buscar usuario a eliminar
-    target_user = db.query(Usuario).filter(Usuario.id == user_id).first()
+    result = db.execute(select(Usuario).where(Usuario.id == user_id))
+    target_user = result.scalar_one_or_none()
     if not target_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

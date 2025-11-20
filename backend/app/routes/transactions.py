@@ -5,6 +5,7 @@ from uuid import UUID
 from ..core.database import get_db
 from ..core.middleware import require_auth
 from ..models.portfolio import Portfolio
+from app.utils.portfolio_utils import get_user_portfolio_or_404
 from ..models.transaction import Transaction
 from ..models.position import Position
 from ..models.asset import Asset
@@ -16,19 +17,8 @@ router = APIRouter(
 
 
 def get_user_portfolio(portfolio_id: UUID, user_id: UUID, db: Session) -> Portfolio:
-    """Helper para verificar que el portfolio pertenece al usuario"""
-    portfolio = (
-        db.query(Portfolio)
-        .filter(Portfolio.id == portfolio_id, Portfolio.user_id == user_id)
-        .first()
-    )
-
-    if not portfolio:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Cartera no encontrada"
-        )
-
-    return portfolio
+    """Mantener compatibilidad interna delegando al util compartido"""
+    return get_user_portfolio_or_404(db, portfolio_id, user_id)
 
 
 @router.get("", response_model=List[TransactionResponse])

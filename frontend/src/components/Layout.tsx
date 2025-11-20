@@ -11,9 +11,11 @@ export default function Layout({ children }: LayoutProps) {
 
   const handleLogout = async () => {
     await logout()
-    navigate('/login')
+    navigate('/login', { replace: true })
   }
 
+  // ProtectedRoute ya maneja la verificación de usuario
+  // Aquí solo renderizamos el layout
   if (!user) {
     return null
   }
@@ -26,7 +28,7 @@ export default function Layout({ children }: LayoutProps) {
             <h1 className="text-2xl font-bold text-gray-900">BolsaV2</h1>
             <div className="flex space-x-4">
               <button
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/dashboard')}
                 className="text-gray-600 hover:text-gray-900"
               >
                 Panel de Control
@@ -42,6 +44,12 @@ export default function Layout({ children }: LayoutProps) {
                 className="text-gray-600 hover:text-gray-900"
               >
                 Activos
+              </button>
+              <button
+                onClick={() => navigate('/quotes')}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                Cotizaciones
               </button>
               <button
                 onClick={() => navigate('/import')}

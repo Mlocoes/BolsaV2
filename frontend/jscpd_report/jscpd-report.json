@@ -1,0 +1,2077 @@
+{
+  "statistics": {
+    "detectionDate": "2025-11-20T14:33:32.853Z",
+    "formats": {
+      "typescript": {
+        "sources": {
+          "src/types/portfolio.ts": {
+            "lines": 87,
+            "tokens": 630,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/stores/authStore.ts": {
+            "lines": 49,
+            "tokens": 487,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/services/snapshotService.ts": {
+            "lines": 63,
+            "tokens": 570,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/services/portfolioService.ts": {
+            "lines": 86,
+            "tokens": 834,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/services/api.ts": {
+            "lines": 100,
+            "tokens": 691,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/vite-env.d.ts": {
+            "lines": 9,
+            "tokens": 37,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 394,
+          "tokens": 3249,
+          "sources": 6,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "css": {
+        "sources": {
+          "src/styles/handsontable-custom.css": {
+            "lines": 50,
+            "tokens": 202,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/components/Dashboard.tsx": {
+            "lines": 3,
+            "tokens": 33,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/index.css": {
+            "lines": 7,
+            "tokens": 38,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 60,
+          "tokens": 273,
+          "sources": 3,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "javascript": {
+        "sources": {
+          "src/pages/UsersCatalogHandsontable.tsx": {
+            "lines": 73,
+            "tokens": 547,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 104,
+            "duplicatedTokens": 749,
+            "percentage": 142.47,
+            "percentageTokens": 136.93,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/pages/UsersCatalog.tsx": {
+            "lines": 98,
+            "tokens": 819,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 54,
+            "duplicatedTokens": 409,
+            "percentage": 55.1,
+            "percentageTokens": 49.94,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/pages/QuotesHandsontable.tsx": {
+            "lines": 93,
+            "tokens": 718,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 94,
+            "duplicatedTokens": 764,
+            "percentage": 101.08,
+            "percentageTokens": 106.41,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/pages/Quotes.tsx": {
+            "lines": 99,
+            "tokens": 856,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 94,
+            "duplicatedTokens": 764,
+            "percentage": 94.95,
+            "percentageTokens": 89.25,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/pages/Portfolios.tsx": {
+            "lines": 85,
+            "tokens": 655,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/pages/Login.tsx": {
+            "lines": 23,
+            "tokens": 166,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/pages/ImportData.tsx": {
+            "lines": 122,
+            "tokens": 1071,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/pages/AssetsCatalogHandsontable.tsx": {
+            "lines": 214,
+            "tokens": 1645,
+            "sources": 1,
+            "clones": 3,
+            "duplicatedLines": 267,
+            "duplicatedTokens": 2062,
+            "percentage": 124.77,
+            "percentageTokens": 125.35,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/pages/AssetsCatalog.tsx": {
+            "lines": 238,
+            "tokens": 1928,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 217,
+            "duplicatedTokens": 1722,
+            "percentage": 91.18,
+            "percentageTokens": 89.32,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/components/PortfolioHistory.tsx": {
+            "lines": 240,
+            "tokens": 1884,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/components/PortfolioDistributionChart.tsx": {
+            "lines": 16,
+            "tokens": 127,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/components/PerformanceChart.tsx": {
+            "lines": 26,
+            "tokens": 296,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/components/Layout.tsx": {
+            "lines": 40,
+            "tokens": 253,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/components/Dashboard.tsx": {
+            "lines": 275,
+            "tokens": 2351,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/components/CreatePortfolioModal.tsx": {
+            "lines": 63,
+            "tokens": 399,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/components/AddTransactionModal.tsx": {
+            "lines": 205,
+            "tokens": 1470,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/App.tsx": {
+            "lines": 51,
+            "tokens": 255,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 1961,
+          "tokens": 15440,
+          "sources": 17,
+          "clones": 5,
+          "duplicatedLines": 415,
+          "duplicatedTokens": 3235,
+          "percentage": 21.16,
+          "percentageTokens": 20.95,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "tsx": {
+        "sources": {
+          "src/pages/UsersCatalogHandsontable.tsx": {
+            "lines": 305,
+            "tokens": 2435,
+            "sources": 1,
+            "clones": 11,
+            "duplicatedLines": 196,
+            "duplicatedTokens": 1385,
+            "percentage": 64.26,
+            "percentageTokens": 56.88,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/pages/UsersCatalog.tsx": {
+            "lines": 238,
+            "tokens": 1953,
+            "sources": 1,
+            "clones": 6,
+            "duplicatedLines": 112,
+            "duplicatedTokens": 887,
+            "percentage": 47.06,
+            "percentageTokens": 45.42,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/pages/QuotesHandsontable.tsx": {
+            "lines": 335,
+            "tokens": 2696,
+            "sources": 1,
+            "clones": 7,
+            "duplicatedLines": 132,
+            "duplicatedTokens": 1051,
+            "percentage": 39.4,
+            "percentageTokens": 38.98,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/pages/Quotes.tsx": {
+            "lines": 301,
+            "tokens": 2526,
+            "sources": 1,
+            "clones": 5,
+            "duplicatedLines": 100,
+            "duplicatedTokens": 851,
+            "percentage": 33.22,
+            "percentageTokens": 33.69,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/pages/Portfolios.tsx": {
+            "lines": 156,
+            "tokens": 1336,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/pages/Login.tsx": {
+            "lines": 81,
+            "tokens": 673,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/pages/ImportData.tsx": {
+            "lines": 272,
+            "tokens": 2438,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 32,
+            "duplicatedTokens": 198,
+            "percentage": 11.76,
+            "percentageTokens": 8.12,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/pages/Dashboard.tsx": {
+            "lines": 9,
+            "tokens": 53,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/pages/AssetsCatalogHandsontable.tsx": {
+            "lines": 523,
+            "tokens": 4255,
+            "sources": 1,
+            "clones": 13,
+            "duplicatedLines": 286,
+            "duplicatedTokens": 2481,
+            "percentage": 54.68,
+            "percentageTokens": 58.31,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/pages/AssetsCatalog.tsx": {
+            "lines": 439,
+            "tokens": 3698,
+            "sources": 1,
+            "clones": 8,
+            "duplicatedLines": 224,
+            "duplicatedTokens": 2013,
+            "percentage": 51.03,
+            "percentageTokens": 54.43,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/components/ProtectedRoute.tsx": {
+            "lines": 31,
+            "tokens": 244,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/components/PortfolioHistory.tsx": {
+            "lines": 433,
+            "tokens": 3306,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 12,
+            "duplicatedTokens": 158,
+            "percentage": 2.77,
+            "percentageTokens": 4.78,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/components/PortfolioDistributionChart.tsx": {
+            "lines": 74,
+            "tokens": 721,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/components/PerformanceChart.tsx": {
+            "lines": 53,
+            "tokens": 606,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/components/Layout.tsx": {
+            "lines": 83,
+            "tokens": 557,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/components/Dashboard.tsx": {
+            "lines": 561,
+            "tokens": 5269,
+            "sources": 1,
+            "clones": 12,
+            "duplicatedLines": 140,
+            "duplicatedTokens": 1218,
+            "percentage": 24.96,
+            "percentageTokens": 23.12,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/components/CreatePortfolioModal.tsx": {
+            "lines": 112,
+            "tokens": 851,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 35,
+            "duplicatedTokens": 194,
+            "percentage": 31.25,
+            "percentageTokens": 22.8,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/components/AddTransactionModal.tsx": {
+            "lines": 301,
+            "tokens": 2375,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 35,
+            "duplicatedTokens": 194,
+            "percentage": 11.63,
+            "percentageTokens": 8.17,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/main.tsx": {
+            "lines": 45,
+            "tokens": 288,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "src/App.tsx": {
+            "lines": 92,
+            "tokens": 560,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 4444,
+          "tokens": 36840,
+          "sources": 20,
+          "clones": 35,
+          "duplicatedLines": 652,
+          "duplicatedTokens": 5315,
+          "percentage": 14.67,
+          "percentageTokens": 14.43,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      }
+    },
+    "total": {
+      "lines": 6859,
+      "tokens": 55802,
+      "sources": 46,
+      "clones": 40,
+      "duplicatedLines": 1067,
+      "duplicatedTokens": 8550,
+      "percentage": 15.56,
+      "percentageTokens": 15.32,
+      "newDuplicatedLines": 0,
+      "newClones": 0
+    }
+  },
+  "duplicates": [
+    {
+      "format": "javascript",
+      "lines": 55,
+      "fragment": "}\n                    className=\"text-red-600 hover:text-red-900\"\n                  >\n                    Eliminar\n                  </button>\n                </td>\n              </tr>\n            ))}\n          </tbody>\n        </table>\n\n        {users.length === 0 && (\n          <div className=\"text-center py-12 text-gray-500\">\n            No se encontraron usuarios\n          </div>\n        )}\n      </div>\n\n      {/* Modal Crear Usuario */}\n      {showModal && (\n        <div className=\"fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50\">\n          <div className=\"bg-white rounded-lg p-6 w-full max-w-md\">\n            <h2 className=\"text-2xl font-bold mb-4\">Crear Usuario</h2>\n            <form onSubmit={handleSubmit} className=\"space-y-4\">\n              <div>\n                <label className=\"block text-sm font-medium mb-1\">Usuario *</label>\n                <input\n                  type=\"text\"\n                  value={formData.username}\n                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}\n                  className=\"w-full px-3 py-2 border rounded\"\n                  required\n                />\n              </div>\n\n              <div>\n                <label className=\"block text-sm font-medium mb-1\">Correo Electrónico *</label>\n                <input\n                  type=\"email\"\n                  value={formData.email}\n                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}\n                  className=\"w-full px-3 py-2 border rounded\"\n                  required\n                />\n              </div>\n\n              <div>\n                <label className=\"block text-sm font-medium mb-1\">Contraseña *</label>\n                <input\n                  type=\"password\"\n                  value={formData.password}\n                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}\n                  className=\"w-full px-3 py-2 border rounded\"\n                  required\n                  minLength={6}",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/UsersCatalog.tsx",
+        "start": 147,
+        "end": 201,
+        "startLoc": {
+          "line": 147,
+          "column": 2,
+          "position": 1277
+        },
+        "endLoc": {
+          "line": 201,
+          "column": 2,
+          "position": 1686
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/UsersCatalogHandsontable.tsx",
+        "start": 233,
+        "end": 276,
+        "startLoc": {
+          "line": 233,
+          "column": 2,
+          "position": 1919
+        },
+        "endLoc": {
+          "line": 276,
+          "column": 2,
+          "position": 2260
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 19,
+      "fragment": "interface User {\n  id: string\n  username: string\n  email: string\n  is_active: boolean\n  created_at: string\n}\n\nexport default function UsersCatalog() {\n  const [users, setUsers] = useState<User[]>([])\n  const [isLoading, setIsLoading] = useState(true)\n  const [showModal, setShowModal] = useState(false)\n  const [formData, setFormData] = useState({\n    username: '',\n    email: '',\n    password: ''\n  })\n\n  useEffect",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/UsersCatalog.tsx",
+        "start": 5,
+        "end": 23,
+        "startLoc": {
+          "line": 5,
+          "column": 1,
+          "position": 32
+        },
+        "endLoc": {
+          "line": 23,
+          "column": 10,
+          "position": 182
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/UsersCatalogHandsontable.tsx",
+        "start": 15,
+        "end": 32,
+        "startLoc": {
+          "line": 15,
+          "column": 1,
+          "position": 96
+        },
+        "endLoc": {
+          "line": 32,
+          "column": 6,
+          "position": 245
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 39,
+      "fragment": ")\n\n  useEffect(() => {\n    loadUsers()\n  }, [])\n\n  const loadUsers = async () => {\n    setIsLoading(true)\n    try {\n      const response = await api.get('/users')\n      setUsers(response.data)\n    } catch (error) {\n      console.error('Failed to load users:', error)\n      alert('This feature requires admin privileges')\n    } finally {\n      setIsLoading(false)\n    }\n  }\n\n  const handleSubmit = async (e: React.FormEvent) => {\n    e.preventDefault()\n\n    if (!formData.username || !formData.email || !formData.password) {\n      alert('Todos los campos son obligatorios')\n      return\n    }\n\n    try {\n      await api.post('/auth/register', formData)\n      alert('Usuario creado correctamente')\n      setShowModal(false)\n      setFormData({ username: '', email: '', password: '' })\n      loadUsers()\n    } catch (error: any) {\n      alert(error.response?.data?.detail || 'Error al crear usuario')\n    }\n  }\n\n  const toggleUserStatus = async (user",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/UsersCatalog.tsx",
+        "start": 21,
+        "end": 59,
+        "startLoc": {
+          "line": 21,
+          "column": 2,
+          "position": 178
+        },
+        "endLoc": {
+          "line": 59,
+          "column": 5,
+          "position": 482
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/UsersCatalogHandsontable.tsx",
+        "start": 32,
+        "end": 70,
+        "startLoc": {
+          "line": 32,
+          "column": 5,
+          "position": 254
+        },
+        "endLoc": {
+          "line": 70,
+          "column": 7,
+          "position": 558
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 17,
+      "fragment": "</div>\n        </div>\n      </Layout>\n    )\n  }\n\n  return (\n    <Layout>\n      <div className=\"container mx-auto p-6 space-y-6\">\n      {/* Cabecera */}\n      <div className=\"flex items-center justify-between\">\n        <div>\n          <h1 className=\"text-3xl font-bold\">Gestión de Usuarios</h1>\n          <p className=\"text-gray-600\">Gestiona los usuarios del sistema (Solo administradores)</p>\n        </div>\n        <button\n          ",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/UsersCatalog.tsx",
+        "start": 87,
+        "end": 103,
+        "startLoc": {
+          "line": 87,
+          "column": 4,
+          "position": 746
+        },
+        "endLoc": {
+          "line": 103,
+          "column": 11,
+          "position": 865
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/UsersCatalogHandsontable.tsx",
+        "start": 187,
+        "end": 203,
+        "startLoc": {
+          "line": 187,
+          "column": 11,
+          "position": 1592
+        },
+        "endLoc": {
+          "line": 203,
+          "column": 13,
+          "position": 1711
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 8,
+      "fragment": "\">\n          <div className=\"bg-white rounded-lg p-6 w-full max-w-md\">\n            <h2 className=\"text-2xl font-bold mb-4\">Crear Usuario</h2>\n            <form onSubmit={handleSubmit} className=\"space-y-4\">\n              <div>\n                <label className=\"block text-sm font-medium mb-1\">Usuario *</label>\n                <input\n                  ",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/UsersCatalog.tsx",
+        "start": 167,
+        "end": 174,
+        "startLoc": {
+          "line": 167,
+          "column": 75,
+          "position": 1391
+        },
+        "endLoc": {
+          "line": 174,
+          "column": 19,
+          "position": 1464
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/UsersCatalogHandsontable.tsx",
+        "start": 242,
+        "end": 249,
+        "startLoc": {
+          "line": 242,
+          "column": 89,
+          "position": 1965
+        },
+        "endLoc": {
+          "line": 249,
+          "column": 21,
+          "position": 2038
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 17,
+      "fragment": "/>\n                <p className=\"text-xs text-gray-500 mt-1\">Mínimo 6 caracteres</p>\n              </div>\n\n              <div className=\"flex gap-2 justify-end\">\n                <button\n                  type=\"button\"\n                  onClick={() => {\n                    setShowModal(false)\n                    setFormData({ username: '', email: '', password: '' })\n                  }}\n                  className=\"px-4 py-2 border rounded hover:bg-gray-50\"\n                >\n                  Cancelar\n                </button>\n                <button\n                  ",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/UsersCatalog.tsx",
+        "start": 202,
+        "end": 218,
+        "startLoc": {
+          "line": 202,
+          "column": 17,
+          "position": 1688
+        },
+        "endLoc": {
+          "line": 218,
+          "column": 19,
+          "position": 1801
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/UsersCatalogHandsontable.tsx",
+        "start": 277,
+        "end": 293,
+        "startLoc": {
+          "line": 277,
+          "column": 19,
+          "position": 2262
+        },
+        "endLoc": {
+          "line": 293,
+          "column": 21,
+          "position": 2375
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 15,
+      "fragment": "import { useState, useEffect, useRef } from 'react'\nimport { HotTable } from '@handsontable/react-wrapper'\nimport { registerAllModules } from 'handsontable/registry'\nimport { registerLanguageDictionary, esMX } from 'handsontable/i18n'\nimport 'handsontable/dist/handsontable.full.min.css'\nimport '../styles/handsontable-custom.css'\nimport api from '../services/api'\nimport Layout from '../components/Layout'\n\n// Registrar todos los módulos de Handsontable\nregisterAllModules()\n// Registrar idioma español\nregisterLanguageDictionary(esMX)\n\ninterface Asset",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/QuotesHandsontable.tsx",
+        "start": 1,
+        "end": 15,
+        "startLoc": {
+          "line": 1,
+          "column": 1,
+          "position": 0
+        },
+        "endLoc": {
+          "line": 15,
+          "column": 6,
+          "position": 98
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/UsersCatalogHandsontable.tsx",
+        "start": 1,
+        "end": 15,
+        "startLoc": {
+          "line": 1,
+          "column": 1,
+          "position": 0
+        },
+        "endLoc": {
+          "line": 15,
+          "column": 5,
+          "position": 98
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 19,
+      "fragment": "<HotTable\n                ref={hotTableRef}\n                data={tableData}\n                columns={columns}\n                colHeaders={true}\n                rowHeaders={true}\n                height=\"500\"\n                licenseKey=\"non-commercial-and-evaluation\"\n                stretchH=\"all\"\n                autoWrapRow={true}\n                autoWrapCol={true}\n                filters={true}\n                dropdownMenu={true}\n                columnSorting={true}\n                manualColumnResize={true}\n                contextMenu={true}\n                language=\"es-MX\"\n              />\n            </",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/QuotesHandsontable.tsx",
+        "start": 312,
+        "end": 330,
+        "startLoc": {
+          "line": 312,
+          "column": 15,
+          "position": 2568
+        },
+        "endLoc": {
+          "line": 330,
+          "column": 3,
+          "position": 2670
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/UsersCatalogHandsontable.tsx",
+        "start": 218,
+        "end": 236,
+        "startLoc": {
+          "line": 218,
+          "column": 15,
+          "position": 1826
+        },
+        "endLoc": {
+          "line": 236,
+          "column": 2,
+          "position": 1930
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 95,
+      "fragment": "}>\n                      {asset.name} ({asset.symbol})\n                    </option>\n                  ))}\n                </select>\n              </div>\n\n              {/* Fecha Inicio */}\n              <div className=\"col-md-3\">\n                <label htmlFor=\"startDate\" className=\"form-label\">Fecha Inicio</label>\n                <input\n                  type=\"date\"\n                  id=\"startDate\"\n                  className=\"form-control\"\n                  value={startDate}\n                  onChange={(e) => setStartDate(e.target.value)}\n                  disabled={datesDisabled}\n                />\n              </div>\n\n              {/* Fecha Fin */}\n              <div className=\"col-md-3\">\n                <label htmlFor=\"endDate\" className=\"form-label\">Fecha Fin</label>\n                <input\n                  type=\"date\"\n                  id=\"endDate\"\n                  className=\"form-control\"\n                  value={endDate}\n                  onChange={(e) => setEndDate(e.target.value)}\n                  disabled={datesDisabled}\n                />\n              </div>\n\n              {/* Botón Buscar */}\n              <div className=\"col-md-2 d-flex align-items-end\">\n                <button\n                  className=\"btn btn-primary w-100\"\n                  onClick={handleSearch}\n                  disabled={isLoading}\n                >\n                  {isLoading ? '🔄 Buscando...' : '🔍 Buscar'}\n                </button>\n              </div>\n            </div>\n\n            {selectedAsset === 'all' && (\n              <div className=\"alert alert-info mt-3 mb-0\">\n                <small>\n                  ℹ️ Mostrando las últimas cotizaciones registradas para todos los activos\n                </small>\n              </div>\n            )}\n          </div>\n        </div>\n\n        {/* Tabla de Cotizaciones */}\n        <div className=\"card\">\n          <div className=\"card-body\">\n            <h5 className=\"card-title\">\n              Resultados {quotes.length > 0 && `(${quotes.length})`}\n            </h5>\n\n            {isLoading ? (\n              <div className=\"text-center py-5\">\n                <div className=\"spinner-border text-primary\" role=\"status\">\n                  <span className=\"visually-hidden\">Cargando...</span>\n                </div>\n              </div>\n            ) : quotes.length === 0 ? (\n              <div className=\"text-center text-muted py-5\">\n                <p>No se encontraron cotizaciones</p>\n                <small>\n                  {selectedAsset === 'all' \n                    ? 'Presiona \"Buscar\" para cargar las últimas cotizaciones de todos los activos'\n                    : 'Selecciona un rango de fechas y presiona \"Buscar\"'\n                  }\n                </small>\n              </div>\n            ) : (\n              <div className=\"table-responsive\">\n                <table className=\"table table-hover table-striped\">\n                  <thead>\n                    <tr>\n                      <th>Fecha</th>\n                      <th>Activo</th>\n                      <th className=\"text-end\">Cotización</th>\n                      <th className=\"text-end\">Apertura</th>\n                      <th className=\"text-end\">Máximo</th>\n                      <th className=\"text-end\">Mínimo</th>\n                      <th className=\"text-end\">Volumen</th>\n                    </tr>\n                  </thead>\n                  <tbody>\n                    {quotes.map((quote, index) => (\n                      <tr key={`",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/Quotes.tsx",
+        "start": 175,
+        "end": 269,
+        "startLoc": {
+          "line": 175,
+          "column": 7,
+          "position": 1461
+        },
+        "endLoc": {
+          "line": 269,
+          "column": 2,
+          "position": 2225
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/QuotesHandsontable.tsx",
+        "start": 239,
+        "end": 313,
+        "startLoc": {
+          "line": 239,
+          "column": 3,
+          "position": 2022
+        },
+        "endLoc": {
+          "line": 313,
+          "column": 12,
+          "position": 2574
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 26,
+      "fragment": "interface Asset {\n  id: string\n  symbol: string\n  name: string\n}\n\ninterface Quote {\n  symbol: string\n  date: string\n  close: number\n  open?: number\n  high?: number\n  low?: number\n  volume?: number\n}\n\nexport default function Quotes() {\n  const [assets, setAssets] = useState<Asset[]>([])\n  const [quotes, setQuotes] = useState<Quote[]>([])\n  const [isLoading, setIsLoading] = useState(false)\n  const [selectedAsset, setSelectedAsset] = useState<string>('all')\n  const [startDate, setStartDate] = useState('')\n  const [endDate, setEndDate] = useState('')\n  const [datesDisabled, setDatesDisabled] = useState(true)\n\n  useEffect",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/Quotes.tsx",
+        "start": 5,
+        "end": 30,
+        "startLoc": {
+          "line": 5,
+          "column": 1,
+          "position": 32
+        },
+        "endLoc": {
+          "line": 30,
+          "column": 10,
+          "position": 262
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/QuotesHandsontable.tsx",
+        "start": 15,
+        "end": 39,
+        "startLoc": {
+          "line": 15,
+          "column": 1,
+          "position": 96
+        },
+        "endLoc": {
+          "line": 39,
+          "column": 6,
+          "position": 325
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 30,
+      "fragment": ")\n\n  useEffect(() => {\n    loadAssets()\n  }, [])\n\n  useEffect(() => {\n    if (selectedAsset === 'all') {\n      setDatesDisabled(true)\n      setStartDate('')\n      setEndDate('')\n    } else {\n      setDatesDisabled(false)\n    }\n  }, [selectedAsset])\n\n  const loadAssets = async () => {\n    try {\n      const response = await api.get('/assets')\n      setAssets(response.data)\n    } catch (error) {\n      console.error('Error al cargar activos:', error)\n      alert('Error al cargar activos')\n    }\n  }\n\n  const loadLatestQuotes = async () => {\n    setIsLoading(true)\n    try {\n      // Obtener la última cotización de cada activo",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/Quotes.tsx",
+        "start": 28,
+        "end": 57,
+        "startLoc": {
+          "line": 28,
+          "column": 5,
+          "position": 258
+        },
+        "endLoc": {
+          "line": 57,
+          "column": 47,
+          "position": 460
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/QuotesHandsontable.tsx",
+        "start": 39,
+        "end": 68,
+        "startLoc": {
+          "line": 39,
+          "column": 5,
+          "position": 334
+        },
+        "endLoc": {
+          "line": 68,
+          "column": 6,
+          "position": 536
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 9,
+      "fragment": "const quotesBySymbol = new Map<string, Quote>()\n      response.data.forEach((quote: Quote) => {\n        const existing = quotesBySymbol.get(quote.symbol)\n        if (!existing || new Date(quote.date) > new Date(existing.date)) {\n          quotesBySymbol.set(quote.symbol, quote)\n        }\n      })\n      \n      // Convertir a array y ordenar por símbolo",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/Quotes.tsx",
+        "start": 63,
+        "end": 71,
+        "startLoc": {
+          "line": 63,
+          "column": 7,
+          "position": 503
+        },
+        "endLoc": {
+          "line": 71,
+          "column": 43,
+          "position": 610
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/QuotesHandsontable.tsx",
+        "start": 72,
+        "end": 80,
+        "startLoc": {
+          "line": 72,
+          "column": 7,
+          "position": 573
+        },
+        "endLoc": {
+          "line": 80,
+          "column": 6,
+          "position": 680
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 32,
+      "fragment": "const latestQuotes = Array.from(quotesBySymbol.values()).sort((a, b) => \n        a.symbol.localeCompare(b.symbol)\n      )\n      \n      setQuotes(latestQuotes)\n    } catch (error) {\n      console.error('Error al cargar cotizaciones:', error)\n      alert('Error al cargar cotizaciones')\n    } finally {\n      setIsLoading(false)\n    }\n  }\n\n  const loadFilteredQuotes = async () => {\n    if (selectedAsset === 'all') {\n      loadLatestQuotes()\n      return\n    }\n\n    if (!startDate || !endDate) {\n      alert('Por favor, selecciona las fechas de inicio y fin')\n      return\n    }\n\n    if (new Date(startDate) > new Date(endDate)) {\n      alert('La fecha de inicio debe ser anterior a la fecha de fin')\n      return\n    }\n\n    setIsLoading(true)\n    try {\n      const response",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/Quotes.tsx",
+        "start": 72,
+        "end": 103,
+        "startLoc": {
+          "line": 72,
+          "column": 7,
+          "position": 613
+        },
+        "endLoc": {
+          "line": 103,
+          "column": 9,
+          "position": 832
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/QuotesHandsontable.tsx",
+        "start": 80,
+        "end": 111,
+        "startLoc": {
+          "line": 80,
+          "column": 7,
+          "position": 680
+        },
+        "endLoc": {
+          "line": 111,
+          "column": 6,
+          "position": 899
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 8,
+      "fragment": "const sortedQuotes = response.data.sort((a: Quote, b: Quote) => \n        new Date(b.date).getTime() - new Date(a.date).getTime()\n      )\n      \n      setQuotes(sortedQuotes)\n    } catch (error) {\n      console.error('Error al cargar cotizaciones:', error)\n      alert('Error al cargar cotizaciones filtradas'",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/Quotes.tsx",
+        "start": 113,
+        "end": 120,
+        "startLoc": {
+          "line": 113,
+          "column": 7,
+          "position": 893
+        },
+        "endLoc": {
+          "line": 120,
+          "column": 41,
+          "position": 986
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/QuotesHandsontable.tsx",
+        "start": 123,
+        "end": 130,
+        "startLoc": {
+          "line": 123,
+          "column": 7,
+          "position": 993
+        },
+        "endLoc": {
+          "line": 130,
+          "column": 31,
+          "position": 1086
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 17,
+      "fragment": "${skipDuplicates}`,\n        formData,\n        {\n          headers: {\n            'Content-Type': 'multipart/form-data',\n          },\n        }\n      )\n      setImportResult(response.data)\n    } catch (error: any) {\n      alert(error.response?.data?.detail || 'Error al importar')\n    } finally {\n      setIsImporting(false)\n    }\n  }\n\n  const handleDownloadTemplate",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/ImportData.tsx",
+        "start": 68,
+        "end": 84,
+        "startLoc": {
+          "line": 68,
+          "column": 47,
+          "position": 566
+        },
+        "endLoc": {
+          "line": 84,
+          "column": 23,
+          "position": 665
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/ImportData.tsx",
+        "start": 40,
+        "end": 56,
+        "startLoc": {
+          "line": 40,
+          "column": 25,
+          "position": 379
+        },
+        "endLoc": {
+          "line": 56,
+          "column": 19,
+          "position": 478
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 51,
+      "fragment": "}\n              className=\"px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700\"\n            >\n              Buscar\n            </button>\n          </div>\n        </div>\n\n        {/* Tabla con Handsontable */}\n        <div className=\"bg-white rounded-lg shadow overflow-hidden\">\n          <div className=\"p-4\">\n            {filteredAssets.length === 0 ? (\n              <div className=\"text-center py-12 text-gray-500\">\n                No se encontraron activos\n              </div>\n            ) : (\n              <HotTable\n                ref={hotTableRef}\n                data={tableData}\n                columns={columns}\n                colHeaders={true}\n                rowHeaders={true}\n                height=\"500\"\n                licenseKey=\"non-commercial-and-evaluation\"\n                stretchH=\"all\"\n                autoWrapRow={true}\n                autoWrapCol={true}\n                filters={true}\n                dropdownMenu={true}\n                columnSorting={true}\n                manualColumnResize={true}\n                contextMenu={['copy']}\n                language=\"es-MX\"\n              />\n            )}\n          </div>\n        </div>\n\n        {/* Modal Crear/Editar */}\n        {showModal && (\n          <div className=\"modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50\">\n            <div className=\"bg-white rounded-lg p-6 w-full max-w-md\">\n              <h2 className=\"text-2xl font-bold mb-4\">\n                {editingAsset ? 'Editar Activo' : 'Crear Activo'}\n              </h2>\n              <form onSubmit={handleSubmit} className=\"space-y-4\">\n                <div>\n                  <label className=\"block text-sm font-medium mb-1\">Símbolo *</label>\n                  <input\n                    type=\"text\"\n                    value={formData.symbol",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/AssetsCatalogHandsontable.tsx",
+        "start": 323,
+        "end": 373,
+        "startLoc": {
+          "line": 323,
+          "column": 13,
+          "position": 2718
+        },
+        "endLoc": {
+          "line": 373,
+          "column": 7,
+          "position": 3058
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/UsersCatalogHandsontable.tsx",
+        "start": 203,
+        "end": 250,
+        "startLoc": {
+          "line": 203,
+          "column": 2,
+          "position": 1724
+        },
+        "endLoc": {
+          "line": 250,
+          "column": 9,
+          "position": 2050
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 19,
+      "fragment": "import { useState, useEffect, useRef } from 'react'\nimport { HotTable } from '@handsontable/react-wrapper'\nimport { registerAllModules } from 'handsontable/registry'\nimport { registerLanguageDictionary, esMX } from 'handsontable/i18n'\nimport 'handsontable/dist/handsontable.full.min.css'\nimport '../styles/handsontable-custom.css'\nimport api from '../services/api'\nimport Layout from '../components/Layout'\n\n// Registrar todos los módulos de Handsontable\nregisterAllModules()\n// Registrar idioma español\nregisterLanguageDictionary(esMX)\n\ninterface Asset {\n  id: string\n  symbol: string\n  name: string\n  asset_type",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/AssetsCatalogHandsontable.tsx",
+        "start": 1,
+        "end": 19,
+        "startLoc": {
+          "line": 1,
+          "column": 1,
+          "position": 0
+        },
+        "endLoc": {
+          "line": 19,
+          "column": 11,
+          "position": 121
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/UsersCatalogHandsontable.tsx",
+        "start": 1,
+        "end": 19,
+        "startLoc": {
+          "line": 1,
+          "column": 1,
+          "position": 0
+        },
+        "endLoc": {
+          "line": 19,
+          "column": 2,
+          "position": 120
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 6,
+      "fragment": "({\n      from_date: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],\n      to_date: new Date().toISOString().split('T')[0],\n      force_refresh: false\n    })\n    setShowImportModal",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/AssetsCatalogHandsontable.tsx",
+        "start": 133,
+        "end": 138,
+        "startLoc": {
+          "line": 133,
+          "column": 14,
+          "position": 1178
+        },
+        "endLoc": {
+          "line": 138,
+          "column": 19,
+          "position": 1263
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/AssetsCatalogHandsontable.tsx",
+        "start": 41,
+        "end": 46,
+        "startLoc": {
+          "line": 41,
+          "column": 9,
+          "position": 383
+        },
+        "endLoc": {
+          "line": 46,
+          "column": 6,
+          "position": 468
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 15,
+      "fragment": ")\n        td.appendChild(deleteBtn)\n        \n        return td\n      }\n    }\n  ]\n\n  if (isLoading) {\n    return (\n      <Layout>\n        <div className=\"flex h-96 items-center justify-center\">\n          <div className=\"text-center\">\n            <div className=\"inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4\"></div>\n            <div className=\"text-xl text-gray-600\">Cargando activos",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/AssetsCatalogHandsontable.tsx",
+        "start": 265,
+        "end": 279,
+        "startLoc": {
+          "line": 265,
+          "column": 8,
+          "position": 2315
+        },
+        "endLoc": {
+          "line": 279,
+          "column": 8,
+          "position": 2409
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/UsersCatalogHandsontable.tsx",
+        "start": 172,
+        "end": 186,
+        "startLoc": {
+          "line": 172,
+          "column": 10,
+          "position": 1491
+        },
+        "endLoc": {
+          "line": 186,
+          "column": 9,
+          "position": 1585
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 14,
+      "fragment": "...</div>\n          </div>\n        </div>\n      </Layout>\n    )\n  }\n\n  return (\n    <Layout>\n      <div className=\"container mx-auto p-6 space-y-6\">\n        {/* Cabecera */}\n        <div className=\"flex items-center justify-between\">\n          <div>\n            <h1 className=\"text-3xl font-bold\">Catálogo",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/AssetsCatalogHandsontable.tsx",
+        "start": 279,
+        "end": 292,
+        "startLoc": {
+          "line": 279,
+          "column": 8,
+          "position": 2410
+        },
+        "endLoc": {
+          "line": 292,
+          "column": 9,
+          "position": 2489
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/UsersCatalogHandsontable.tsx",
+        "start": 186,
+        "end": 199,
+        "startLoc": {
+          "line": 186,
+          "column": 9,
+          "position": 1586
+        },
+        "endLoc": {
+          "line": 199,
+          "column": 8,
+          "position": 1665
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 25,
+      "fragment": "</div>\n            ) : (\n              <HotTable\n                ref={hotTableRef}\n                data={tableData}\n                columns={columns}\n                colHeaders={true}\n                rowHeaders={true}\n                height=\"500\"\n                licenseKey=\"non-commercial-and-evaluation\"\n                stretchH=\"all\"\n                autoWrapRow={true}\n                autoWrapCol={true}\n                filters={true}\n                dropdownMenu={true}\n                columnSorting={true}\n                manualColumnResize={true}\n                contextMenu={['copy']}\n                language=\"es-MX\"\n              />\n            )}\n          </div>\n        </div>\n\n        {/* Modal Crear/Editar */",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/AssetsCatalogHandsontable.tsx",
+        "start": 337,
+        "end": 361,
+        "startLoc": {
+          "line": 337,
+          "column": 15,
+          "position": 2809
+        },
+        "endLoc": {
+          "line": 361,
+          "column": 25,
+          "position": 2941
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/UsersCatalogHandsontable.tsx",
+        "start": 216,
+        "end": 240,
+        "startLoc": {
+          "line": 216,
+          "column": 15,
+          "position": 1814
+        },
+        "endLoc": {
+          "line": 240,
+          "column": 26,
+          "position": 1946
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 50,
+      "fragment": "={handleUpdateAllQuotes}\n            className=\"px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700\"\n          >\n            📈 Actualizar Cotizaciones\n          </button>\n          <button\n            onClick={openCreateModal}\n            className=\"px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700\"\n          >\n            + Añadir Activo\n          </button>\n        </div>\n      </div>\n\n      {/* Búsqueda */}\n      <div className=\"bg-white p-4 rounded-lg shadow\">\n        <div className=\"flex gap-2\">\n          <input\n            type=\"text\"\n            value={searchTerm}\n            onChange={(e) => setSearchTerm(e.target.value)}\n            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}\n            placeholder=\"Buscar por símbolo o nombre...\"\n            className=\"flex-1 px-4 py-2 border rounded\"\n          />\n          <button\n            onClick={handleSearch}\n            className=\"px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700\"\n          >\n            Buscar\n          </button>\n        </div>\n      </div>\n\n      {/* Tabla de Activos */}\n      <div className=\"bg-white rounded-lg shadow overflow-hidden\">\n        <table className=\"w-full\">\n          <thead className=\"bg-gray-50\">\n            <tr>\n              <th className=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Símbolo</th>\n              <th className=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Nombre</th>\n              <th className=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Tipo</th>\n              <th className=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Mercado</th>\n              <th className=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Moneda</th>\n              <th className=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Acciones</th>\n            </tr>\n          </thead>\n          <tbody className=\"bg-white divide-y divide-gray-200\">\n            {filteredAssets.map((asset) => (\n              <tr key={asset",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/AssetsCatalog.tsx",
+        "start": 189,
+        "end": 238,
+        "startLoc": {
+          "line": 189,
+          "column": 8,
+          "position": 1705
+        },
+        "endLoc": {
+          "line": 238,
+          "column": 6,
+          "position": 2083
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/AssetsCatalogHandsontable.tsx",
+        "start": 297,
+        "end": 340,
+        "startLoc": {
+          "line": 297,
+          "column": 8,
+          "position": 2545
+        },
+        "endLoc": {
+          "line": 340,
+          "column": 12,
+          "position": 2827
+        }
+      }
+    },
+    {
+      "format": "javascript",
+      "lines": 169,
+      "fragment": "}\n                    className=\"text-red-600 hover:text-red-900\"\n                  >\n                    Eliminar\n                  </button>\n                </td>\n              </tr>\n            ))}\n          </tbody>\n        </table>\n\n        {filteredAssets.length === 0 && (\n          <div className=\"text-center py-12 text-gray-500\">\n            No se encontraron activos\n          </div>\n        )}\n      </div>\n\n      {/* Modal */}\n      {showModal && (\n        <div className=\"fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50\">\n          <div className=\"bg-white rounded-lg p-6 w-full max-w-md\">\n            <h2 className=\"text-2xl font-bold mb-4\">\n              {editingAsset ? 'Editar Activo' : 'Crear Activo'}\n            </h2>\n            <form onSubmit={handleSubmit} className=\"space-y-4\">\n              <div>\n                <label className=\"block text-sm font-medium mb-1\">Símbolo *</label>\n                <input\n                  type=\"text\"\n                  value={formData.symbol}\n                  onChange={(e) => setFormData({ ...formData, symbol: e.target.value.toUpperCase() })}\n                  className=\"w-full px-3 py-2 border rounded\"\n                  required\n                  disabled={!!editingAsset}\n                />\n              </div>\n\n              <div>\n                <label className=\"block text-sm font-medium mb-1\">Nombre *</label>\n                <input\n                  type=\"text\"\n                  value={formData.name}\n                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}\n                  className=\"w-full px-3 py-2 border rounded\"\n                  required\n                />\n              </div>\n\n              <div>\n                <label className=\"block text-sm font-medium mb-1\">Tipo</label>\n                <select\n                  value={formData.asset_type}\n                  onChange={(e) => setFormData({ ...formData, asset_type: e.target.value })}\n                  className=\"w-full px-3 py-2 border rounded\"\n                >\n                  <option value=\"stock\">Acción</option>\n                  <option value=\"etf\">ETF</option>\n                  <option value=\"crypto\">Criptomoneda</option>\n                  <option value=\"bond\">Bono</option>\n                  <option value=\"fund\">Fondo</option>\n                </select>\n              </div>\n\n              <div>\n                <label className=\"block text-sm font-medium mb-1\">Mercado</label>\n                <input\n                  type=\"text\"\n                  value={formData.market}\n                  onChange={(e) => setFormData({ ...formData, market: e.target.value })}\n                  className=\"w-full px-3 py-2 border rounded\"\n                  placeholder=\"NASDAQ, NYSE, etc.\"\n                />\n              </div>\n\n              <div>\n                <label className=\"block text-sm font-medium mb-1\">Moneda</label>\n                <input\n                  type=\"text\"\n                  value={formData.currency}\n                  onChange={(e) => setFormData({ ...formData, currency: e.target.value.toUpperCase() })}\n                  className=\"w-full px-3 py-2 border rounded\"\n                />\n              </div>\n\n              <div className=\"flex gap-2 justify-end\">\n                <button\n                  type=\"button\"\n                  onClick={() => setShowModal(false)}\n                  className=\"px-4 py-2 border rounded hover:bg-gray-50\"\n                >\n                  Cancelar\n                </button>\n                <button\n                  type=\"submit\"\n                  className=\"px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700\"\n                >\n                  {editingAsset ? 'Actualizar' : 'Crear'}\n                </button>\n              </div>\n            </form>\n          </div>\n        </div>\n      )}\n\n      {/* Modal de Importación Histórica */}\n      {showImportModal && importingAsset && (\n        <div className=\"fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50\">\n          <div className=\"bg-white rounded-lg p-6 w-full max-w-md\">\n            <h2 className=\"text-2xl font-bold mb-4\">Importar Datos Históricos</h2>\n            <p className=\"text-gray-600 mb-4\">\n              Activo: <span className=\"font-semibold\">{importingAsset.symbol}</span>\n            </p>\n            \n            <div className=\"space-y-4\">\n              <div>\n                <label className=\"block text-sm font-medium mb-1\">Fecha Inicio</label>\n                <input\n                  type=\"date\"\n                  value={importData.from_date}\n                  onChange={(e) => setImportData({ ...importData, from_date: e.target.value })}\n                  className=\"w-full px-3 py-2 border rounded\"\n                  max={importData.to_date}\n                />\n              </div>\n\n              <div>\n                <label className=\"block text-sm font-medium mb-1\">Fecha Fin</label>\n                <input\n                  type=\"date\"\n                  value={importData.to_date}\n                  onChange={(e) => setImportData({ ...importData, to_date: e.target.value })}\n                  className=\"w-full px-3 py-2 border rounded\"\n                  min={importData.from_date}\n                  max={new Date().toISOString().split('T')[0]}\n                />\n              </div>\n\n              <div className=\"flex items-center\">\n                <input\n                  type=\"checkbox\"\n                  id=\"force_refresh\"\n                  checked={importData.force_refresh}\n                  onChange={(e) => setImportData({ ...importData, force_refresh: e.target.checked })}\n                  className=\"mr-2\"\n                />\n                <label htmlFor=\"force_refresh\" className=\"text-sm\">\n                  Forzar re-importación (sobrescribir existentes)\n                </label>\n              </div>\n\n              <div className=\"bg-yellow-50 border border-yellow-200 rounded p-3 text-sm\">\n                <p className=\"text-yellow-800\">\n                  ℹ️ Máximo: 2 años por solicitud. La importación inteligente solo descarga datos faltantes.\n                </p>\n              </div>\n\n              <div className=\"flex gap-2 justify-end\">\n                <button\n                  type=\"button\"\n                  onClick={() => setShowImportModal(false)}\n                  className=\"px-4 py-2 border rounded hover:bg-gray-50\"\n                  disabled={isImporting}\n                >\n                  Cancelar\n                </button>\n                <button\n                  onClick={handleImportHistorical}\n                  disabled={isImporting}",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/AssetsCatalog.tsx",
+        "start": 259,
+        "end": 427,
+        "startLoc": {
+          "line": 259,
+          "column": 2,
+          "position": 2289
+        },
+        "endLoc": {
+          "line": 427,
+          "column": 2,
+          "position": 3633
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/AssetsCatalogHandsontable.tsx",
+        "start": 354,
+        "end": 511,
+        "startLoc": {
+          "line": 354,
+          "column": 2,
+          "position": 2914
+        },
+        "endLoc": {
+          "line": 511,
+          "column": 2,
+          "position": 4190
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 33,
+      "fragment": "interface Asset {\n  id: string\n  symbol: string\n  name: string\n  asset_type: string\n  market?: string\n  currency: string\n  created_at: string\n}\n\nexport default function AssetsCatalog() {\n  const [assets, setAssets] = useState<Asset[]>([])\n  const [isLoading, setIsLoading] = useState(true)\n  const [searchTerm, setSearchTerm] = useState('')\n  const [showModal, setShowModal] = useState(false)\n  const [showImportModal, setShowImportModal] = useState(false)\n  const [editingAsset, setEditingAsset] = useState<Asset | null>(null)\n  const [importingAsset, setImportingAsset] = useState<Asset | null>(null)\n  const [isImporting, setIsImporting] = useState(false)\n  const [formData, setFormData] = useState({\n    symbol: '',\n    name: '',\n    asset_type: 'stock',\n    market: '',\n    currency: 'USD'\n  })\n  const [importData, setImportData] = useState({\n    from_date: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],\n    to_date: new Date().toISOString().split('T')[0],\n    force_refresh: false\n  })\n\n  useEffect",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/AssetsCatalog.tsx",
+        "start": 5,
+        "end": 37,
+        "startLoc": {
+          "line": 5,
+          "column": 1,
+          "position": 32
+        },
+        "endLoc": {
+          "line": 37,
+          "column": 10,
+          "position": 405
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/AssetsCatalogHandsontable.tsx",
+        "start": 15,
+        "end": 46,
+        "startLoc": {
+          "line": 15,
+          "column": 1,
+          "position": 96
+        },
+        "endLoc": {
+          "line": 46,
+          "column": 6,
+          "position": 468
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 74,
+      "fragment": ")\n\n  useEffect(() => {\n    loadAssets()\n  }, [])\n\n  const loadAssets = async () => {\n    setIsLoading(true)\n    try {\n      const response = await api.get('/assets')\n      setAssets(response.data)\n    } catch (error) {\n      console.error('Failed to load assets:', error)\n    } finally {\n      setIsLoading(false)\n    }\n  }\n\n  const handleSearch = async () => {\n    if (!searchTerm.trim()) {\n      loadAssets()\n      return\n    }\n\n    try {\n      const response = await api.get(`/assets/search?q=${searchTerm}`)\n      setAssets(response.data)\n    } catch (error) {\n      console.error('Búsqueda fallida:', error)\n    }\n  }\n\n  const openCreateModal = () => {\n    setEditingAsset(null)\n    setFormData({ symbol: '', name: '', asset_type: 'stock', market: '', currency: 'USD' })\n    setShowModal(true)\n  }\n\n  const openEditModal = (asset: Asset) => {\n    setEditingAsset(asset)\n    setFormData({\n      symbol: asset.symbol,\n      name: asset.name,\n      asset_type: asset.asset_type,\n      market: asset.market || '',\n      currency: asset.currency\n    })\n    setShowModal(true)\n  }\n\n  const handleSubmit = async (e: React.FormEvent) => {\n    e.preventDefault()\n\n    if (!formData.symbol || !formData.name) {\n      alert('El símbolo y el nombre son obligatorios')\n      return\n    }\n\n    try {\n      if (editingAsset) {\n        await api.put(`/assets/${editingAsset.id}`, formData)\n        alert('Activo actualizado correctamente')\n      } else {\n        await api.post('/assets', formData)\n        alert('Activo creado correctamente')\n      }\n      setShowModal(false)\n      loadAssets()\n    } catch (error: any) {\n      alert(error.response?.data?.detail || 'Operación fallida')\n    }\n  }\n\n  const handleDelete = async (asset",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/AssetsCatalog.tsx",
+        "start": 35,
+        "end": 108,
+        "startLoc": {
+          "line": 35,
+          "column": 2,
+          "position": 401
+        },
+        "endLoc": {
+          "line": 108,
+          "column": 6,
+          "position": 973
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/AssetsCatalogHandsontable.tsx",
+        "start": 46,
+        "end": 119,
+        "startLoc": {
+          "line": 46,
+          "column": 5,
+          "position": 477
+        },
+        "endLoc": {
+          "line": 119,
+          "column": 8,
+          "position": 1049
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 57,
+      "fragment": "}`)\n      alert('Activo eliminado correctamente')\n      loadAssets()\n    } catch (error: any) {\n      alert(error.response?.data?.detail || 'Error al eliminar')\n    }\n  }\n\n  const openImportModal = (asset: Asset) => {\n    setImportingAsset(asset)\n    setImportData({\n      from_date: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],\n      to_date: new Date().toISOString().split('T')[0],\n      force_refresh: false\n    })\n    setShowImportModal(true)\n  }\n\n  const handleImportHistorical = async () => {\n    if (!importingAsset) return\n\n    setIsImporting(true)\n    \n    try {\n      const response = await api.post(\n        `/quotes/import-historical-smart?symbol=${importingAsset.symbol}&start_date=${importData.from_date}&end_date=${importData.to_date}&force_refresh=${importData.force_refresh}`\n      )\n\n      if (response.data) {\n        alert(`Importados ${response.data.created} registros para ${importingAsset.symbol}`)\n        setShowImportModal(false)\n      }\n    } catch (error: any) {\n      alert(error.response?.data?.detail || 'Error en la importación')\n    } finally {\n      setIsImporting(false)\n    }\n  }\n\n  const handleUpdateAllQuotes = async () => {\n    if (!confirm('¿Actualizar cotizaciones de todos los activos? Puede tardar varios minutos.')) return\n\n    try {\n      const response = await api.post('/quotes/update-all-latest')\n      alert(`Actualizados ${response.data.updated} de ${response.data.total_assets} activos`)\n    } catch (error: any) {\n      alert('Error al actualizar cotizaciones')\n    }\n  }\n\n  const filteredAssets = assets.filter(\n    (asset) =>\n      asset.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||\n      asset.name.toLowerCase().includes(searchTerm.toLowerCase())\n  )\n\n  if",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/AssetsCatalog.tsx",
+        "start": 112,
+        "end": 168,
+        "startLoc": {
+          "line": 112,
+          "column": 3,
+          "position": 1020
+        },
+        "endLoc": {
+          "line": 168,
+          "column": 3,
+          "position": 1533
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/AssetsCatalogHandsontable.tsx",
+        "start": 123,
+        "end": 179,
+        "startLoc": {
+          "line": 123,
+          "column": 8,
+          "position": 1098
+        },
+        "endLoc": {
+          "line": 179,
+          "column": 6,
+          "position": 1611
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 18,
+      "fragment": "...</div>\n        </div>\n      </Layout>\n    )\n  }\n\n  return (\n    <Layout>\n      <div className=\"container mx-auto p-6 space-y-6\">\n      {/* Cabecera */}\n      <div className=\"flex items-center justify-between\">\n        <div>\n          <h1 className=\"text-3xl font-bold\">Catálogo de Activos</h1>\n          <p className=\"text-gray-600\">Gestiona acciones, ETFs y otros activos</p>\n        </div>\n        <div className=\"flex gap-2\">\n          <button\n            ",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/AssetsCatalog.tsx",
+        "start": 172,
+        "end": 189,
+        "startLoc": {
+          "line": 172,
+          "column": 8,
+          "position": 1575
+        },
+        "endLoc": {
+          "line": 189,
+          "column": 13,
+          "position": 1703
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/UsersCatalog.tsx",
+        "start": 87,
+        "end": 297,
+        "startLoc": {
+          "line": 87,
+          "column": 9,
+          "position": 745
+        },
+        "endLoc": {
+          "line": 297,
+          "column": 15,
+          "position": 2543
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 10,
+      "fragment": "\">\n          <div className=\"bg-white rounded-lg p-6 w-full max-w-md\">\n            <h2 className=\"text-2xl font-bold mb-4\">\n              {editingAsset ? 'Editar Activo' : 'Crear Activo'}\n            </h2>\n            <form onSubmit={handleSubmit} className=\"space-y-4\">\n              <div>\n                <label className=\"block text-sm font-medium mb-1\">Símbolo *</label>\n                <input\n                  ",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/AssetsCatalog.tsx",
+        "start": 279,
+        "end": 288,
+        "startLoc": {
+          "line": 279,
+          "column": 75,
+          "position": 2403
+        },
+        "endLoc": {
+          "line": 288,
+          "column": 19,
+          "position": 2489
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/AssetsCatalogHandsontable.tsx",
+        "start": 363,
+        "end": 372,
+        "startLoc": {
+          "line": 363,
+          "column": 89,
+          "position": 2960
+        },
+        "endLoc": {
+          "line": 372,
+          "column": 21,
+          "position": 3046
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 13,
+      "fragment": ">\n                  <option value=\"stock\">Acción</option>\n                  <option value=\"etf\">ETF</option>\n                  <option value=\"crypto\">Criptomoneda</option>\n                  <option value=\"bond\">Bono</option>\n                  <option value=\"fund\">Fondo</option>\n                </select>\n              </div>\n\n              <div>\n                <label className=\"block text-sm font-medium mb-1\">Mercado</label>\n                <input\n                  ",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/AssetsCatalog.tsx",
+        "start": 314,
+        "end": 326,
+        "startLoc": {
+          "line": 314,
+          "column": 17,
+          "position": 2709
+        },
+        "endLoc": {
+          "line": 326,
+          "column": 19,
+          "position": 2820
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/AssetsCatalogHandsontable.tsx",
+        "start": 398,
+        "end": 410,
+        "startLoc": {
+          "line": 398,
+          "column": 19,
+          "position": 3266
+        },
+        "endLoc": {
+          "line": 410,
+          "column": 21,
+          "position": 3377
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 12,
+      "fragment": "\">\n          <div className=\"bg-white rounded-lg p-6 w-full max-w-md\">\n            <h2 className=\"text-2xl font-bold mb-4\">Importar Datos Históricos</h2>\n            <p className=\"text-gray-600 mb-4\">\n              Activo: <span className=\"font-semibold\">{importingAsset.symbol}</span>\n            </p>\n            \n            <div className=\"space-y-4\">\n              <div>\n                <label className=\"block text-sm font-medium mb-1\">Fecha Inicio</label>\n                <input\n                  ",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/AssetsCatalog.tsx",
+        "start": 366,
+        "end": 377,
+        "startLoc": {
+          "line": 366,
+          "column": 75,
+          "position": 3103
+        },
+        "endLoc": {
+          "line": 377,
+          "column": 19,
+          "position": 3212
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/AssetsCatalogHandsontable.tsx",
+        "start": 450,
+        "end": 461,
+        "startLoc": {
+          "line": 450,
+          "column": 89,
+          "position": 3660
+        },
+        "endLoc": {
+          "line": 461,
+          "column": 21,
+          "position": 3769
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 15,
+      "fragment": "/>\n                <label htmlFor=\"force_refresh\" className=\"text-sm\">\n                  Forzar re-importación (sobrescribir existentes)\n                </label>\n              </div>\n\n              <div className=\"bg-yellow-50 border border-yellow-200 rounded p-3 text-sm\">\n                <p className=\"text-yellow-800\">\n                  ℹ️ Máximo: 2 años por solicitud. La importación inteligente solo descarga datos faltantes.\n                </p>\n              </div>\n\n              <div className=\"flex gap-2 justify-end\">\n                <button\n                  ",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/pages/AssetsCatalog.tsx",
+        "start": 404,
+        "end": 418,
+        "startLoc": {
+          "line": 404,
+          "column": 17,
+          "position": 3455
+        },
+        "endLoc": {
+          "line": 418,
+          "column": 19,
+          "position": 3576
+        }
+      },
+      "secondFile": {
+        "name": "src/pages/AssetsCatalogHandsontable.tsx",
+        "start": 488,
+        "end": 502,
+        "startLoc": {
+          "line": 488,
+          "column": 19,
+          "position": 4012
+        },
+        "endLoc": {
+          "line": 502,
+          "column": 21,
+          "position": 4133
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 7,
+      "fragment": " data={chartData}>\n              <CartesianGrid strokeDasharray=\"3 3\" stroke=\"#e2e8f0\" />\n              <XAxis dataKey=\"date\" stroke=\"#64748b\" />\n              <YAxis stroke=\"#64748b\" />\n              <Tooltip content={<CustomTooltip />} />\n              <Legend />\n              <Line",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/components/PortfolioHistory.tsx",
+        "start": 349,
+        "end": 355,
+        "startLoc": {
+          "line": 349,
+          "column": 10,
+          "position": 2625
+        },
+        "endLoc": {
+          "line": 355,
+          "column": 5,
+          "position": 2704
+        }
+      },
+      "secondFile": {
+        "name": "src/components/PortfolioHistory.tsx",
+        "start": 327,
+        "end": 333,
+        "startLoc": {
+          "line": 327,
+          "column": 10,
+          "position": 2461
+        },
+        "endLoc": {
+          "line": 333,
+          "column": 5,
+          "position": 2540
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 12,
+      "fragment": "},\n          renderer: function(instance: any, td: HTMLTableCellElement, row: number, col: number, prop: any, value: any, cellProperties: any) {\n            Handsontable.renderers.NumericRenderer.apply(this, [instance, td, row, col, prop, value, cellProperties]);\n            if (value >= 0) {\n              td.classList.add('htPositive');\n            } else {\n              td.classList.add('htNegative');\n            }\n            return td;\n          }\n        }\n      ]",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/components/Dashboard.tsx",
+        "start": 179,
+        "end": 190,
+        "startLoc": {
+          "line": 179,
+          "column": 2,
+          "position": 1911
+        },
+        "endLoc": {
+          "line": 190,
+          "column": 2,
+          "position": 2058
+        }
+      },
+      "secondFile": {
+        "name": "src/components/Dashboard.tsx",
+        "start": 164,
+        "end": 174,
+        "startLoc": {
+          "line": 164,
+          "column": 2,
+          "position": 1725
+        },
+        "endLoc": {
+          "line": 174,
+          "column": 2,
+          "position": 1870
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 16,
+      "fragment": ".current || !selectedSnapshot) return;\n\n    const data = selectedSnapshot.positions.map(p => ({\n      symbol: p.symbol,\n      name: p.name,\n      asset_type: p.asset_type,\n      quantity: p.quantity,\n      average_price: p.average_price,\n      current_price: p.current_price,\n      current_value: p.current_value,\n      cost_basis: p.cost_basis,\n      profit_loss: p.profit_loss,\n      profit_loss_percent: p.profit_loss_percent\n    }));\n\n    hotInstance.current.",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/components/Dashboard.tsx",
+        "start": 204,
+        "end": 219,
+        "startLoc": {
+          "line": 204,
+          "column": 12,
+          "position": 2153
+        },
+        "endLoc": {
+          "line": 219,
+          "column": 2,
+          "position": 2286
+        }
+      },
+      "secondFile": {
+        "name": "src/components/Dashboard.tsx",
+        "start": 122,
+        "end": 137,
+        "startLoc": {
+          "line": 122,
+          "column": 12,
+          "position": 1231
+        },
+        "endLoc": {
+          "line": 137,
+          "column": 2,
+          "position": 1365
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 12,
+      "fragment": ">\n\n        <div className=\"bg-white overflow-hidden shadow rounded-lg\">\n          <div className=\"p-5\">\n            <div className=\"flex items-center\">\n              <div className=\"flex-shrink-0\">\n                <Wallet className=\"h-6 w-6 text-gray-400\" />\n              </div>\n              <div className=\"ml-5 w-0 flex-1\">\n                <dl>\n                  <dt className=\"text-sm font-medium text-gray-500 truncate\">\n                    Costo",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/components/Dashboard.tsx",
+        "start": 359,
+        "end": 370,
+        "startLoc": {
+          "line": 359,
+          "column": 4,
+          "position": 3457
+        },
+        "endLoc": {
+          "line": 370,
+          "column": 6,
+          "position": 3549
+        }
+      },
+      "secondFile": {
+        "name": "src/components/Dashboard.tsx",
+        "start": 340,
+        "end": 350,
+        "startLoc": {
+          "line": 340,
+          "column": 2,
+          "position": 3308
+        },
+        "endLoc": {
+          "line": 350,
+          "column": 6,
+          "position": 3399
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 13,
+      "fragment": ")}\n                  </dd>\n                </dl>\n              </div>\n            </div>\n          </div>\n        </div>\n\n        <div className=\"bg-white overflow-hidden shadow rounded-lg\">\n          <div className=\"p-5\">\n            <div className=\"flex items-center\">\n              <div className=\"flex-shrink-0\">\n                {",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/components/Dashboard.tsx",
+        "start": 373,
+        "end": 385,
+        "startLoc": {
+          "line": 373,
+          "column": 10,
+          "position": 3576
+        },
+        "endLoc": {
+          "line": 385,
+          "column": 2,
+          "position": 3655
+        }
+      },
+      "secondFile": {
+        "name": "src/components/Dashboard.tsx",
+        "start": 353,
+        "end": 365,
+        "startLoc": {
+          "line": 353,
+          "column": 11,
+          "position": 3426
+        },
+        "endLoc": {
+          "line": 365,
+          "column": 2,
+          "position": 3505
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 13,
+      "fragment": ")}\n                  </dd>\n                </dl>\n              </div>\n            </div>\n          </div>\n        </div>\n\n        <div className=\"bg-white overflow-hidden shadow rounded-lg\">\n          <div className=\"p-5\">\n            <div className=\"flex items-center\">\n              <div className=\"flex-shrink-0\">\n                {totals.totalProfitLossPercent",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/components/Dashboard.tsx",
+        "start": 397,
+        "end": 409,
+        "startLoc": {
+          "line": 397,
+          "column": 16,
+          "position": 3781
+        },
+        "endLoc": {
+          "line": 409,
+          "column": 23,
+          "position": 3863
+        }
+      },
+      "secondFile": {
+        "name": "src/components/Dashboard.tsx",
+        "start": 353,
+        "end": 385,
+        "startLoc": {
+          "line": 353,
+          "column": 11,
+          "position": 3426
+        },
+        "endLoc": {
+          "line": 385,
+          "column": 16,
+          "position": 3658
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 10,
+      "fragment": ">= 0 ? (\n                  <TrendingUp className=\"h-6 w-6 text-green-500\" />\n                ) : (\n                  <TrendingDown className=\"h-6 w-6 text-red-500\" />\n                )}\n              </div>\n              <div className=\"ml-5 w-0 flex-1\">\n                <dl>\n                  <dt className=\"text-sm font-medium text-gray-500 truncate\">\n                    Rendimiento",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/components/Dashboard.tsx",
+        "start": 409,
+        "end": 418,
+        "startLoc": {
+          "line": 409,
+          "column": 2,
+          "position": 3865
+        },
+        "endLoc": {
+          "line": 418,
+          "column": 12,
+          "position": 3941
+        }
+      },
+      "secondFile": {
+        "name": "src/components/Dashboard.tsx",
+        "start": 385,
+        "end": 394,
+        "startLoc": {
+          "line": 385,
+          "column": 2,
+          "position": 3660
+        },
+        "endLoc": {
+          "line": 394,
+          "column": 9,
+          "position": 3736
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 18,
+      "fragment": "</h3>\n            <button\n              onClick={onClose}\n              className=\"text-gray-400 hover:text-gray-500\"\n            >\n              <X className=\"h-6 w-6\" />\n            </button>\n          </div>\n\n          {error && (\n            <div className=\"mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded\">\n              {error}\n            </div>\n          )}\n\n          <form onSubmit={handleSubmit}>\n            <div className=\"space-y-4\">\n              {",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/components/AddTransactionModal.tsx",
+        "start": 92,
+        "end": 109,
+        "startLoc": {
+          "line": 92,
+          "column": 13,
+          "position": 896
+        },
+        "endLoc": {
+          "line": 109,
+          "column": 2,
+          "position": 998
+        }
+      },
+      "secondFile": {
+        "name": "src/components/CreatePortfolioModal.tsx",
+        "start": 45,
+        "end": 62,
+        "startLoc": {
+          "line": 45,
+          "column": 13,
+          "position": 445
+        },
+        "endLoc": {
+          "line": 62,
+          "column": 2,
+          "position": 547
+        }
+      }
+    },
+    {
+      "format": "tsx",
+      "lines": 19,
+      "fragment": "\"\n                />\n              </div>\n            </div>\n\n            <div className=\"mt-6 flex justify-end space-x-3\">\n              <button\n                type=\"button\"\n                onClick={onClose}\n                className=\"px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50\"\n              >\n                Cancelar\n              </button>\n              <button\n                type=\"submit\"\n                disabled={loading || !selectedAsset}\n                className=\"px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 disabled:opacity-50\"\n              >\n                {loading ? 'Guardando...'",
+      "tokens": 0,
+      "firstFile": {
+        "name": "src/components/AddTransactionModal.tsx",
+        "start": 276,
+        "end": 294,
+        "startLoc": {
+          "line": 276,
+          "column": 43,
+          "position": 2242
+        },
+        "endLoc": {
+          "line": 294,
+          "column": 15,
+          "position": 2334
+        }
+      },
+      "secondFile": {
+        "name": "src/components/CreatePortfolioModal.tsx",
+        "start": 87,
+        "end": 105,
+        "startLoc": {
+          "line": 87,
+          "column": 35,
+          "position": 722
+        },
+        "endLoc": {
+          "line": 105,
+          "column": 13,
+          "position": 810
+        }
+      }
+    }
+  ]
+}

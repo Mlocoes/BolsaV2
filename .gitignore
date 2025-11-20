@@ -13,3 +13,7 @@ redis-data/
 .DS_Store
 .idea/
 .vscode/
+
+# Docker Secrets (información sensible)
+secrets/
+*.txt

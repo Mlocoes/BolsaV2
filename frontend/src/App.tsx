@@ -1,25 +1,90 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { useEffect } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
+import { useAuthStore } from './stores/authStore'
+import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Portfolios from './pages/Portfolios'
-import AssetsCatalog from './pages/AssetsCatalog'
+import AssetsCatalog from './pages/AssetsCatalogHandsontable'
+import Quotes from './pages/QuotesHandsontable'
 import ImportData from './pages/ImportData'
-import UsersCatalog from './pages/UsersCatalog'
+import UsersCatalog from './pages/UsersCatalogHandsontable'
 
 function App() {
-  console.log('App component rendering...')
+  const { logout } = useAuthStore()
+
+  useEffect(() => {
+    // SIEMPRE hacer logout al cargar/recargar (F5)
+    // Esto fuerza que el usuario tenga que hacer login cada vez
+    logout().catch(() => {
+      // Ignorar errores si no hay sesión
+    })
+
+    // Forzar navegación a login SIN cambiar la URL completa
+    // Solo si no estamos ya en login
+    if (window.location.pathname !== '/login') {
+      window.history.replaceState(null, '', '/login')
+    }
+  }, [])
   
   return (
     <BrowserRouter>
       <Toaster position="top-right" />
       <Routes>
+        {/* Ruta raíz siempre redirige a login */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/portfolios" element={<Portfolios />} />
-        <Route path="/assets" element={<AssetsCatalog />} />
-        <Route path="/import" element={<ImportData />} />
-        <Route path="/users" element={<UsersCatalog />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/portfolios"
+          element={
+            <ProtectedRoute>
+              <Portfolios />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/assets"
+          element={
+            <ProtectedRoute>
+              <AssetsCatalog />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/quotes"
+          element={
+            <ProtectedRoute>
+              <Quotes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/import"
+          element={
+            <ProtectedRoute>
+              <ImportData />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute>
+              <UsersCatalog />
+            </ProtectedRoute>
+          }
+        />
+        {/* Redirigir cualquier ruta no encontrada a login */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   )
