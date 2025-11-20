@@ -22,13 +22,15 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (isSubmitting) return
-    
+
     setIsSubmitting(true)
     try {
-      console.log('Intentando iniciar sesión con el usuario:', username)
-      await login(username, password)
+      const trimmedUsername = username.trim()
+      const trimmedPassword = password.trim()
+      console.log('Intentando iniciar sesión con el usuario:', trimmedUsername)
+      await login(trimmedUsername, trimmedPassword)
       console.log('Inicio de sesión exitoso, navegando al panel de control')
       toast.success('¡Inicio de sesión exitoso!')
       // La redirección se hará automáticamente por el useEffect

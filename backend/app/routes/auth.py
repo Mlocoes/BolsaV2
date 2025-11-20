@@ -69,8 +69,11 @@ async def login(
         LoginResponse con datos del usuario
     """
     # Buscar usuario
+    # Normalizar username (trim y lowercase) para hacer el login insensible a mayúsculas/espacios
+    username = form_data.username.strip().lower() if form_data.username else ""
+    
     result = db.execute(
-        select(Usuario).where(Usuario.username == form_data.username)
+        select(Usuario).where(Usuario.username == username)
     )
     user = result.scalar_one_or_none()
     
