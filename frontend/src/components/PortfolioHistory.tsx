@@ -1,8 +1,20 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { HotTable } from '@handsontable/react-wrapper'
+import Handsontable from 'handsontable'
+import { registerAllModules } from 'handsontable/registry'
+import { registerLanguageDictionary, esMX } from 'handsontable/i18n'
+import 'handsontable/dist/handsontable.full.min.css'
+import '../styles/handsontable-custom.css'
 import { snapshotService } from '../services/snapshotService'
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { TrendingUp, TrendingDown, Calendar, BarChart3, RefreshCw } from 'lucide-react'
+import { Calendar, BarChart3, RefreshCw } from 'lucide-react'
 import { toast } from 'react-hot-toast'
+
+// Registrar todos los módulos de Handsontable
+registerAllModules()
+// Registrar idioma español (usando es-MX pero con código es-ES)
+const esESDict = { ...esMX, languageCode: 'es-ES' }
+registerLanguageDictionary(esESDict)
 
 interface PortfolioHistoryProps {
   portfolioId: string
@@ -42,6 +54,7 @@ export default function PortfolioHistory({ portfolioId }: PortfolioHistoryProps)
   const [period, setPeriod] = useState<'7d' | '30d' | '90d' | '1y' | 'ytd' | 'all'>('30d')
   const [chartType, setChartType] = useState<'value' | 'pnl'>('value')
   const [isBackfilling, setIsBackfilling] = useState(false)
+  const hotTableRef = useRef(null)
 
   useEffect(() => {
     loadHistory()
@@ -371,62 +384,118 @@ export default function PortfolioHistory({ portfolioId }: PortfolioHistoryProps)
         </ResponsiveContainer>
       </div>
 
-      {/* Daily Performance Table */}
+      {/* Daily Performance Table with Handsontable */}
       <div className="rounded-lg bg-white shadow">
         <div className="border-b border-secondary-200 px-6 py-4">
-          <h3 className="font-bold text-secondary-900">Daily Performance</h3>
+          <h3 className="font-bold text-secondary-900">Rendimiento Diario</h3>
         </div>
-        <div className="max-h-96 overflow-y-auto">
-          <table className="w-full">
-            <thead className="sticky top-0 bg-secondary-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-secondary-700">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-semibold text-secondary-700">
-                  Value
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-semibold text-secondary-700">
-                  Daily Change
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-semibold text-secondary-700">
-                  Total P&L
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-semibold text-secondary-700">
-                  Positions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {[...snapshots].reverse().map((snapshot, index) => (
-                <tr
-                  key={index}
-                  className="border-b border-secondary-100 hover:bg-secondary-50"
-                >
-                  <td className="px-6 py-3 text-sm text-secondary-900">
-                    {new Date(snapshot.date).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-3 text-right text-sm text-secondary-900">
-                    {formatCurrency(snapshot.total_value)}
-                  </td>
-                  <td className={`px-6 py-3 text-right text-sm font-medium ${
-                    snapshot.daily_pnl_percent >= 0 ? 'text-success-600' : 'text-danger-600'
-                  }`}>
-                    {snapshot.daily_pnl_percent >= 0 ? <TrendingUp className="inline h-4 w-4 mr-1" /> : <TrendingDown className="inline h-4 w-4 mr-1" />}
-                    {formatPercent(snapshot.daily_pnl_percent)}
-                  </td>
-                  <td className={`px-6 py-3 text-right text-sm font-medium ${
-                    snapshot.total_pnl >= 0 ? 'text-success-600' : 'text-danger-600'
-                  }`}>
-                    {formatCurrency(snapshot.total_pnl)} ({formatPercent(snapshot.total_pnl_percent)})
-                  </td>
-                  <td className="px-6 py-3 text-right text-sm text-secondary-600">
-                    {snapshot.number_of_positions}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="p-4">
+          {snapshots.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              No hay datos disponibles
+            </div>
+          ) : (
+            <HotTable
+              ref={hotTableRef}
+              data={[...snapshots].reverse().map(s => ({
+                fecha: new Date(s.date).toLocaleDateString('es-ES'),
+                valor: s.total_value,
+                cambio_diario: s.daily_pnl_percent,
+                pnl_total: s.total_pnl,
+                pnl_total_percent: s.total_pnl_percent,
+                posiciones: s.number_of_positions
+              }))}
+              columns={[
+                { data: 'fecha', title: 'Fecha', readOnly: true, width: 120 },
+                { 
+                  data: 'valor', 
+                  title: 'Valor', 
+                  type: 'numeric',
+                  numericFormat: { pattern: '$0,0.00' },
+                  readOnly: true,
+                  width: 150,
+                  className: 'htRight'
+                },
+                { 
+                  data: 'cambio_diario', 
+                  title: 'Cambio Diario', 
+                  type: 'numeric',
+                  numericFormat: { pattern: '0.00%' },
+                  readOnly: true,
+                  width: 150,
+                  className: 'htRight',
+                  renderer: function(instance: any, td: HTMLTableCellElement, row: number, col: number, prop: any, value: any, cellProperties: any) {
+                    Handsontable.renderers.NumericRenderer.apply(this, [instance, td, row, col, prop, value, cellProperties])
+                    if (value >= 0) {
+                      td.style.color = '#059669'
+                      td.style.fontWeight = '600'
+                    } else {
+                      td.style.color = '#DC2626'
+                      td.style.fontWeight = '600'
+                    }
+                    return td
+                  }
+                },
+                { 
+                  data: 'pnl_total', 
+                  title: 'P&L Total', 
+                  type: 'numeric',
+                  numericFormat: { pattern: '$0,0.00' },
+                  readOnly: true,
+                  width: 150,
+                  className: 'htRight',
+                  renderer: function(instance: any, td: HTMLTableCellElement, row: number, col: number, prop: any, value: any, cellProperties: any) {
+                    Handsontable.renderers.NumericRenderer.apply(this, [instance, td, row, col, prop, value, cellProperties])
+                    if (value >= 0) {
+                      td.style.color = '#059669'
+                    } else {
+                      td.style.color = '#DC2626'
+                    }
+                    return td
+                  }
+                },
+                { 
+                  data: 'pnl_total_percent', 
+                  title: 'P&L %', 
+                  type: 'numeric',
+                  numericFormat: { pattern: '0.00%' },
+                  readOnly: true,
+                  width: 120,
+                  className: 'htRight',
+                  renderer: function(instance: any, td: HTMLTableCellElement, row: number, col: number, prop: any, value: any, cellProperties: any) {
+                    Handsontable.renderers.NumericRenderer.apply(this, [instance, td, row, col, prop, value, cellProperties])
+                    if (value >= 0) {
+                      td.style.color = '#059669'
+                    } else {
+                      td.style.color = '#DC2626'
+                    }
+                    return td
+                  }
+                },
+                { 
+                  data: 'posiciones', 
+                  title: 'Posiciones', 
+                  type: 'numeric',
+                  readOnly: true,
+                  width: 120,
+                  className: 'htRight'
+                }
+              ]}
+              colHeaders={true}
+              rowHeaders={true}
+              height="400"
+              licenseKey="non-commercial-and-evaluation"
+              stretchH="all"
+              autoWrapRow={true}
+              autoWrapCol={true}
+              filters={true}
+              dropdownMenu={true}
+              columnSorting={true}
+              manualColumnResize={true}
+              contextMenu={true}
+              language="es-ES"
+            />
+          )}
         </div>
       </div>
     </div>

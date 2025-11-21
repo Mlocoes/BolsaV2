@@ -6,10 +6,10 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Portfolios from './pages/Portfolios'
-import AssetsCatalog from './pages/AssetsCatalogHandsontable'
-import Quotes from './pages/QuotesHandsontable'
+import AssetsCatalog from './pages/AssetsCatalog'
+import Quotes from './pages/Quotes'
 import ImportData from './pages/ImportData'
-import UsersCatalog from './pages/UsersCatalogHandsontable'
+import UsersCatalog from './pages/UsersCatalog'
 
 function App() {
   const { logout } = useAuthStore()

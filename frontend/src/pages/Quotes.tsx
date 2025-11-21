@@ -1,6 +1,17 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { HotTable } from '@handsontable/react-wrapper'
+import { registerAllModules } from 'handsontable/registry'
+import { registerLanguageDictionary, esMX } from 'handsontable/i18n'
+import 'handsontable/dist/handsontable.full.min.css'
+import '../styles/handsontable-custom.css'
 import api from '../services/api'
 import Layout from '../components/Layout'
+
+// Registrar todos los módulos de Handsontable
+registerAllModules()
+// Registrar idioma español (usando es-MX pero con código es-ES)
+const esESDict = { ...esMX, languageCode: 'es-ES' }
+registerLanguageDictionary(esESDict)
 
 interface Asset {
   id: string
@@ -26,6 +37,7 @@ export default function Quotes() {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const [datesDisabled, setDatesDisabled] = useState(true)
+  const hotTableRef = useRef(null)
 
   useEffect(() => {
     loadAssets()
@@ -54,12 +66,10 @@ export default function Quotes() {
   const loadLatestQuotes = async () => {
     setIsLoading(true)
     try {
-      // Obtener la última cotización de cada activo
       const response = await api.get('/quotes', {
         params: { limit: 1000 }
       })
       
-      // Agrupar por símbolo y mantener solo la cotización más reciente de cada uno
       const quotesBySymbol = new Map<string, Quote>()
       response.data.forEach((quote: Quote) => {
         const existing = quotesBySymbol.get(quote.symbol)
@@ -68,7 +78,6 @@ export default function Quotes() {
         }
       })
       
-      // Convertir a array y ordenar por símbolo
       const latestQuotes = Array.from(quotesBySymbol.values()).sort((a, b) => 
         a.symbol.localeCompare(b.symbol)
       )
@@ -100,16 +109,18 @@ export default function Quotes() {
 
     setIsLoading(true)
     try {
+      const asset = assets.find(a => a.id === selectedAsset)
+      if (!asset) return
+
       const response = await api.get('/quotes', {
         params: {
-          symbol: selectedAsset,
+          symbol: asset.symbol,
           start_date: startDate,
           end_date: endDate,
-          limit: 1000
+          limit: 10000
         }
       })
-      
-      // Ordenar por fecha descendente (más reciente primero)
+
       const sortedQuotes = response.data.sort((a: Quote, b: Quote) => 
         new Date(b.date).getTime() - new Date(a.date).getTime()
       )
@@ -117,7 +128,7 @@ export default function Quotes() {
       setQuotes(sortedQuotes)
     } catch (error) {
       console.error('Error al cargar cotizaciones:', error)
-      alert('Error al cargar cotizaciones filtradas')
+      alert('Error al cargar cotizaciones')
     } finally {
       setIsLoading(false)
     }
@@ -125,6 +136,11 @@ export default function Quotes() {
 
   const handleSearch = () => {
     loadFilteredQuotes()
+  }
+
+  const getAssetName = (symbol: string) => {
+    const asset = assets.find(a => a.symbol === symbol)
+    return asset ? `${asset.symbol} - ${asset.name}` : symbol
   }
 
   const formatDate = (dateString: string) => {
@@ -136,165 +152,184 @@ export default function Quotes() {
     })
   }
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 4
-    }).format(value)
-  }
+  // Preparar datos para Handsontable
+  const tableData = quotes.map(quote => ({
+    fecha: formatDate(quote.date),
+    activo: getAssetName(quote.symbol),
+    cotizacion: quote.close,
+    apertura: quote.open || null,
+    maximo: quote.high || null,
+    minimo: quote.low || null,
+    volumen: quote.volume || null
+  }))
 
-  const getAssetName = (symbol: string) => {
-    const asset = assets.find(a => a.symbol === symbol)
-    return asset ? `${asset.name} (${symbol})` : symbol
-  }
+  const columns = [
+    { data: 'fecha', title: 'Fecha', readOnly: true, width: 120 },
+    { data: 'activo', title: 'Activo', readOnly: true, width: 200 },
+    { 
+      data: 'cotizacion', 
+      title: 'Cotización', 
+      type: 'numeric',
+      numericFormat: { pattern: '$0,0.00' },
+      readOnly: true,
+      width: 120,
+      className: 'htRight htBold'
+    },
+    { 
+      data: 'apertura', 
+      title: 'Apertura', 
+      type: 'numeric',
+      numericFormat: { pattern: '$0,0.00' },
+      readOnly: true,
+      width: 120,
+      className: 'htRight'
+    },
+    { 
+      data: 'maximo', 
+      title: 'Máximo', 
+      type: 'numeric',
+      numericFormat: { pattern: '$0,0.00' },
+      readOnly: true,
+      width: 120,
+      className: 'htRight'
+    },
+    { 
+      data: 'minimo', 
+      title: 'Mínimo', 
+      type: 'numeric',
+      numericFormat: { pattern: '$0,0.00' },
+      readOnly: true,
+      width: 120,
+      className: 'htRight'
+    },
+    { 
+      data: 'volumen', 
+      title: 'Volumen', 
+      type: 'numeric',
+      numericFormat: { pattern: '0,0' },
+      readOnly: true,
+      width: 150,
+      className: 'htRight'
+    }
+  ]
 
   return (
     <Layout>
-      <div className="container-fluid">
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2>📊 Cotizaciones</h2>
+      <div className="container mx-auto p-6 space-y-6">
+        {/* Cabecera */}
+        <div>
+          <h1 className="text-3xl font-bold">Cotizaciones</h1>
+          <p className="text-gray-600">Consulta el histórico de cotizaciones de los activos</p>
         </div>
 
         {/* Filtros */}
-        <div className="card mb-4">
-          <div className="card-body">
-            <div className="row g-3">
-              {/* Selector de Activos */}
-              <div className="col-md-4">
-                <label htmlFor="assetSelect" className="form-label">Activo</label>
-                <select
-                  id="assetSelect"
-                  className="form-select"
-                  value={selectedAsset}
-                  onChange={(e) => setSelectedAsset(e.target.value)}
-                >
-                  <option value="all">Todos los activos</option>
-                  {assets.map(asset => (
-                    <option key={asset.id} value={asset.symbol}>
-                      {asset.name} ({asset.symbol})
-                    </option>
-                  ))}
-                </select>
-              </div>
+        <div className="bg-white rounded-lg shadow p-6">
+          <h5 className="text-lg font-semibold mb-4">Filtros</h5>
 
-              {/* Fecha Inicio */}
-              <div className="col-md-3">
-                <label htmlFor="startDate" className="form-label">Fecha Inicio</label>
-                <input
-                  type="date"
-                  id="startDate"
-                  className="form-control"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  disabled={datesDisabled}
-                />
-              </div>
-
-              {/* Fecha Fin */}
-              <div className="col-md-3">
-                <label htmlFor="endDate" className="form-label">Fecha Fin</label>
-                <input
-                  type="date"
-                  id="endDate"
-                  className="form-control"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  disabled={datesDisabled}
-                />
-              </div>
-
-              {/* Botón Buscar */}
-              <div className="col-md-2 d-flex align-items-end">
-                <button
-                  className="btn btn-primary w-100"
-                  onClick={handleSearch}
-                  disabled={isLoading}
-                >
-                  {isLoading ? '🔄 Buscando...' : '🔍 Buscar'}
-                </button>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            {/* Selector de Activo */}
+            <div>
+              <label className="block text-sm font-medium mb-1">Activo</label>
+              <select
+                className="w-full px-3 py-2 border rounded"
+                value={selectedAsset}
+                onChange={(e) => setSelectedAsset(e.target.value)}
+              >
+                <option value="all">📊 Todas las Cotizaciones Actuales</option>
+                {assets.map((asset) => (
+                  <option key={asset.id} value={asset.id}>
+                    {asset.symbol} - {asset.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            {selectedAsset === 'all' && (
-              <div className="alert alert-info mt-3 mb-0">
-                <small>
-                  ℹ️ Mostrando las últimas cotizaciones registradas para todos los activos
-                </small>
-              </div>
-            )}
+            {/* Fecha Inicio */}
+            <div>
+              <label className="block text-sm font-medium mb-1">Fecha Inicio</label>
+              <input
+                type="date"
+                className="w-full px-3 py-2 border rounded"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                disabled={datesDisabled}
+              />
+            </div>
+
+            {/* Fecha Fin */}
+            <div>
+              <label className="block text-sm font-medium mb-1">Fecha Fin</label>
+              <input
+                type="date"
+                className="w-full px-3 py-2 border rounded"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                disabled={datesDisabled}
+              />
+            </div>
+
+            {/* Botón Buscar */}
+            <div className="md:col-span-2 flex items-end">
+              <button
+                className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400"
+                onClick={handleSearch}
+                disabled={isLoading}
+              >
+                {isLoading ? '🔄 Buscando...' : '🔍 Buscar'}
+              </button>
+            </div>
           </div>
+
+          {selectedAsset === 'all' && (
+            <div className="mt-4 bg-blue-50 border border-blue-200 rounded p-3 text-sm text-blue-800">
+              ℹ️ Mostrando las últimas cotizaciones registradas para todos los activos
+            </div>
+          )}
         </div>
 
-        {/* Tabla de Cotizaciones */}
-        <div className="card">
-          <div className="card-body">
-            <h5 className="card-title">
-              Resultados {quotes.length > 0 && `(${quotes.length})`}
-            </h5>
+        {/* Tabla con Handsontable */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h5 className="text-lg font-semibold mb-4">
+            Resultados {quotes.length > 0 && `(${quotes.length})`}
+          </h5>
 
-            {isLoading ? (
-              <div className="text-center py-5">
-                <div className="spinner-border text-primary" role="status">
-                  <span className="visually-hidden">Cargando...</span>
-                </div>
-              </div>
-            ) : quotes.length === 0 ? (
-              <div className="text-center text-muted py-5">
-                <p>No se encontraron cotizaciones</p>
-                <small>
-                  {selectedAsset === 'all' 
-                    ? 'Presiona "Buscar" para cargar las últimas cotizaciones de todos los activos'
-                    : 'Selecciona un rango de fechas y presiona "Buscar"'
-                  }
-                </small>
-              </div>
-            ) : (
-              <div className="table-responsive">
-                <table className="table table-hover table-striped">
-                  <thead>
-                    <tr>
-                      <th>Fecha</th>
-                      <th>Activo</th>
-                      <th className="text-end">Cotización</th>
-                      <th className="text-end">Apertura</th>
-                      <th className="text-end">Máximo</th>
-                      <th className="text-end">Mínimo</th>
-                      <th className="text-end">Volumen</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {quotes.map((quote, index) => (
-                      <tr key={`${quote.symbol}-${quote.date}-${index}`}>
-                        <td>{formatDate(quote.date)}</td>
-                        <td>
-                          <strong>{getAssetName(quote.symbol)}</strong>
-                        </td>
-                        <td className="text-end">
-                          <strong>{formatCurrency(quote.close)}</strong>
-                        </td>
-                        <td className="text-end">
-                          {quote.open ? formatCurrency(quote.open) : '-'}
-                        </td>
-                        <td className="text-end">
-                          {quote.high ? formatCurrency(quote.high) : '-'}
-                        </td>
-                        <td className="text-end">
-                          {quote.low ? formatCurrency(quote.low) : '-'}
-                        </td>
-                        <td className="text-end">
-                          {quote.volume
-                            ? new Intl.NumberFormat('es-ES').format(quote.volume)
-                            : '-'}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              <p className="mt-4 text-gray-600">Cargando...</p>
+            </div>
+          ) : quotes.length === 0 ? (
+            <div className="text-center text-gray-500 py-12">
+              <p>No se encontraron cotizaciones</p>
+              <small className="text-gray-400">
+                {selectedAsset === 'all' 
+                  ? 'Presiona "Buscar" para cargar las últimas cotizaciones de todos los activos'
+                  : 'Selecciona un rango de fechas y presiona "Buscar"'
+                }
+              </small>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <HotTable
+                ref={hotTableRef}
+                data={tableData}
+                columns={columns}
+                colHeaders={true}
+                rowHeaders={true}
+                height="500"
+                licenseKey="non-commercial-and-evaluation"
+                stretchH="all"
+                autoWrapRow={true}
+                autoWrapCol={true}
+                filters={true}
+                dropdownMenu={true}
+                columnSorting={true}
+                manualColumnResize={true}
+                contextMenu={true}
+                language="es-ES"
+              />
+            </div>
+          )}
         </div>
       </div>
     </Layout>

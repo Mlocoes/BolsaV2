@@ -69,3 +69,46 @@ async def get_asset(
             detail="Activo no encontrado"
         )
     return asset
+
+@router.put("/{asset_id}", response_model=AssetResponse)
+async def update_asset(
+    asset_id: UUID,
+    asset_update: AssetCreate,
+    db: Session = Depends(get_db)
+):
+    """Actualizar un activo"""
+    result = db.execute(select(Asset).where(Asset.id == asset_id))
+    db_asset = result.scalar_one_or_none()
+    
+    if not db_asset:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Activo no encontrado"
+        )
+    
+    # Actualizar campos
+    for key, value in asset_update.dict().items():
+        setattr(db_asset, key, value)
+        
+    db.commit()
+    db.refresh(db_asset)
+    return db_asset
+
+@router.delete("/{asset_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_asset(
+    asset_id: UUID,
+    db: Session = Depends(get_db)
+):
+    """Eliminar un activo"""
+    result = db.execute(select(Asset).where(Asset.id == asset_id))
+    asset = result.scalar_one_or_none()
+    
+    if not asset:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Activo no encontrado"
+        )
+        
+    db.delete(asset)
+    db.commit()
+    return None

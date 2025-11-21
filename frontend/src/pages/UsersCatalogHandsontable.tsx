@@ -10,7 +10,9 @@ import Layout from '../components/Layout'
 // Registrar todos los módulos de Handsontable
 registerAllModules()
 // Registrar idioma español
-registerLanguageDictionary(esMX)
+// Registrar idioma español (usando es-MX pero con código es-ES)
+const esESDict = { ...esMX, languageCode: 'es-ES' }
+registerLanguageDictionary(esESDict)
 
 interface User {
   id: string
@@ -231,7 +233,7 @@ export default function UsersCatalog() {
                 columnSorting={true}
                 manualColumnResize={true}
                 contextMenu={['copy']}
-                language="es-MX"
+                language="es-ES"
               />
             )}
           </div>

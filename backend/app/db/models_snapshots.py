@@ -7,7 +7,7 @@ from sqlalchemy import Column, Date, DateTime, ForeignKey, Index, Numeric, Strin
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.sql import func
 
-from app.db.models import Base
+from app.core.database import Base
 
 
 class PortfolioSnapshot(Base):

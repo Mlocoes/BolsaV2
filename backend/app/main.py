@@ -105,30 +105,17 @@ async def shutdown_event():
     await session_manager.disconnect()
     logger.info("✓ Session manager desconectado")
 
-# Configuración de CORS más permisiva para desarrollo
-# Permite conexiones desde cualquier IP en la red local
+# CORS: Permitir frontend local y red local
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://192.168.0.8:3000",
-        "http://192.168.0.8:8000",
     ],
-    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1|192\.168\.\d{1,3}\.\d{1,3})(:\d+)?",
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allow_headers=[
-        "Accept",
-        "Accept-Language",
-        "Content-Language",
-        "Content-Type",
-        "Authorization",
-        "X-Requested-With",
-        "X-Session-ID",
-    ],
-    expose_headers=["Content-Disposition", "X-Session-ID"],
-    max_age=3600,
+    allow_methods=["*"],
+    allow_headers=["*"]
 )
 
 # Incluir rutas

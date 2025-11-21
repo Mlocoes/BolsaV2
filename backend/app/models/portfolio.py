@@ -28,3 +28,4 @@ class Portfolio(Base):
     user = relationship("Usuario", back_populates="portfolios")
     positions = relationship("Position", back_populates="portfolio", cascade="all, delete-orphan")
     transactions = relationship("Transaction", back_populates="portfolio", cascade="all, delete-orphan")
+    results = relationship("Result", back_populates="portfolio", cascade="all, delete-orphan")

@@ -1,6 +1,17 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { HotTable } from '@handsontable/react-wrapper'
+import { registerAllModules } from 'handsontable/registry'
+import { registerLanguageDictionary, esMX } from 'handsontable/i18n'
+import 'handsontable/dist/handsontable.full.min.css'
+import '../styles/handsontable-custom.css'
 import api from '../services/api'
 import Layout from '../components/Layout'
+
+// Registrar todos los módulos de Handsontable
+registerAllModules()
+// Registrar idioma español (usando es-MX pero con código es-ES)
+const esESDict = { ...esMX, languageCode: 'es-ES' }
+registerLanguageDictionary(esESDict)
 
 interface User {
   id: string
@@ -19,6 +30,7 @@ export default function UsersCatalog() {
     email: '',
     password: ''
   })
+  const hotTableRef = useRef(null)
 
   useEffect(() => {
     loadUsers()
@@ -56,23 +68,23 @@ export default function UsersCatalog() {
     }
   }
 
-  const toggleUserStatus = async (user: User) => {
+  const toggleUserStatus = async (userId: string, currentStatus: boolean) => {
     try {
-      await api.patch(`/users/${user.id}`, {
-        is_active: !user.is_active
+      await api.patch(`/users/${userId}`, {
+        is_active: !currentStatus
       })
-      alert(`Usuario ${user.is_active ? 'desactivado' : 'activado'} correctamente`)
+      alert(`Usuario ${currentStatus ? 'desactivado' : 'activado'} correctamente`)
       loadUsers()
     } catch (error: any) {
       alert(error.response?.data?.detail || 'Operación fallida')
     }
   }
 
-  const handleDelete = async (user: User) => {
-    if (!confirm(`¿Eliminar usuario ${user.username}? Esta acción no se puede deshacer.`)) return
+  const handleDelete = async (userId: string, username: string) => {
+    if (!confirm(`¿Eliminar usuario ${username}? Esta acción no se puede deshacer.`)) return
 
     try {
-      await api.delete(`/users/${user.id}`)
+      await api.delete(`/users/${userId}`)
       alert('Usuario eliminado correctamente')
       loadUsers()
     } catch (error: any) {
@@ -80,11 +92,100 @@ export default function UsersCatalog() {
     }
   }
 
+  // Preparar datos para Handsontable
+  const tableData = users.map(user => ({
+    id: user.id,
+    username: user.username,
+    email: user.email,
+    status: user.is_active ? 'Activo' : 'Inactivo',
+    is_active: user.is_active,
+    created_at: new Date(user.created_at).toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    })
+  }))
+
+  const columns = [
+    { 
+      data: 'username', 
+      title: 'Usuario', 
+      readOnly: true,
+      width: 150,
+      className: 'htLeft htBold'
+    },
+    { 
+      data: 'email', 
+      title: 'Correo', 
+      readOnly: true,
+      width: 250
+    },
+    { 
+      data: 'status', 
+      title: 'Estado', 
+      readOnly: true,
+      width: 100,
+      renderer: function(_instance: any, td: HTMLTableCellElement, _row: number, _col: number, _prop: any, value: any) {
+        td.innerHTML = value
+        if (value === 'Activo') {
+          td.style.backgroundColor = '#dcfce7'
+          td.style.color = '#166534'
+          td.style.fontWeight = '600'
+        } else {
+          td.style.backgroundColor = '#fee2e2'
+          td.style.color = '#991b1b'
+          td.style.fontWeight = '600'
+        }
+        td.style.textAlign = 'center'
+        return td
+      }
+    },
+    { 
+      data: 'created_at', 
+      title: 'Creado', 
+      readOnly: true,
+      width: 120
+    },
+    {
+      data: 'id',
+      title: 'Acciones',
+      readOnly: true,
+      width: 200,
+      renderer: function(_instance: any, td: HTMLTableCellElement, row: number, _col: number, _prop: any, _value: any) {
+        const user = users[row]
+        if (!user) return td
+        
+        td.innerHTML = ''
+        td.style.textAlign = 'center'
+        
+        // Botón toggle status
+        const toggleBtn = document.createElement('button')
+        toggleBtn.innerHTML = user.is_active ? 'Desactivar' : 'Activar'
+        toggleBtn.className = 'text-blue-600 hover:text-blue-900 mr-3 text-sm font-medium'
+        toggleBtn.onclick = () => toggleUserStatus(user.id, user.is_active)
+        
+        // Botón eliminar
+        const deleteBtn = document.createElement('button')
+        deleteBtn.innerHTML = 'Eliminar'
+        deleteBtn.className = 'text-red-600 hover:text-red-900 text-sm font-medium'
+        deleteBtn.onclick = () => handleDelete(user.id, user.username)
+        
+        td.appendChild(toggleBtn)
+        td.appendChild(deleteBtn)
+        
+        return td
+      }
+    }
+  ]
+
   if (isLoading) {
     return (
       <Layout>
         <div className="flex h-96 items-center justify-center">
-          <div className="text-xl">Cargando usuarios...</div>
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+            <div className="text-xl text-gray-600">Cargando usuarios...</div>
+          </div>
         </div>
       </Layout>
     )
@@ -107,59 +208,34 @@ export default function UsersCatalog() {
         </button>
       </div>
 
-      {/* Tabla de Usuarios */}
+      {/* Tabla con Handsontable */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Correo</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Creado</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td className="px-6 py-4 whitespace-nowrap font-medium">{user.username}</td>
-                <td className="px-6 py-4">{user.email}</td>
-                <td className="px-6 py-4">
-                  <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                    user.is_active 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
-                  }`}>
-                    {user.is_active ? 'Activo' : 'Inactivo'}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {new Date(user.created_at).toLocaleDateString('es-ES')}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <button
-                    onClick={() => toggleUserStatus(user)}
-                    className="text-blue-600 hover:text-blue-900 mr-3"
-                  >
-                    {user.is_active ? 'Desactivar' : 'Activar'}
-                  </button>
-                  <button
-                    onClick={() => handleDelete(user)}
-                    className="text-red-600 hover:text-red-900"
-                  >
-                    Eliminar
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {users.length === 0 && (
-          <div className="text-center py-12 text-gray-500">
-            No se encontraron usuarios
-          </div>
-        )}
+        <div className="p-4">
+          {users.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              No se encontraron usuarios
+            </div>
+          ) : (
+            <HotTable
+              ref={hotTableRef}
+              data={tableData}
+              columns={columns}
+              colHeaders={true}
+              rowHeaders={true}
+              height="500"
+              licenseKey="non-commercial-and-evaluation"
+              stretchH="all"
+              autoWrapRow={true}
+              autoWrapCol={true}
+              filters={true}
+              dropdownMenu={true}
+              columnSorting={true}
+              manualColumnResize={true}
+              contextMenu={['copy']}
+              language="es-ES"
+            />
+          )}
+        </div>
       </div>
 
       {/* Modal Crear Usuario */}

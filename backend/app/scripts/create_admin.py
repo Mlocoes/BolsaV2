@@ -2,7 +2,7 @@ import asyncio
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker, Session
 from app.core.config import settings
-from app.core.security import hash_password
+from app.core.auth import get_password_hash
 from app.models.usuario import Usuario
 import logging
 
@@ -21,8 +21,9 @@ def create_admin():
         admin = Usuario(
             username="admin",
             email="admin@bolsav2.com",
-            password_hash=hash_password("admin123"),
-            is_active=True
+            hashed_password=get_password_hash("admin123"),
+            is_active=True,
+            is_admin=True
         )
         session.add(admin)
         session.commit()

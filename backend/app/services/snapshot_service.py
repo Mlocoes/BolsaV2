@@ -156,7 +156,8 @@ class SnapshotService:
     def create_snapshot(
         db: Session,
         portfolio_id: UUID,
-        target_date: date
+        target_date: date,
+        overwrite: bool = False
     ) -> PortfolioSnapshot:
         """
         Create a snapshot for a specific date
@@ -165,6 +166,7 @@ class SnapshotService:
             db: Database session
             portfolio_id: Portfolio ID
             target_date: Date for snapshot
+            overwrite: Whether to overwrite if exists
             
         Returns:
             Created PortfolioSnapshot
@@ -178,9 +180,15 @@ class SnapshotService:
                 )
             )
         )
+        existing_snapshot = existing.scalar_one_or_none()
         
-        if existing.scalar_one_or_none():
-            raise ValueError(f"Snapshot already exists for {target_date}")
+        if existing_snapshot:
+            if not overwrite:
+                raise ValueError(f"Snapshot already exists for {target_date}")
+            else:
+                # Delete existing snapshot (cascade handles positions)
+                db.delete(existing_snapshot)
+                db.flush()
 
         # Calculate portfolio state
         state = SnapshotService.calculate_portfolio_state(
@@ -287,7 +295,8 @@ class SnapshotService:
         db: Session,
         portfolio_id: UUID,
         from_date: date,
-        to_date: date
+        to_date: date,
+        overwrite: bool = False
     ) -> Dict:
         """
         Create snapshots for a date range
@@ -297,6 +306,7 @@ class SnapshotService:
             portfolio_id: Portfolio ID
             from_date: Start date
             to_date: End date
+            overwrite: Whether to overwrite existing snapshots
             
         Returns:
             Summary of created snapshots
@@ -308,7 +318,7 @@ class SnapshotService:
         current_date = from_date
         while current_date <= to_date:
             try:
-                SnapshotService.create_snapshot(db, portfolio_id, current_date)
+                SnapshotService.create_snapshot(db, portfolio_id, current_date, overwrite)
                 created += 1
             except ValueError as e:
                 # Snapshot already exists

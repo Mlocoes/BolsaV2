@@ -1,6 +1,17 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { HotTable } from '@handsontable/react-wrapper'
+import { registerAllModules } from 'handsontable/registry'
+import { registerLanguageDictionary, esMX } from 'handsontable/i18n'
+import 'handsontable/dist/handsontable.full.min.css'
+import '../styles/handsontable-custom.css'
 import api from '../services/api'
 import Layout from '../components/Layout'
+
+// Registrar todos los módulos de Handsontable
+registerAllModules()
+// Registrar idioma español (usando es-MX pero con código es-ES)
+const esESDict = { ...esMX, languageCode: 'es-ES' }
+registerLanguageDictionary(esESDict)
 
 interface Asset {
   id: string
@@ -13,6 +24,7 @@ interface Asset {
 }
 
 export default function AssetsCatalog() {
+  console.log('🚀 AssetsCatalog component renderizando')
   const [assets, setAssets] = useState<Asset[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -33,6 +45,7 @@ export default function AssetsCatalog() {
     to_date: new Date().toISOString().split('T')[0],
     force_refresh: false
   })
+  const hotTableRef = useRef(null)
 
   useEffect(() => {
     loadAssets()
@@ -105,11 +118,11 @@ export default function AssetsCatalog() {
     }
   }
 
-  const handleDelete = async (asset: Asset) => {
-    if (!confirm(`¿Eliminar activo ${asset.symbol}?`)) return
+  const handleDelete = async (assetId: string, symbol: string) => {
+    if (!confirm(`¿Eliminar activo ${symbol}?`)) return
 
     try {
-      await api.delete(`/assets/${asset.id}`)
+      await api.delete(`/assets/${assetId}`)
       alert('Activo eliminado correctamente')
       loadAssets()
     } catch (error: any) {
@@ -165,15 +178,125 @@ export default function AssetsCatalog() {
       asset.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+  const getAssetTypeLabel = (type: string) => {
+    const labels: { [key: string]: string } = {
+      stock: 'Acción',
+      etf: 'ETF',
+      crypto: 'Cripto',
+      bond: 'Bono',
+      fund: 'Fondo'
+    }
+    return labels[type] || type
+  }
+
+  // Preparar datos para Handsontable
+  const tableData = filteredAssets.map(asset => ({
+    id: asset.id,
+    symbol: asset.symbol,
+    name: asset.name,
+    asset_type: getAssetTypeLabel(asset.asset_type),
+    market: asset.market || '-',
+    currency: asset.currency
+  }))
+
+  useEffect(() => {
+    // Asegurar que Handsontable se inicialice correctamente
+    console.log('AssetsCatalog - tableData:', tableData.length, 'filas')
+    console.log('AssetsCatalog - filteredAssets:', filteredAssets.length, 'filas')
+    if (hotTableRef.current && tableData.length > 0) {
+      console.log('HotTable ref está disponible')
+    } else {
+      console.log('HotTable ref NO está disponible aún')
+    }
+  }, [tableData, filteredAssets])
+
+  const columns = [
+    { 
+      data: 'symbol', 
+      title: 'Símbolo', 
+      readOnly: true,
+      width: 120,
+      className: 'htLeft htBold'
+    },
+    { 
+      data: 'name', 
+      title: 'Nombre', 
+      readOnly: true,
+      width: 250
+    },
+    { 
+      data: 'asset_type', 
+      title: 'Tipo', 
+      readOnly: true,
+      width: 100
+    },
+    { 
+      data: 'market', 
+      title: 'Mercado', 
+      readOnly: true,
+      width: 100
+    },
+    { 
+      data: 'currency', 
+      title: 'Moneda', 
+      readOnly: true,
+      width: 80,
+      className: 'htCenter'
+    },
+    {
+      data: 'id',
+      title: 'Acciones',
+      readOnly: true,
+      width: 200,
+      renderer: function(_instance: any, td: HTMLTableCellElement, row: number, _col: number, _prop: any, _value: any) {
+        const asset = filteredAssets[row]
+        if (!asset) return td
+        
+        td.innerHTML = ''
+        td.style.textAlign = 'center'
+        
+        // Botón importar
+        const importBtn = document.createElement('button')
+        importBtn.innerHTML = '📥'
+        importBtn.title = 'Importar Histórico'
+        importBtn.className = 'text-green-600 hover:text-green-900 mr-2 text-lg'
+        importBtn.onclick = () => openImportModal(asset)
+        
+        // Botón editar
+        const editBtn = document.createElement('button')
+        editBtn.innerHTML = 'Editar'
+        editBtn.className = 'text-blue-600 hover:text-blue-900 mr-2 text-sm font-medium'
+        editBtn.onclick = () => openEditModal(asset)
+        
+        // Botón eliminar
+        const deleteBtn = document.createElement('button')
+        deleteBtn.innerHTML = 'Eliminar'
+        deleteBtn.className = 'text-red-600 hover:text-red-900 text-sm font-medium'
+        deleteBtn.onclick = () => handleDelete(asset.id, asset.symbol)
+        
+        td.appendChild(importBtn)
+        td.appendChild(editBtn)
+        td.appendChild(deleteBtn)
+        
+        return td
+      }
+    }
+  ]
+
   if (isLoading) {
     return (
       <Layout>
         <div className="flex h-96 items-center justify-center">
-          <div className="text-xl">Cargando activos...</div>
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+            <div className="text-xl text-gray-600">Cargando activos...</div>
+          </div>
         </div>
       </Layout>
     )
   }
+
+  console.log('📊 AssetsCatalog render - assets:', assets.length, 'filteredAssets:', filteredAssets.length, 'tableData:', tableData.length)
 
   return (
     <Layout>
@@ -220,58 +343,51 @@ export default function AssetsCatalog() {
         </div>
       </div>
 
-      {/* Tabla de Activos */}
+      {/* Tabla con Handsontable */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Símbolo</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mercado</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Moneda</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {filteredAssets.map((asset) => (
-              <tr key={asset.id}>
-                <td className="px-6 py-4 whitespace-nowrap font-medium">{asset.symbol}</td>
-                <td className="px-6 py-4">{asset.name}</td>
-                <td className="px-6 py-4">{asset.asset_type}</td>
-                <td className="px-6 py-4">{asset.market || '-'}</td>
-                <td className="px-6 py-4">{asset.currency}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <button
-                    onClick={() => openImportModal(asset)}
-                    className="text-green-600 hover:text-green-900 mr-3"
-                    title="Importar Histórico"
-                  >
-                    📥
-                  </button>
-                  <button
-                    onClick={() => openEditModal(asset)}
-                    className="text-blue-600 hover:text-blue-900 mr-3"
-                  >
-                    Editar
-                  </button>
-                  <button
-                    onClick={() => handleDelete(asset)}
-                    className="text-red-600 hover:text-red-900"
-                  >
-                    Eliminar
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {filteredAssets.length === 0 && (
-          <div className="text-center py-12 text-gray-500">
-            No se encontraron activos
-          </div>
-        )}
+        <div className="p-4">
+          {filteredAssets.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              No se encontraron activos
+            </div>
+          ) : (
+            <div style={{ width: '100%', overflow: 'auto' }}>
+              {(() => {
+                console.log('🔍 Renderizando HotTable con:', {
+                  filas: tableData.length,
+                  columnas: columns.length,
+                  datos: tableData.slice(0, 2)
+                })
+                return null
+              })()}
+              <HotTable
+                ref={hotTableRef}
+                data={tableData}
+                columns={columns}
+                colHeaders={true}
+                rowHeaders={true}
+                height={500}
+                licenseKey="non-commercial-and-evaluation"
+                stretchH="all"
+                autoWrapRow={true}
+                autoWrapCol={true}
+                filters={true}
+                dropdownMenu={true}
+                columnSorting={true}
+                manualColumnResize={true}
+                contextMenu={true}
+                language="es-ES"
+                width="100%"
+                afterInit={() => {
+                  console.log('✅ HotTable inicializado correctamente')
+                }}
+                afterRender={() => {
+                  console.log('✅ HotTable renderizado')
+                }}
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Modal */}

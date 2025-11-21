@@ -1,12 +1,10 @@
-from datetime import datetime, timedelta
 from typing import Optional
-from jose import JWTError, jwt
+from fastapi import HTTPException, status
+from .session import session_manager
 import bcrypt
-from .config import settings
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verificar si la contraseña coincide con el hash"""
-    # Convertir a bytes si no lo está
     if isinstance(plain_password, str):
         plain_password = plain_password.encode('utf-8')
     if isinstance(hashed_password, str):
@@ -16,33 +14,23 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def get_password_hash(password: str) -> str:
     """Obtener el hash de una contraseña"""
-    # Convertir a bytes
     if isinstance(password, str):
         password = password.encode('utf-8')
     
-    # Generar salt y hash
     salt = bcrypt.gensalt()
     hashed = bcrypt.hashpw(password, salt)
     
-    # Retornar como string
     return hashed.decode('utf-8')
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
-    """Crear un token JWT"""
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=settings.TOKEN_EXPIRY_MINUTES)
-    
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm="HS256")
-    return encoded_jwt
+async def create_user_session(user_id: str, user_data: dict) -> str:
+    """Crear una sesión de usuario"""
+    return await session_manager.create_session(str(user_id), user_data)
 
-def decode_access_token(token: str) -> Optional[dict]:
-    """Decodificar un token JWT"""
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-        return payload
-    except JWTError:
-        return None
+async def get_current_user_session(session_id: str) -> Optional[dict]:
+    """Obtener sesión actual"""
+    return await session_manager.get_session(session_id)
+
+async def end_user_session(session_id: str) -> bool:
+    """Cerrar sesión"""
+    return await session_manager.delete_session(session_id)
+

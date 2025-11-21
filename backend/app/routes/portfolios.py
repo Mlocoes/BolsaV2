@@ -124,3 +124,31 @@ async def delete_portfolio(
     db.delete(db_portfolio)
     db.commit()
     return None
+
+@router.post("/{portfolio_id}/calculate")
+async def calculate_portfolio(
+    portfolio_id: UUID,
+    user: dict = Depends(require_auth),
+    db: Session = Depends(get_db)
+):
+    """Recalcular métricas del portfolio"""
+    # Verificar propiedad
+    get_user_portfolio_or_404(db, portfolio_id, UUID(user["user_id"]))
+    
+    from app.services.result_service import ResultService
+    service = ResultService(db)
+    result = service.calculate_portfolio_result(portfolio_id)
+    return result
+
+@router.get("/{portfolio_id}/results")
+async def get_portfolio_results(
+    portfolio_id: UUID,
+    user: dict = Depends(require_auth),
+    db: Session = Depends(get_db)
+):
+    """Obtener historial de resultados"""
+    get_user_portfolio_or_404(db, portfolio_id, UUID(user["user_id"]))
+    
+    from app.services.result_service import ResultService
+    service = ResultService(db)
+    return service.get_portfolio_history(portfolio_id)

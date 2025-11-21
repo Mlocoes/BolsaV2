@@ -71,7 +71,11 @@ export const authAPI = {
       console.log('Login response received:', response.data)
 
       // El backend ya establece la cookie HttpOnly automáticamente
-      // No es necesario guardar el session_id en localStorage
+      
+      // En desarrollo (cross-port), guardamos session_id para el header
+      if (response.data.session_id) {
+        localStorage.setItem('session_id', response.data.session_id)
+      }
 
       // Ya no retornamos token, solo mensaje y user
       return {
