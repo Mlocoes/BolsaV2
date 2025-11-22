@@ -192,32 +192,58 @@ class ImportExportService:
     
     # ==================== IMPORTACIÓN ====================
     
-    def import_transactions_csv(
-        self, 
+    # ==================== IMPORTACIÓN ====================
+    
+    def _process_transactions_df(
+        self,
+        df: pd.DataFrame,
         portfolio_id: UUID,
-        csv_content: str,
-        skip_duplicates: bool = True
+        skip_duplicates: bool
     ) -> Dict[str, any]:
-        """
-        Importar transacciones desde CSV
+        """Helper para procesar DataFrame de transacciones"""
+        # Normalizar columnas (strip whitespace y lower case para comparación flexible)
+        df.columns = df.columns.str.strip()
         
-        Args:
-            portfolio_id: ID del portfolio destino
-            csv_content: Contenido del archivo CSV
-            skip_duplicates: Si True, ignora duplicados
-            
-        Returns:
-            Dict con estadísticas de importación
-        """
-        # Leer CSV
-        df = pd.read_csv(io.StringIO(csv_content))
+        # Definir mapeo de columnas (Aliases)
+        column_mapping = {
+            'date': ['date', 'data', 'fecha'],
+            'type': ['type', 'c/v', 'tipo'],
+            'asset_symbol': ['asset_symbol', 'activo', 'symbol', 'simbolo'],
+            'quantity': ['quantity', 'cantidad', 'cuantida', 'cuantidad', 'unidades'],
+            'price': ['price', 'precio'],
+            'fees': ['fees', 'fee', 'comision'],
+            'notes': ['notes', 'nota', 'notas', 'comentarios']
+        }
         
-        # Validar columnas requeridas
+        # Normalizar nombres de columnas en el DataFrame
+        # Crear un mapa inverso: alias -> nombre_canonico
+        alias_to_canonical = {}
+        for canonical, aliases in column_mapping.items():
+            for alias in aliases:
+                alias_to_canonical[alias.lower()] = canonical
+        
+        # Renombrar columnas del DF si coinciden con algún alias
+        new_columns = []
+        found_canonical = set()
+        
+        for col in df.columns:
+            col_lower = col.lower()
+            if col_lower in alias_to_canonical:
+                canonical = alias_to_canonical[col_lower]
+                new_columns.append(canonical)
+                found_canonical.add(canonical)
+            else:
+                new_columns.append(col)
+        
+        df.columns = new_columns
+
+        # Validar columnas requeridas (Canonical names)
         required_columns = ['date', 'type', 'asset_symbol', 'quantity', 'price']
-        missing_columns = [col for col in required_columns if col not in df.columns]
+        missing_columns = [col for col in required_columns if col not in found_canonical]
         
         if missing_columns:
-            raise ValueError(f"Columnas requeridas faltantes: {', '.join(missing_columns)}")
+            found_columns = list(df.columns)
+            raise ValueError(f"Columnas requeridas faltantes (o no reconocidas): {', '.join(missing_columns)}. Columnas encontradas: {', '.join(found_columns)}")
         
         # Verificar que el portfolio existe
         portfolio = self.db.query(Portfolio).filter(Portfolio.id == portfolio_id).first()
@@ -231,6 +257,16 @@ class ImportExportService:
             'errors': []
         }
         
+        def parse_spanish_float(val):
+            if pd.isna(val):
+                return 0.0
+            if isinstance(val, (int, float)):
+                return float(val)
+            val_str = str(val).strip()
+            # Reemplazar punto de miles por nada y coma decimal por punto
+            val_str = val_str.replace('.', '').replace(',', '.')
+            return float(val_str)
+
         for idx, row in df.iterrows():
             try:
                 # Buscar o crear asset
@@ -242,14 +278,44 @@ class ImportExportService:
                     asset = Asset(
                         symbol=asset_symbol,
                         name=asset_symbol,
-                        type='stock'
+                        asset_type='stock' # Default to stock
                     )
                     self.db.add(asset)
                     self.db.flush()
                 
-                # Parsear fecha
-                transaction_date = pd.to_datetime(row['date']).date()
+                # Parsear fecha (DD/MM/YYYY o YYYY-MM-DD)
+                date_val = row['date']
+                if isinstance(date_val, str):
+                    # Intentar varios formatos
+                    try:
+                        transaction_date = datetime.strptime(date_val, '%d/%m/%Y').date()
+                    except ValueError:
+                        try:
+                            transaction_date = datetime.strptime(date_val, '%Y-%m-%d').date()
+                        except ValueError:
+                             transaction_date = pd.to_datetime(date_val).date()
+                else:
+                    # Si pandas ya lo parseó (ej: desde Excel)
+                    transaction_date = pd.to_datetime(date_val).date()
                 
+                # Parsear valores numéricos
+                quantity = parse_spanish_float(row['quantity'])
+                price = parse_spanish_float(row['price'])
+                fees = parse_spanish_float(row.get('fees', 0))
+                notes = str(row.get('notes', '')) if pd.notna(row.get('notes')) else None
+
+                # Parsear tipo (C/V o BUY/SELL)
+                raw_type = str(row['type']).upper().strip()
+                type_map = {
+                    'C': 'buy', 'V': 'sell',
+                    'BUY': 'buy', 'SELL': 'sell',
+                    'COMPRA': 'buy', 'VENTA': 'sell'
+                }
+                
+                if raw_type not in type_map:
+                    raise ValueError(f"Tipo desconocido: {raw_type}. Use C/V o BUY/SELL.")
+                tx_type = type_map[raw_type]
+
                 # Verificar duplicado
                 if skip_duplicates:
                     existing = self.db.query(Transaction).filter(
@@ -257,9 +323,9 @@ class ImportExportService:
                             Transaction.portfolio_id == portfolio_id,
                             Transaction.asset_id == asset.id,
                             Transaction.transaction_date == transaction_date,
-                            Transaction.transaction_type == row['type'].upper(),
-                            Transaction.quantity == float(row['quantity']),
-                            Transaction.price == float(row['price'])
+                            Transaction.transaction_type == tx_type,
+                            Transaction.quantity == quantity,
+                            Transaction.price == price
                         )
                     ).first()
                     
@@ -271,12 +337,12 @@ class ImportExportService:
                 transaction = Transaction(
                     portfolio_id=portfolio_id,
                     asset_id=asset.id,
-                    transaction_type=str(row['type']).upper(),
+                    transaction_type=tx_type,
                     transaction_date=transaction_date,
-                    quantity=float(row['quantity']),
-                    price=float(row['price']),
-                    fees=float(row.get('fees', 0)),
-                    notes=str(row.get('notes', '')) if pd.notna(row.get('notes')) else None
+                    quantity=quantity,
+                    price=price,
+                    fees=fees,
+                    notes=notes
                 )
                 
                 self.db.add(transaction)
@@ -286,7 +352,47 @@ class ImportExportService:
                 stats['errors'].append(f"Fila {idx + 2}: {str(e)}")
         
         self.db.commit()
+        
+        # Recalcular posiciones para los assets afectados
+        # Optimizacion: Recolectar assets afectados y recalcular solo esos
+        from app.services.position_service import PositionService
+        position_service = PositionService(self.db)
+        
+        affected_assets = set()
+        for idx, row in df.iterrows():
+             try:
+                asset_symbol = str(row['asset_symbol']).upper()
+                asset = self.db.query(Asset).filter(Asset.symbol == asset_symbol).first()
+                if asset:
+                    affected_assets.add(asset.id)
+             except:
+                 pass
+                 
+        for asset_id in affected_assets:
+            position_service.recalculate_position(portfolio_id, asset_id)
+            
+        self.db.commit()
         return stats
+
+    def import_transactions_csv(
+        self, 
+        portfolio_id: UUID,
+        csv_content: str,
+        skip_duplicates: bool = True
+    ) -> Dict[str, any]:
+        """Importar transacciones desde CSV"""
+        df = pd.read_csv(io.StringIO(csv_content))
+        return self._process_transactions_df(df, portfolio_id, skip_duplicates)
+
+    def import_transactions_xlsx(
+        self, 
+        portfolio_id: UUID,
+        file_content: bytes,
+        skip_duplicates: bool = True
+    ) -> Dict[str, any]:
+        """Importar transacciones desde XLSX"""
+        df = pd.read_excel(io.BytesIO(file_content))
+        return self._process_transactions_df(df, portfolio_id, skip_duplicates)
     
     def import_quotes_csv(
         self,
@@ -295,13 +401,6 @@ class ImportExportService:
     ) -> Dict[str, any]:
         """
         Importar cotizaciones desde CSV
-        
-        Args:
-            csv_content: Contenido del archivo CSV
-            skip_duplicates: Si True, ignora duplicados
-            
-        Returns:
-            Dict con estadísticas de importación
         """
         # Leer CSV
         df = pd.read_csv(io.StringIO(csv_content))
@@ -321,16 +420,26 @@ class ImportExportService:
             'errors': []
         }
         
+        from decimal import Decimal
+        
         for idx, row in df.iterrows():
             try:
                 symbol = str(row['symbol']).upper()
                 quote_date = pd.to_datetime(row['date']).date()
+                timestamp = datetime.combine(quote_date, datetime.min.time())
                 
+                # Buscar asset
+                asset = self.db.query(Asset).filter(Asset.symbol == symbol).first()
+                if not asset:
+                    stats['errors'].append(f"Fila {idx + 2}: Asset {symbol} no encontrado")
+                    stats['skipped'] += 1
+                    continue
+
                 # Verificar si existe
                 existing = self.db.query(Quote).filter(
                     and_(
-                        Quote.symbol == symbol,
-                        Quote.date == quote_date
+                        Quote.asset_id == asset.id,
+                        Quote.timestamp == timestamp
                     )
                 ).first()
                 
@@ -340,10 +449,10 @@ class ImportExportService:
                         continue
                     else:
                         # Actualizar
-                        existing.open = float(row['open'])
-                        existing.high = float(row['high'])
-                        existing.low = float(row['low'])
-                        existing.close = float(row['close'])
+                        existing.open = Decimal(str(row['open']))
+                        existing.high = Decimal(str(row['high']))
+                        existing.low = Decimal(str(row['low']))
+                        existing.close = Decimal(str(row['close']))
                         existing.volume = int(row.get('volume', 0)) if pd.notna(row.get('volume')) else None
                         existing.source = str(row.get('source', 'manual'))
                         existing.updated_at = datetime.utcnow()
@@ -351,12 +460,12 @@ class ImportExportService:
                 else:
                     # Crear nueva
                     quote = Quote(
-                        symbol=symbol,
-                        date=quote_date,
-                        open=float(row['open']),
-                        high=float(row['high']),
-                        low=float(row['low']),
-                        close=float(row['close']),
+                        asset_id=asset.id,
+                        timestamp=timestamp,
+                        open=Decimal(str(row['open'])),
+                        high=Decimal(str(row['high'])),
+                        low=Decimal(str(row['low'])),
+                        close=Decimal(str(row['close'])),
                         volume=int(row.get('volume', 0)) if pd.notna(row.get('volume')) else None,
                         source=str(row.get('source', 'manual'))
                     )

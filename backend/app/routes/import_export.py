@@ -120,46 +120,45 @@ async def export_quotes(
 @router.post("/transactions/{portfolio_id}/import", response_model=ImportStats)
 async def import_transactions(
     portfolio_id: UUID,
-    file: UploadFile = File(..., description="Archivo CSV con transacciones"),
+    file: UploadFile = File(..., description="Archivo CSV o Excel con transacciones"),
     skip_duplicates: bool = Query(True, description="Omitir duplicados"),
     user: dict = Depends(require_auth),
     db: Session = Depends(get_db)
 ):
     """
-    Importar transacciones desde archivo CSV
+    Importar transacciones desde archivo CSV o Excel
     
-    Formato CSV esperado:
-    ```
-    date,type,asset_symbol,quantity,price,fees,notes
-    2025-01-15,BUY,AAPL,10,150.50,9.99,Initial purchase
-    ```
-    
+    Formato CSV/Excel esperado:
     Columnas requeridas: date, type, asset_symbol, quantity, price
     Columnas opcionales: fees, notes
     
     Args:
         portfolio_id: ID del portfolio destino
-        file: Archivo CSV
+        file: Archivo CSV o Excel (.xlsx)
         skip_duplicates: Si True, ignora transacciones duplicadas
     
     Returns:
         Estadísticas de importación
     """
     # Validar tipo de archivo
-    if not file.filename.endswith('.csv'):
+    filename = file.filename.lower()
+    if not (filename.endswith('.csv') or filename.endswith('.xlsx')):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Solo se permiten archivos CSV"
+            detail="Solo se permiten archivos CSV o Excel (.xlsx)"
         )
     
     try:
         # Leer contenido
         content = await file.read()
-        csv_content = content.decode('utf-8')
-        
-        # Importar
         service = ImportExportService(db)
-        stats = service.import_transactions_csv(portfolio_id, csv_content, skip_duplicates)
+        
+        if filename.endswith('.csv'):
+            csv_content = content.decode('utf-8')
+            stats = service.import_transactions_csv(portfolio_id, csv_content, skip_duplicates)
+        else:
+            # Excel
+            stats = service.import_transactions_xlsx(portfolio_id, content, skip_duplicates)
         
         return stats
         
@@ -241,10 +240,10 @@ async def download_transactions_template(
     Returns:
         Archivo CSV de ejemplo
     """
-    template = """date,type,asset_symbol,quantity,price,fees,notes
-2025-01-15,BUY,AAPL,10,150.50,9.99,Initial purchase
-2025-02-20,SELL,AAPL,5,155.00,9.99,Partial sale
-2025-03-10,BUY,TSLA,20,200.00,19.99,Tesla investment"""
+    template = """Data,C/V,Activo,Cantidad,Precio,Fee,Nota
+01/01/2025,C,TSLA,100,400,0,Compra inicial
+15/02/2025,V,NVDA,50,170,5.50,Venta parcial
+10/03/2025,C,AAPL,20,150,2.00,Inversion"""
     
     return Response(
         content=template,

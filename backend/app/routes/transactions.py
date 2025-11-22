@@ -9,7 +9,7 @@ from app.utils.portfolio_utils import get_user_portfolio_or_404
 from ..models.transaction import Transaction
 from ..models.position import Position
 from ..models.asset import Asset
-from ..schemas.portfolio import TransactionCreate, TransactionResponse
+from ..schemas.portfolio import TransactionCreate, TransactionResponse, TransactionBatchUpdate
 
 router = APIRouter(
     prefix="/api/portfolios/{portfolio_id}/transactions", tags=["transactions"]
@@ -62,47 +62,10 @@ async def create_transaction(
     db_transaction = Transaction(**transaction.dict(), portfolio_id=portfolio_id)
     db.add(db_transaction)
 
-    # Actualizar o crear posición
-    position = (
-        db.query(Position)
-        .filter(
-            Position.portfolio_id == portfolio_id,
-            Position.asset_id == transaction.asset_id,
-        )
-        .first()
-    )
-
-    if transaction.transaction_type in ["buy", "deposit"]:
-        if position:
-            # Actualizar posición existente
-            total_cost = (position.quantity * position.average_price) + (
-                transaction.quantity * transaction.price
-            )
-            position.quantity += transaction.quantity
-            position.average_price = (
-                total_cost / position.quantity if position.quantity > 0 else 0
-            )
-        else:
-            # Crear nueva posición
-            position = Position(
-                portfolio_id=portfolio_id,
-                asset_id=transaction.asset_id,
-                quantity=transaction.quantity,
-                average_price=transaction.price,
-            )
-            db.add(position)
-
-    elif transaction.transaction_type == "sell":
-        if not position or position.quantity < transaction.quantity:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Cantidad insuficiente para vender",
-            )
-        position.quantity -= transaction.quantity
-
-        # Si la cantidad es 0, eliminar la posición
-        if position.quantity == 0:
-            db.delete(position)
+    # Actualizar posición usando PositionService (más robusto)
+    from app.services.position_service import PositionService
+    position_service = PositionService(db)
+    position_service.recalculate_position(portfolio_id, transaction.asset_id)
 
     db.commit()
     db.refresh(db_transaction)
@@ -161,7 +124,16 @@ async def delete_transaction(
             status_code=status.HTTP_404_NOT_FOUND, detail="Transacción no encontrada"
         )
 
+    # Guardar asset_id antes de borrar para recalcular
+    asset_id = transaction.asset_id
+    
     db.delete(transaction)
+    db.commit()
+    
+    # Recalcular posición
+    from app.services.position_service import PositionService
+    position_service = PositionService(db)
+    position_service.recalculate_position(portfolio_id, asset_id)
     db.commit()
     
     # Trigger snapshot recalculation in background
@@ -192,3 +164,90 @@ async def delete_transaction(
     background_tasks.add_task(run_recalculation, portfolio_id, transaction_date, today)
     
     return None
+
+@router.put("/batch", status_code=status.HTTP_200_OK)
+async def update_transactions_batch(
+    portfolio_id: UUID,
+    batch_update: TransactionBatchUpdate,
+    background_tasks: BackgroundTasks,
+    user: dict = Depends(require_auth),
+    db: Session = Depends(get_db),
+):
+    """Actualizar múltiples transacciones en lote"""
+    get_user_portfolio(portfolio_id, UUID(user["user_id"]), db)
+    
+    affected_assets = set()
+    min_date = None
+    
+    for tx_update in batch_update.transactions:
+        transaction = db.query(Transaction).filter(
+            Transaction.id == tx_update.id,
+            Transaction.portfolio_id == portfolio_id
+        ).first()
+        
+        if not transaction:
+            continue
+            
+        # Update fields
+        if tx_update.asset_id:
+            affected_assets.add(transaction.asset_id) # Old asset
+            transaction.asset_id = tx_update.asset_id
+            affected_assets.add(tx_update.asset_id) # New asset
+        else:
+            affected_assets.add(transaction.asset_id)
+            
+        if tx_update.transaction_type:
+            transaction.transaction_type = tx_update.transaction_type
+        if tx_update.quantity is not None:
+            transaction.quantity = tx_update.quantity
+        if tx_update.price is not None:
+            transaction.price = tx_update.price
+        if tx_update.fees is not None:
+            transaction.fees = tx_update.fees
+        if tx_update.currency:
+            transaction.currency = tx_update.currency
+        if tx_update.notes is not None:
+            transaction.notes = tx_update.notes
+        if tx_update.transaction_date:
+            transaction.transaction_date = tx_update.transaction_date
+            
+        # Track min date for snapshot recalc
+        # Handle naive/aware datetime
+        tx_date = transaction.transaction_date
+        if tx_date.tzinfo:
+            tx_date = tx_date.date()
+        else:
+            tx_date = tx_date.date()
+            
+        if min_date is None or tx_date < min_date:
+            min_date = tx_date
+            
+    db.commit()
+    
+    # Recalculate positions
+    from app.services.position_service import PositionService
+    position_service = PositionService(db)
+    for asset_id in affected_assets:
+        position_service.recalculate_position(portfolio_id, asset_id)
+        
+    db.commit()
+    
+    # Trigger snapshot recalculation
+    if min_date:
+        from datetime import datetime
+        from app.services.snapshot_service import snapshot_service
+        today = datetime.now().date()
+        
+        def run_recalculation(pid, start_date, end_date):
+            from app.core.database import SessionLocal
+            db_bg = SessionLocal()
+            try:
+                snapshot_service.create_daily_snapshots_for_portfolio(
+                    db_bg, pid, start_date, end_date, overwrite=True
+                )
+            finally:
+                db_bg.close()
+                
+        background_tasks.add_task(run_recalculation, portfolio_id, min_date, today)
+        
+    return {"message": "Transacciones actualizadas correctamente"}

@@ -11,7 +11,7 @@ from app.db.models import Base
 config = context.config
 
 # Set database URL from settings
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+config.set_main_option("sqlalchemy.url", settings.ASYNC_DATABASE_URL)
 
 # Configure logging - skip if config file is missing or has issues
 if config.config_file_name is not None:

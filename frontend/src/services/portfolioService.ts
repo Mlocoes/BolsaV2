@@ -53,6 +53,10 @@ export const portfolioService = {
     return response.data;
   },
 
+  async updateTransactionsBatch(portfolioId: string, transactions: any[]): Promise<void> {
+    await api.put(`/portfolios/${portfolioId}/transactions/batch`, { transactions });
+  },
+
   // Assets
   async getAssets(): Promise<Asset[]> {
     const response = await api.get('/assets');

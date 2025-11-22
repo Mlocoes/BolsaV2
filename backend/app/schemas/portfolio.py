@@ -106,3 +106,17 @@ class PortfolioDetail(PortfolioResponse):
     
     class Config:
         from_attributes = True
+
+class TransactionUpdate(BaseModel):
+    id: UUID
+    asset_id: Optional[UUID] = None
+    transaction_type: Optional[TransactionType] = None
+    quantity: Optional[float] = Field(None, gt=0)
+    price: Optional[float] = Field(None, gt=0)
+    fees: Optional[float] = Field(None, ge=0)
+    currency: Optional[str] = Field(None, max_length=10)
+    notes: Optional[str] = Field(None, max_length=500)
+    transaction_date: Optional[datetime] = None
+
+class TransactionBatchUpdate(BaseModel):
+    transactions: List[TransactionUpdate]

@@ -10,24 +10,25 @@ import AssetsCatalog from './pages/AssetsCatalog'
 import Quotes from './pages/Quotes'
 import ImportData from './pages/ImportData'
 import UsersCatalog from './pages/UsersCatalog'
+import BulkEditTransactions from './pages/BulkEditTransactions'
 
 function App() {
   const { logout } = useAuthStore()
-  
+
   useEffect(() => {
     // SIEMPRE hacer logout al cargar/recargar (F5)
     // Esto fuerza que el usuario tenga que hacer login cada vez
     logout().catch(() => {
       // Ignorar errores si no hay sesión
     })
-    
+
     // Forzar navegación a login SIN cambiar la URL completa
     // Solo si no estamos ya en login
     if (window.location.pathname !== '/login') {
       window.history.replaceState(null, '', '/login')
     }
   }, [])
-  
+
   return (
     <BrowserRouter>
       <Toaster position="top-right" />
@@ -35,53 +36,61 @@ function App() {
         {/* Ruta raíz siempre redirige a login */}
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
-        <Route 
-          path="/dashboard" 
+        <Route
+          path="/dashboard"
           element={
             <ProtectedRoute>
               <Dashboard />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/portfolios" 
+        <Route
+          path="/portfolios"
           element={
             <ProtectedRoute>
               <Portfolios />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/assets" 
+        <Route
+          path="/assets"
           element={
             <ProtectedRoute>
               <AssetsCatalog />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/quotes" 
+        <Route
+          path="/quotes"
           element={
             <ProtectedRoute>
               <Quotes />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/import" 
+        <Route
+          path="/import"
           element={
             <ProtectedRoute>
               <ImportData />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/users" 
+        <Route
+          path="/users"
           element={
             <ProtectedRoute>
               <UsersCatalog />
             </ProtectedRoute>
-          } 
+          }
+        />
+        <Route
+          path="/portfolio/:id/bulk-edit"
+          element={
+            <ProtectedRoute>
+              <BulkEditTransactions />
+            </ProtectedRoute>
+          }
         />
         {/* Redirigir cualquier ruta no encontrada a login */}
         <Route path="*" element={<Navigate to="/login" replace />} />

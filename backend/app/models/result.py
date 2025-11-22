@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Float, Date, ForeignKey, DateTime
+from sqlalchemy import Column, Float, Date, ForeignKey, DateTime, Numeric
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -13,11 +13,11 @@ class Result(Base):
     period_start = Column(Date, nullable=False)
     period_end = Column(Date, nullable=False)
     
-    # Métricas calculadas
-    total_invested = Column(Float, default=0.0)
-    total_current_value = Column(Float, default=0.0)
-    pnl_absolute = Column(Float, default=0.0)
-    pnl_percent = Column(Float, default=0.0)
+    # Métricas calculadas - Usamos Numeric(18, 6) para precisión financiera
+    total_invested = Column(Numeric(18, 6), default=0.0)
+    total_current_value = Column(Numeric(18, 6), default=0.0)
+    pnl_absolute = Column(Numeric(18, 6), default=0.0)
+    pnl_percent = Column(Numeric(18, 6), default=0.0)
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

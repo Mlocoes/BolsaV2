@@ -157,12 +157,12 @@ export default function Dashboard() {
         { data: 'current_price', type: 'numeric', readOnly: true, numericFormat: { pattern: '$0,0.00' } },
         { data: 'current_value', type: 'numeric', readOnly: true, numericFormat: { pattern: '$0,0.00' } },
         { data: 'cost_basis', type: 'numeric', readOnly: true, numericFormat: { pattern: '$0,0.00' } },
-        { 
-          data: 'profit_loss', 
-          type: 'numeric', 
-          readOnly: true, 
+        {
+          data: 'profit_loss',
+          type: 'numeric',
+          readOnly: true,
           numericFormat: { pattern: '$0,0.00' },
-          renderer: function(instance: any, td: HTMLTableCellElement, row: number, col: number, prop: any, value: any, cellProperties: any) {
+          renderer: function (instance: any, td: HTMLTableCellElement, row: number, col: number, prop: any, value: any, cellProperties: any) {
             Handsontable.renderers.NumericRenderer.apply(this, [instance, td, row, col, prop, value, cellProperties]);
             if (value >= 0) {
               td.classList.add('htPositive');
@@ -172,12 +172,12 @@ export default function Dashboard() {
             return td;
           }
         },
-        { 
-          data: 'profit_loss_percent', 
-          type: 'numeric', 
-          readOnly: true, 
+        {
+          data: 'profit_loss_percent',
+          type: 'numeric',
+          readOnly: true,
           numericFormat: { pattern: '0.00%' },
-          renderer: function(instance: any, td: HTMLTableCellElement, row: number, col: number, prop: any, value: any, cellProperties: any) {
+          renderer: function (instance: any, td: HTMLTableCellElement, row: number, col: number, prop: any, value: any, cellProperties: any) {
             Handsontable.renderers.NumericRenderer.apply(this, [instance, td, row, col, prop, value, cellProperties]);
             if (value >= 0) {
               td.classList.add('htPositive');
@@ -228,7 +228,7 @@ export default function Dashboard() {
         totalProfitLossPercent: selectedSnapshot.total_pnl_percent || selectedSnapshot.total_profit_loss_percent || 0
       };
     }
-    
+
     const totalValue = positions.reduce((sum, p) => sum + (p.current_value || 0), 0);
     const totalCost = positions.reduce((sum, p) => sum + (p.cost_basis || 0), 0);
     const totalProfitLoss = totalValue - totalCost;
@@ -324,15 +324,24 @@ export default function Dashboard() {
             ))}
           </select>
         </div>
-        
+
         {selectedPortfolio && (
-          <button
-            onClick={() => setShowTransactionModal(true)}
-            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-          >
-            <Plus className="h-5 w-5 mr-2" />
-            Nueva Transacción
-          </button>
+          <div className="flex space-x-2">
+            <button
+              onClick={() => window.location.href = `/portfolio/${selectedPortfolio.id}/bulk-edit`}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+            >
+              <TrendingUp className="h-5 w-5 mr-2" />
+              Edición Masiva
+            </button>
+            <button
+              onClick={() => setShowTransactionModal(true)}
+              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+            >
+              <Plus className="h-5 w-5 mr-2" />
+              Nueva Transacción
+            </button>
+          </div>
         )}
       </div>
 
@@ -437,8 +446,8 @@ export default function Dashboard() {
               </h3>
             </div>
             <div className="p-6">
-              <PortfolioDistributionChart 
-                positions={selectedSnapshot ? selectedSnapshot.positions.map(p => ({...p, position_id: '', asset_id: '', change_percent: 0})) : positions} 
+              <PortfolioDistributionChart
+                positions={selectedSnapshot ? selectedSnapshot.positions.map(p => ({ ...p, position_id: '', asset_id: '', change_percent: 0 })) : positions}
               />
             </div>
           </div>
@@ -450,8 +459,8 @@ export default function Dashboard() {
               </h3>
             </div>
             <div className="p-6">
-              <PerformanceChart 
-                positions={selectedSnapshot ? selectedSnapshot.positions.map(p => ({...p, position_id: '', asset_id: '', change_percent: 0})) : positions} 
+              <PerformanceChart
+                positions={selectedSnapshot ? selectedSnapshot.positions.map(p => ({ ...p, position_id: '', asset_id: '', change_percent: 0 })) : positions}
               />
             </div>
           </div>
@@ -509,9 +518,9 @@ export default function Dashboard() {
                       })}
                     </p>
                     <p className="text-xs text-blue-700 mt-1">
-                      {selectedSnapshot.positions.length} posiciones | 
-                      Valor Total: ${selectedSnapshot.total_value.toLocaleString('es-ES', {minimumFractionDigits: 2})} | 
-                      G/P: ${(selectedSnapshot.total_pnl || selectedSnapshot.total_profit_loss || 0).toLocaleString('es-ES', {minimumFractionDigits: 2})} 
+                      {selectedSnapshot.positions.length} posiciones |
+                      Valor Total: ${selectedSnapshot.total_value.toLocaleString('es-ES', { minimumFractionDigits: 2 })} |
+                      G/P: ${(selectedSnapshot.total_pnl || selectedSnapshot.total_profit_loss || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                       ({(selectedSnapshot.total_pnl_percent || selectedSnapshot.total_profit_loss_percent || 0) >= 0 ? '+' : ''}{(selectedSnapshot.total_pnl_percent || selectedSnapshot.total_profit_loss_percent || 0).toFixed(2)}%)
                     </p>
                   </div>
