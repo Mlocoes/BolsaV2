@@ -123,6 +123,8 @@ services:
       - backend
     networks:
       - bolsav2_network
+    # volumes:
+    #   - ./frontend/dist:/usr/share/nginx/html
 
 networks:
   bolsav2_network:

@@ -1,16 +1,28 @@
 import { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { portfolioService } from '../services/portfolioService';
 import { snapshotService, type PortfolioSnapshot } from '../services/snapshotService';
 import type { Portfolio, PositionWithPrice } from '../types/portfolio';
-import { Wallet, TrendingUp, TrendingDown, Plus } from 'lucide-react';
-import AddTransactionModal from './AddTransactionModal';
+import { Wallet, TrendingUp, TrendingDown, List } from 'lucide-react';
 import CreatePortfolioModal from './CreatePortfolioModal';
 import PortfolioDistributionChart from './PortfolioDistributionChart';
 import PerformanceChart from './PerformanceChart';
 import Handsontable from 'handsontable';
 import 'handsontable/dist/handsontable.full.min.css';
+import { registerLanguageDictionary, esMX } from 'handsontable/i18n';
+import numbro from 'numbro';
+import esES from 'numbro/dist/languages/es-ES.min.js';
+
+// Registrar idioma en numbro
+numbro.registerLanguage(esES);
+numbro.setLanguage('es-ES');
+
+// Crear diccionario para es-ES basado en es-MX
+const esESDictionary = { ...esMX, languageCode: 'es-ES' };
+registerLanguageDictionary(esESDictionary);
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [selectedPortfolio, setSelectedPortfolio] = useState<Portfolio | null>(null);
   const [positions, setPositions] = useState<PositionWithPrice[]>([]);
@@ -19,7 +31,6 @@ export default function Dashboard() {
   const [selectedSnapshot, setSelectedSnapshot] = useState<PortfolioSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [showCreatePortfolioModal, setShowCreatePortfolioModal] = useState(false);
   const hotTableRef = useRef<HTMLDivElement>(null);
   const hotInstance = useRef<Handsontable | null>(null);
@@ -68,7 +79,7 @@ export default function Dashboard() {
         setSelectedPortfolio(data[0]);
       }
     } catch (err: any) {
-      setError(err.message || 'Error al cargar portfolios');
+      setError(err.message || 'Error al cargar carteras');
     } finally {
       setLoading(false);
     }
@@ -136,6 +147,7 @@ export default function Dashboard() {
 
     hotInstance.current = new Handsontable(hotTableRef.current, {
       data,
+      language: 'es-ES',
       colHeaders: [
         'Símbolo',
         'Nombre',
@@ -152,16 +164,16 @@ export default function Dashboard() {
         { data: 'symbol', type: 'text', readOnly: true },
         { data: 'name', type: 'text', readOnly: true },
         { data: 'asset_type', type: 'text', readOnly: true },
-        { data: 'quantity', type: 'numeric', readOnly: true, numericFormat: { pattern: '0,0.00' } },
-        { data: 'average_price', type: 'numeric', readOnly: true, numericFormat: { pattern: '$0,0.00' } },
-        { data: 'current_price', type: 'numeric', readOnly: true, numericFormat: { pattern: '$0,0.00' } },
-        { data: 'current_value', type: 'numeric', readOnly: true, numericFormat: { pattern: '$0,0.00' } },
-        { data: 'cost_basis', type: 'numeric', readOnly: true, numericFormat: { pattern: '$0,0.00' } },
+        { data: 'quantity', type: 'numeric', readOnly: true, numericFormat: { pattern: '0,0.00', culture: 'es-ES' } },
+        { data: 'average_price', type: 'numeric', readOnly: true, numericFormat: { pattern: '0,0.00', culture: 'es-ES' } },
+        { data: 'current_price', type: 'numeric', readOnly: true, numericFormat: { pattern: '0,0.00', culture: 'es-ES' } },
+        { data: 'current_value', type: 'numeric', readOnly: true, numericFormat: { pattern: '0,0.00', culture: 'es-ES' } },
+        { data: 'cost_basis', type: 'numeric', readOnly: true, numericFormat: { pattern: '0,0.00', culture: 'es-ES' } },
         {
           data: 'profit_loss',
           type: 'numeric',
           readOnly: true,
-          numericFormat: { pattern: '$0,0.00' },
+          numericFormat: { pattern: '0,0.00', culture: 'es-ES' },
           renderer: function (instance: any, td: HTMLTableCellElement, row: number, col: number, prop: any, value: any, cellProperties: any) {
             Handsontable.renderers.NumericRenderer.apply(this, [instance, td, row, col, prop, value, cellProperties]);
             if (value >= 0) {
@@ -176,7 +188,7 @@ export default function Dashboard() {
           data: 'profit_loss_percent',
           type: 'numeric',
           readOnly: true,
-          numericFormat: { pattern: '0.00%' },
+          numericFormat: { pattern: '0.00%', culture: 'es-ES' },
           renderer: function (instance: any, td: HTMLTableCellElement, row: number, col: number, prop: any, value: any, cellProperties: any) {
             Handsontable.renderers.NumericRenderer.apply(this, [instance, td, row, col, prop, value, cellProperties]);
             if (value >= 0) {
@@ -243,16 +255,18 @@ export default function Dashboard() {
   };
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2
+    // Usar formato español (España)
+    return new Intl.NumberFormat('es-ES', {
+      style: 'decimal', // Usamos decimal para evitar el símbolo de moneda si no es deseado, o 'currency' con 'EUR'
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
     }).format(value);
   };
 
   const formatPercent = (value: number | undefined) => {
-    if (value === undefined || value === null || isNaN(value)) return '0.00%';
-    return value.toFixed(2) + '%';
+    if (value === undefined || value === null || isNaN(value)) return '0,00%';
+    // Reemplazar punto por coma para decimales
+    return value.toFixed(2).replace('.', ',') + '%';
   };
 
   if (loading) {
@@ -275,15 +289,15 @@ export default function Dashboard() {
     return (
       <div className="text-center py-12">
         <Wallet className="mx-auto h-12 w-12 text-gray-400" />
-        <h3 className="mt-2 text-sm font-medium text-gray-900">No hay portfolios</h3>
-        <p className="mt-1 text-sm text-gray-500">Crea tu primer portfolio para comenzar.</p>
+        <h3 className="mt-2 text-sm font-medium text-gray-900">No hay carteras</h3>
+        <p className="mt-1 text-sm text-gray-500">Crea tu primera cartera para comenzar.</p>
         <div className="mt-6">
           <button
             type="button"
             onClick={() => setShowCreatePortfolioModal(true)}
             className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
           >
-            Crear Portfolio
+            Crear Cartera
           </button>
         </div>
       </div>
@@ -296,7 +310,7 @@ export default function Dashboard() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Panel de Control</h1>
         <p className="mt-2 text-sm text-gray-600">
           Resumen de tus inversiones
         </p>
@@ -306,7 +320,7 @@ export default function Dashboard() {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <label htmlFor="portfolio" className="text-sm font-medium text-gray-700">
-            Portfolio:
+            Cartera:
           </label>
           <select
             id="portfolio"
@@ -325,21 +339,22 @@ export default function Dashboard() {
           </select>
         </div>
 
+
         {selectedPortfolio && (
           <div className="flex space-x-2">
             <button
-              onClick={() => window.location.href = `/portfolio/${selectedPortfolio.id}/bulk-edit`}
+              onClick={() => navigate(`/portfolio/${selectedPortfolio.id}/bulk-edit`)}
               className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
             >
               <TrendingUp className="h-5 w-5 mr-2" />
               Edición Masiva
             </button>
             <button
-              onClick={() => setShowTransactionModal(true)}
+              onClick={() => navigate(`/portfolio/${selectedPortfolio.id}/transactions`)}
               className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
             >
-              <Plus className="h-5 w-5 mr-2" />
-              Nueva Transacción
+              <List className="h-5 w-5 mr-2" />
+              Gestionar Transacciones
             </button>
           </div>
         )}
@@ -442,7 +457,7 @@ export default function Dashboard() {
           <div className="bg-white shadow rounded-lg overflow-hidden">
             <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
               <h3 className="text-lg leading-6 font-medium text-gray-900">
-                Distribución del Portfolio
+                Distribución de la Cartera
               </h3>
             </div>
             <div className="p-6">
@@ -519,9 +534,9 @@ export default function Dashboard() {
                     </p>
                     <p className="text-xs text-blue-700 mt-1">
                       {selectedSnapshot.positions.length} posiciones |
-                      Valor Total: ${selectedSnapshot.total_value.toLocaleString('es-ES', { minimumFractionDigits: 2 })} |
-                      G/P: ${(selectedSnapshot.total_pnl || selectedSnapshot.total_profit_loss || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                      ({(selectedSnapshot.total_pnl_percent || selectedSnapshot.total_profit_loss_percent || 0) >= 0 ? '+' : ''}{(selectedSnapshot.total_pnl_percent || selectedSnapshot.total_profit_loss_percent || 0).toFixed(2)}%)
+                      Valor Total: {selectedSnapshot.total_value.toLocaleString('es-ES', { minimumFractionDigits: 2 })} |
+                      G/P: {(selectedSnapshot.total_pnl || selectedSnapshot.total_profit_loss || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                      ({(selectedSnapshot.total_pnl_percent || selectedSnapshot.total_profit_loss_percent || 0) >= 0 ? '+' : ''}{(selectedSnapshot.total_pnl_percent || selectedSnapshot.total_profit_loss_percent || 0).toFixed(2).replace('.', ',')}%)
                     </p>
                   </div>
                   {selectedSnapshot.created_at && (
@@ -547,17 +562,6 @@ export default function Dashboard() {
       </div>
 
       {/* Modals */}
-      {selectedPortfolio && (
-        <AddTransactionModal
-          isOpen={showTransactionModal}
-          onClose={() => setShowTransactionModal(false)}
-          portfolioId={selectedPortfolio.id}
-          onSuccess={() => {
-            loadPositions(selectedPortfolio.id);
-          }}
-        />
-      )}
-
       <CreatePortfolioModal
         isOpen={showCreatePortfolioModal}
         onClose={() => setShowCreatePortfolioModal(false)}

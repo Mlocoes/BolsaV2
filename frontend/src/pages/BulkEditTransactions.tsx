@@ -7,6 +7,21 @@ import 'handsontable/dist/handsontable.full.min.css';
 import { Save, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+import { registerLanguageDictionary, esMX } from 'handsontable/i18n';
+import { registerAllModules } from 'handsontable/registry';
+import numbro from 'numbro';
+import esES from 'numbro/dist/languages/es-ES.min.js';
+
+// Registrar idioma en numbro
+numbro.registerLanguage(esES);
+numbro.setLanguage('es-ES');
+
+// Registrar módulos de Handsontable
+registerAllModules();
+// Crear diccionario para es-ES basado en es-MX
+const esESDictionary = { ...esMX, languageCode: 'es-ES' };
+registerLanguageDictionary(esESDictionary);
+
 export default function BulkEditTransactions() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -47,17 +62,25 @@ export default function BulkEditTransactions() {
             ]);
 
             // Map transactions for grid
-            const gridData = txs.map(t => ({
-                id: t.id,
-                date: t.transaction_date,
-                type: t.transaction_type,
-                asset_symbol: t.asset?.symbol || '',
-                quantity: t.quantity,
-                price: t.price,
-                fees: t.fee,
-                notes: t.notes,
-                asset_id: t.asset_id // Hidden for reference
-            }));
+            const gridData = txs.map(t => {
+                let dateStr = '';
+                if (t.transaction_date) {
+                    const datePart = new Date(t.transaction_date).toISOString().split('T')[0];
+                    const [y, m, d] = datePart.split('-');
+                    dateStr = `${d}/${m}/${y}`;
+                }
+                return {
+                    id: t.id,
+                    date: dateStr,
+                    type: t.transaction_type,
+                    asset_symbol: t.asset?.symbol || '',
+                    quantity: t.quantity,
+                    price: t.price,
+                    fees: t.fees,
+                    notes: t.notes,
+                    asset_id: t.asset_id // Hidden for reference
+                };
+            });
 
             setTransactions(gridData);
             setAssets(assetsData);
@@ -76,6 +99,7 @@ export default function BulkEditTransactions() {
 
         hotInstance.current = new Handsontable(hotTableRef.current, {
             data: transactions,
+            language: 'es-ES',
             colHeaders: [
                 'Fecha',
                 'Tipo',
@@ -89,7 +113,7 @@ export default function BulkEditTransactions() {
                 {
                     data: 'date',
                     type: 'date',
-                    dateFormat: 'YYYY-MM-DD',
+                    dateFormat: 'DD/MM/YYYY',
                     correctFormat: true
                 },
                 {
@@ -105,17 +129,17 @@ export default function BulkEditTransactions() {
                 {
                     data: 'quantity',
                     type: 'numeric',
-                    numericFormat: { pattern: '0,0.00' }
+                    numericFormat: { pattern: '0,0.00', culture: 'es-ES' }
                 },
                 {
                     data: 'price',
                     type: 'numeric',
-                    numericFormat: { pattern: '0,0.00' }
+                    numericFormat: { pattern: '0,0.00', culture: 'es-ES' }
                 },
                 {
                     data: 'fees',
                     type: 'numeric',
-                    numericFormat: { pattern: '0,0.00' }
+                    numericFormat: { pattern: '0,0.00', culture: 'es-ES' }
                 },
                 {
                     data: 'notes',
@@ -155,6 +179,13 @@ export default function BulkEditTransactions() {
                     assetId = asset.id;
                 }
 
+                // Convertir fecha DD/MM/YYYY a YYYY-MM-DD
+                let isoDate = row.date;
+                if (row.date && row.date.includes('/')) {
+                    const [d, m, y] = row.date.split('/');
+                    isoDate = `${y}-${m}-${d}`;
+                }
+
                 return {
                     id: row.id,
                     asset_id: assetId,
@@ -163,7 +194,7 @@ export default function BulkEditTransactions() {
                     price: parseFloat(row.price),
                     fees: parseFloat(row.fees || 0),
                     notes: row.notes,
-                    transaction_date: row.date
+                    transaction_date: isoDate
                 };
             });
 

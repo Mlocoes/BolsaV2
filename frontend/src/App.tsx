@@ -11,6 +11,8 @@ import Quotes from './pages/Quotes'
 import ImportData from './pages/ImportData'
 import UsersCatalog from './pages/UsersCatalog'
 import BulkEditTransactions from './pages/BulkEditTransactions'
+import PortfolioTransactions from './pages/PortfolioTransactions'
+import TransactionsPortfolioSelection from './pages/TransactionsPortfolioSelection'
 
 function App() {
   const { logout } = useAuthStore()
@@ -89,6 +91,22 @@ function App() {
           element={
             <ProtectedRoute>
               <BulkEditTransactions />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/portfolio/:id/transactions"
+          element={
+            <ProtectedRoute>
+              <PortfolioTransactions />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/transactions"
+          element={
+            <ProtectedRoute>
+              <TransactionsPortfolioSelection />
             </ProtectedRoute>
           }
         />

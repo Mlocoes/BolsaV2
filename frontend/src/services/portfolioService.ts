@@ -57,6 +57,15 @@ export const portfolioService = {
     await api.put(`/portfolios/${portfolioId}/transactions/batch`, { transactions });
   },
 
+  async updateTransaction(portfolioId: string, transaction: any): Promise<void> {
+    // Reusing batch update for single transaction to avoid backend changes
+    await this.updateTransactionsBatch(portfolioId, [transaction]);
+  },
+
+  async deleteTransaction(portfolioId: string, transactionId: string): Promise<void> {
+    await api.delete(`/portfolios/${portfolioId}/transactions/${transactionId}`);
+  },
+
   // Assets
   async getAssets(): Promise<Asset[]> {
     const response = await api.get('/assets');

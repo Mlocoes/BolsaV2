@@ -33,7 +33,7 @@ export interface Transaction {
   transaction_type: 'buy' | 'sell' | 'dividend' | 'deposit' | 'withdrawal';
   quantity: number;
   price: number;
-  fee?: number;
+  fees?: number;
   currency: string;
   notes?: string;
   transaction_date: string;
@@ -81,7 +81,7 @@ export interface CreateTransactionRequest {
   transaction_type: 'buy' | 'sell' | 'dividend' | 'deposit' | 'withdrawal';
   quantity: number;
   price: number;
-  fee?: number;
+  fees?: number;
   currency?: string;
   notes?: string;
   transaction_date?: string;

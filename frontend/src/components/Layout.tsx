@@ -46,6 +46,12 @@ export default function Layout({ children }: LayoutProps) {
                 Activos
               </button>
               <button
+                onClick={() => navigate('/transactions')}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                Transacciones
+              </button>
+              <button
                 onClick={() => navigate('/quotes')}
                 className="text-gray-600 hover:text-gray-900"
               >

@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@handsontable/react": "^16.1.1",
     "@handsontable/react-wrapper": "^16.1.1",
     "axios": "^1.7.7",
     "handsontable": "^16.1.1",
