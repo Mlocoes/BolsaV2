@@ -9,7 +9,11 @@ from uuid import UUID
 from sqlalchemy import select, and_, desc, func
 from sqlalchemy.orm import Session
 
-from app.db.models import Portfolio, Operation, Asset, Quote, OperationSide
+# Correct imports matching the rest of the application
+from app.models.portfolio import Portfolio
+from app.models.transaction import Transaction, TransactionType
+from app.models.asset import Asset
+from app.models.quote import Quote
 from app.db.models_snapshots import PortfolioSnapshot, PositionSnapshot, SnapshotMetrics
 
 
@@ -33,26 +37,26 @@ class SnapshotService:
         Returns:
             Dictionary with portfolio state
         """
-        # Get all operations up to target date
+        # Get all transactions up to target date
         result = db.execute(
-            select(Operation, Asset)
-            .join(Asset, Operation.asset_id == Asset.id)
+            select(Transaction, Asset)
+            .join(Asset, Transaction.asset_id == Asset.id)
             .where(
                 and_(
-                    Operation.portfolio_id == portfolio_id,
-                    func.date(Operation.transaction_date) <= target_date
+                    Transaction.portfolio_id == portfolio_id,
+                    func.date(Transaction.transaction_date) <= target_date
                 )
             )
-            .order_by(Operation.transaction_date)
+            .order_by(Transaction.transaction_date)
         )
-        operations = result.all()
+        transactions = result.all()
 
         # Calculate positions
         positions = {}
         total_invested = Decimal("0")
         
-        for operation, asset in operations:
-            asset_id = str(operation.asset_id)
+        for transaction, asset in transactions:
+            asset_id = str(transaction.asset_id)
             
             if asset_id not in positions:
                 positions[asset_id] = {
@@ -64,27 +68,33 @@ class SnapshotService:
             
             pos = positions[asset_id]
             
-            if operation.side == OperationSide.BUY:
-                pos["quantity"] += operation.quantity
-                cost = (operation.quantity * operation.price) + (operation.fee or 0)
+            # Convert float to Decimal for calculation
+            qty = Decimal(str(transaction.quantity))
+            price = Decimal(str(transaction.price))
+            fees = Decimal(str(transaction.fees or 0))
+            
+            if transaction.transaction_type == TransactionType.BUY:
+                pos["quantity"] += qty
+                cost = (qty * price) + fees
                 pos["total_cost"] += cost
                 total_invested += cost
-            else:  # SELL
+            elif transaction.transaction_type == TransactionType.SELL:
                 # Calculate proportion being sold
                 if pos["quantity"] > 0:
-                    sell_proportion = operation.quantity / pos["quantity"]
+                    sell_proportion = qty / pos["quantity"]
                     cost_reduction = pos["total_cost"] * sell_proportion
                     pos["total_cost"] -= cost_reduction
                     total_invested -= cost_reduction
                 
-                pos["quantity"] -= operation.quantity
+                pos["quantity"] -= qty
+            # Handle other types if necessary (DEPOSIT/WITHDRAWAL usually affect cash, not positions directly unless it's crypto/asset transfer)
             
-            pos["operations"].append(operation)
+            pos["operations"].append(transaction)
 
         # Filter active positions
         active_positions = {
             k: v for k, v in positions.items()
-            if v["quantity"] > 0
+            if v["quantity"] > Decimal("0")
         }
 
         # Get quotes for target date (or closest previous)
@@ -97,21 +107,23 @@ class SnapshotService:
             total_cost = pos_data["total_cost"]
             
             # Get quote for target date or most recent before
+            # Using correct columns: asset_id and timestamp
             quote_result = db.execute(
                 select(Quote)
                 .where(
                     and_(
-                        Quote.symbol == asset.symbol,
-                        Quote.date <= target_date
+                        Quote.asset_id == asset.id,
+                        func.date(Quote.timestamp) <= target_date
                     )
                 )
-                .order_by(desc(Quote.date))
+                .order_by(desc(Quote.timestamp))
                 .limit(1)
             )
             quote = quote_result.scalar_one_or_none()
             
             if not quote:
-                # No quote available, use average cost
+                # No quote available, use average cost as fallback or 0?
+                # Using average cost implies no PnL, which is safer than 0 value
                 current_price = total_cost / quantity if quantity > 0 else Decimal("0")
             else:
                 current_price = Decimal(str(quote.close))
@@ -402,7 +414,7 @@ class SnapshotService:
                     {
                         "symbol": pos.ticker,
                         "name": asset.name or pos.ticker,
-                        "asset_type": asset.asset_type.value if asset.asset_type else "STOCK",
+                        "asset_type": asset.asset_type.value if hasattr(asset.asset_type, 'value') else "STOCK",
                         "quantity": float(pos.quantity),
                         "average_price": float(pos.average_buy_price),
                         "current_price": float(pos.current_price),

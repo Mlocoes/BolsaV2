@@ -2,10 +2,14 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select, and_
 from uuid import UUID
 from typing import List
+from decimal import Decimal, getcontext
 
 from app.models.position import Position
 from app.models.transaction import Transaction
 from app.models.asset import Asset
+
+# Configurar precisión de Decimal si es necesario, por defecto es suficiente (28 dígitos)
+# getcontext().prec = 28
 
 class PositionService:
     def __init__(self, db: Session):
@@ -14,7 +18,7 @@ class PositionService:
     def recalculate_position(self, portfolio_id: UUID, asset_id: UUID) -> Position:
         """
         Recalcula una posición desde cero basándose en todas las transacciones.
-        Esto es más robusto que intentar revertir operaciones individuales.
+        Usa Decimal para evitar errores de punto flotante.
         """
         # 1. Obtener todas las transacciones para este asset y portfolio
         transactions = self.db.scalars(
@@ -28,14 +32,15 @@ class PositionService:
             .order_by(Transaction.transaction_date.asc()) # Orden cronológico es importante para promedio ponderado
         ).all()
 
-        # 2. Calcular cantidad y precio promedio
-        quantity = 0.0
-        total_cost = 0.0
-        average_price = 0.0
+        # 2. Calcular cantidad y precio promedio usando Decimal
+        quantity = Decimal('0.0')
+        total_cost = Decimal('0.0')
+        average_price = Decimal('0.0')
 
         for tx in transactions:
-            tx_qty = float(tx.quantity)
-            tx_price = float(tx.price)
+            # Convertir a string primero para preservar precisión al crear Decimal
+            tx_qty = Decimal(str(tx.quantity))
+            tx_price = Decimal(str(tx.price))
             
             if tx.transaction_type in ["buy", "deposit"]:
                 # Compra: Aumenta cantidad y costo total
@@ -44,27 +49,37 @@ class PositionService:
             
             elif tx.transaction_type in ["sell", "withdrawal"]:
                 # Venta: Disminuye cantidad
-                # Asumimos FIFO o promedio ponderado para la salida?
-                # En contabilidad simple de cartera, al vender se reduce la cantidad
-                # pero el precio promedio de compra unitario NO cambia.
-                # Solo cambia el total_cost proporcionalmente.
-                if quantity > 0:
+                if quantity > Decimal('0'):
                     # Reducir costo total proporcionalmente a la cantidad vendida
-                    cost_of_sold = (tx_qty / quantity) * total_cost
-                    total_cost -= cost_of_sold
+                    # cost_of_sold = (tx_qty / quantity) * total_cost
+                    # total_cost -= cost_of_sold
+                    
+                    # Simplificación matemática:
+                    # Nuevo total_cost = total_cost * (1 - tx_qty/quantity)
+                    #                  = total_cost * ((quantity - tx_qty) / quantity)
+                    remaining_ratio = (quantity - tx_qty) / quantity
+                    total_cost = total_cost * remaining_ratio
+                    
                     quantity -= tx_qty
                 else:
-                    # Venta en corto o error de datos, por ahora permitimos negativo pero costo 0?
+                    # Venta en corto o error de datos
                     quantity -= tx_qty
             
             # Recalcular precio promedio
-            if quantity > 0:
+            if quantity > Decimal('0'):
                 average_price = total_cost / quantity
             else:
-                average_price = 0.0
-                total_cost = 0.0
+                average_price = Decimal('0.0')
+                total_cost = Decimal('0.0')
 
-        # 3. Actualizar o crear la posición en BD
+        # 3. Validar cercanía a cero (epsilon check)
+        # Si la cantidad es muy pequeña (ej. < 1e-9), asumimos 0 para limpiar residuos
+        if abs(quantity) < Decimal('1e-9'):
+            quantity = Decimal('0.0')
+            total_cost = Decimal('0.0')
+            average_price = Decimal('0.0')
+
+        # 4. Actualizar o crear la posición en BD
         position = self.db.scalars(
             select(Position).where(
                 and_(
@@ -74,12 +89,12 @@ class PositionService:
             )
         ).first()
 
-        if quantity == 0 and position:
+        if quantity == Decimal('0') and position:
             # Si la cantidad es 0, eliminamos la posición
             self.db.delete(position)
             return None
         
-        if quantity != 0:
+        if quantity != Decimal('0'):
             if not position:
                 position = Position(
                     portfolio_id=portfolio_id,
@@ -87,8 +102,9 @@ class PositionService:
                 )
                 self.db.add(position)
             
-            position.quantity = quantity
-            position.average_price = average_price
+            # Convertir de vuelta a float para la BD
+            position.quantity = float(quantity)
+            position.average_price = float(average_price)
             
             # Asegurar que se guarde
             self.db.flush()

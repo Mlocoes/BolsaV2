@@ -64,6 +64,11 @@ async def create_transaction(
 
     # Actualizar posición usando PositionService (más robusto)
     from app.services.position_service import PositionService
+    
+    # IMPORTANTE: Hacer flush para que la nueva transacción sea visible 
+    # en las consultas que hace PositionService
+    db.flush()
+    
     position_service = PositionService(db)
     position_service.recalculate_position(portfolio_id, transaction.asset_id)
 

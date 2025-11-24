@@ -140,6 +140,37 @@ async def calculate_portfolio(
     result = service.calculate_portfolio_result(portfolio_id)
     return result
 
+@router.post("/{portfolio_id}/recalculate_positions")
+async def recalculate_portfolio_positions(
+    portfolio_id: UUID,
+    user: dict = Depends(require_auth),
+    db: Session = Depends(get_db)
+):
+    """Forzar recálculo de todas las posiciones del portfolio"""
+    # Verificar propiedad
+    get_user_portfolio_or_404(db, portfolio_id, UUID(user["user_id"]))
+    
+    from app.services.position_service import PositionService
+    from app.models.transaction import Transaction
+    
+    # Obtener todos los assets que tienen transacciones en este portfolio
+    asset_ids = db.scalars(
+        select(Transaction.asset_id)
+        .where(Transaction.portfolio_id == portfolio_id)
+        .distinct()
+    ).all()
+    
+    position_service = PositionService(db)
+    recalculated_count = 0
+    
+    for asset_id in asset_ids:
+        position_service.recalculate_position(portfolio_id, asset_id)
+        recalculated_count += 1
+        
+    db.commit()
+    
+    return {"message": f"Se han recalculado {recalculated_count} posiciones correctamente"}
+
 @router.get("/{portfolio_id}/results")
 async def get_portfolio_results(
     portfolio_id: UUID,

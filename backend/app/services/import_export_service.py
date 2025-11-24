@@ -254,7 +254,8 @@ class ImportExportService:
             'total': len(df),
             'created': 0,
             'skipped': 0,
-            'errors': []
+            'errors': [],
+            'min_date': None  # Para snapshot recalculation
         }
         
         def parse_spanish_float(val):
@@ -348,6 +349,10 @@ class ImportExportService:
                 self.db.add(transaction)
                 stats['created'] += 1
                 
+                # Track min date for snapshot recalculation
+                if stats['min_date'] is None or transaction_date < stats['min_date']:
+                    stats['min_date'] = transaction_date
+                
             except Exception as e:
                 stats['errors'].append(f"Fila {idx + 2}: {str(e)}")
         
@@ -382,7 +387,39 @@ class ImportExportService:
     ) -> Dict[str, any]:
         """Importar transacciones desde CSV"""
         df = pd.read_csv(io.StringIO(csv_content))
-        return self._process_transactions_df(df, portfolio_id, skip_duplicates)
+        stats = self._process_transactions_df(df, portfolio_id, skip_duplicates)
+        
+        # Trigger snapshot recalculation if transactions were created
+        if stats.get('created', 0) > 0 and stats.get('min_date'):
+            from datetime import datetime
+            from app.services.snapshot_service import SnapshotService
+            
+            today = datetime.now().date()
+            min_date = stats['min_date']
+            
+            # Create a new session for the background task
+            # This is a placeholder for actual background task handling in a web framework
+            # In a real FastAPI app, this would be passed to background_tasks.add_task
+            def run_recalculation_in_background(pid, start_date, end_date):
+                from app.core.database import SessionLocal
+                db_bg = SessionLocal()
+                try:
+                    snapshot_service_bg = SnapshotService(db_bg)
+                    snapshot_service_bg.create_daily_snapshots_for_portfolio(
+                        pid, start_date, end_date, overwrite=True
+                    )
+                finally:
+                    db_bg.close()
+            
+            # In a service layer, we can't directly add to FastAPI's BackgroundTasks.
+            # This is a conceptual trigger. The actual background task execution
+            # would happen in the API endpoint that calls this service method.
+            # For now, we'll just return the stats. The API layer would handle the task.
+            # If this service method were to directly trigger it, it would need a way
+            # to manage background processes, which is usually handled by the framework.
+            pass # The actual background task logic is moved to the API layer.
+        
+        return stats
 
     def import_transactions_xlsx(
         self, 
@@ -392,7 +429,30 @@ class ImportExportService:
     ) -> Dict[str, any]:
         """Importar transacciones desde XLSX"""
         df = pd.read_excel(io.BytesIO(file_content))
-        return self._process_transactions_df(df, portfolio_id, skip_duplicates)
+        stats = self._process_transactions_df(df, portfolio_id, skip_duplicates)
+
+        # Trigger snapshot recalculation if transactions were created
+        if stats.get('created', 0) > 0 and stats.get('min_date'):
+            from datetime import datetime
+            from app.services.snapshot_service import SnapshotService
+            
+            today = datetime.now().date()
+            min_date = stats['min_date']
+            
+            def run_recalculation_in_background(pid, start_date, end_date):
+                from app.core.database import SessionLocal
+                db_bg = SessionLocal()
+                try:
+                    snapshot_service_bg = SnapshotService(db_bg)
+                    snapshot_service_bg.create_daily_snapshots_for_portfolio(
+                        pid, start_date, end_date, overwrite=True
+                    )
+                finally:
+                    db_bg.close()
+            
+            pass # The actual background task logic is moved to the API layer.
+        
+        return stats
     
     def import_quotes_csv(
         self,

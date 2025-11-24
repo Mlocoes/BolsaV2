@@ -1,7 +1,7 @@
 """
 Rutas para importación y exportación de datos
 """
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Query
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Query, BackgroundTasks
 from fastapi.responses import StreamingResponse, Response
 from sqlalchemy.orm import Session
 from typing import Optional
@@ -120,6 +120,7 @@ async def export_quotes(
 @router.post("/transactions/{portfolio_id}/import", response_model=ImportStats)
 async def import_transactions(
     portfolio_id: UUID,
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(..., description="Archivo CSV o Excel con transacciones"),
     skip_duplicates: bool = Query(True, description="Omitir duplicados"),
     user: dict = Depends(require_auth),
@@ -159,6 +160,26 @@ async def import_transactions(
         else:
             # Excel
             stats = service.import_transactions_xlsx(portfolio_id, content, skip_duplicates)
+        
+        # Trigger snapshot recalculation if transactions were created
+        if stats.get('created', 0) > 0 and stats.get('min_date'):
+            from datetime import datetime
+            from app.services.snapshot_service import snapshot_service
+            
+            today = datetime.now().date()
+            min_date = stats['min_date']
+            
+            def run_recalculation(pid, start_date, end_date):
+                from app.core.database import SessionLocal
+                db_bg = SessionLocal()
+                try:
+                    snapshot_service.create_daily_snapshots_for_portfolio(
+                        db_bg, pid, start_date, end_date, overwrite=True
+                    )
+                finally:
+                    db_bg.close()
+            
+            background_tasks.add_task(run_recalculation, portfolio_id, min_date, today)
         
         return stats
         
