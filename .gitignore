@@ -17,3 +17,4 @@ redis-data/
 # Docker Secrets (información sensible)
 secrets/
 *.txt
+celerybeat-schedule
