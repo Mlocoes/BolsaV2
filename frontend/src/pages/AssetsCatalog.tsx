@@ -144,7 +144,7 @@ export default function AssetsCatalog() {
     if (!importingAsset) return
 
     setIsImporting(true)
-    
+
     try {
       const response = await api.post(
         `/quotes/import-historical-smart?symbol=${importingAsset.symbol}&start_date=${importData.from_date}&end_date=${importData.to_date}&force_refresh=${importData.force_refresh}`
@@ -211,34 +211,34 @@ export default function AssetsCatalog() {
   }, [tableData, filteredAssets])
 
   const columns = [
-    { 
-      data: 'symbol', 
-      title: 'Símbolo', 
+    {
+      data: 'symbol',
+      title: 'Símbolo',
       readOnly: true,
       width: 120,
       className: 'htLeft htBold'
     },
-    { 
-      data: 'name', 
-      title: 'Nombre', 
+    {
+      data: 'name',
+      title: 'Nombre',
       readOnly: true,
       width: 250
     },
-    { 
-      data: 'asset_type', 
-      title: 'Tipo', 
+    {
+      data: 'asset_type',
+      title: 'Tipo',
       readOnly: true,
       width: 100
     },
-    { 
-      data: 'market', 
-      title: 'Mercado', 
+    {
+      data: 'market',
+      title: 'Mercado',
       readOnly: true,
       width: 100
     },
-    { 
-      data: 'currency', 
-      title: 'Moneda', 
+    {
+      data: 'currency',
+      title: 'Moneda',
       readOnly: true,
       width: 80,
       className: 'htCenter'
@@ -248,36 +248,36 @@ export default function AssetsCatalog() {
       title: 'Acciones',
       readOnly: true,
       width: 200,
-      renderer: function(_instance: any, td: HTMLTableCellElement, row: number, _col: number, _prop: any, _value: any) {
+      renderer: function (_instance: any, td: HTMLTableCellElement, row: number, _col: number, _prop: any, _value: any) {
         const asset = filteredAssets[row]
         if (!asset) return td
-        
+
         td.innerHTML = ''
         td.style.textAlign = 'center'
-        
+
         // Botón importar
         const importBtn = document.createElement('button')
         importBtn.innerHTML = '📥'
         importBtn.title = 'Importar Histórico'
         importBtn.className = 'text-green-600 hover:text-green-900 mr-2 text-lg'
         importBtn.onclick = () => openImportModal(asset)
-        
+
         // Botón editar
         const editBtn = document.createElement('button')
         editBtn.innerHTML = 'Editar'
         editBtn.className = 'text-blue-600 hover:text-blue-900 mr-2 text-sm font-medium'
         editBtn.onclick = () => openEditModal(asset)
-        
+
         // Botón eliminar
         const deleteBtn = document.createElement('button')
         deleteBtn.innerHTML = 'Eliminar'
         deleteBtn.className = 'text-red-600 hover:text-red-900 text-sm font-medium'
         deleteBtn.onclick = () => handleDelete(asset.id, asset.symbol)
-        
+
         td.appendChild(importBtn)
         td.appendChild(editBtn)
         td.appendChild(deleteBtn)
-        
+
         return td
       }
     }
@@ -300,256 +300,256 @@ export default function AssetsCatalog() {
 
   return (
     <Layout>
-      <div className="container mx-auto p-6 space-y-6">
-      {/* Cabecera */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Catálogo de Activos</h1>
-          <p className="text-gray-600">Gestiona acciones, ETFs y otros activos</p>
-        </div>
-        <div className="flex gap-2">
-          <button
-            onClick={handleUpdateAllQuotes}
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-          >
-            📈 Actualizar Cotizaciones
-          </button>
-          <button
-            onClick={openCreateModal}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            + Añadir Activo
-          </button>
-        </div>
-      </div>
-
-      {/* Búsqueda */}
-      <div className="bg-white p-4 rounded-lg shadow">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-            placeholder="Buscar por símbolo o nombre..."
-            className="flex-1 px-4 py-2 border rounded"
-          />
-          <button
-            onClick={handleSearch}
-            className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-          >
-            Buscar
-          </button>
-        </div>
-      </div>
-
-      {/* Tabla con Handsontable */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="p-4">
-          {filteredAssets.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              No se encontraron activos
-            </div>
-          ) : (
-            <div style={{ width: '100%', overflow: 'auto' }}>
-              {(() => {
-                console.log('🔍 Renderizando HotTable con:', {
-                  filas: tableData.length,
-                  columnas: columns.length,
-                  datos: tableData.slice(0, 2)
-                })
-                return null
-              })()}
-              <HotTable
-                ref={hotTableRef}
-                data={tableData}
-                columns={columns}
-                colHeaders={true}
-                rowHeaders={true}
-                height={500}
-                licenseKey="non-commercial-and-evaluation"
-                stretchH="all"
-                autoWrapRow={true}
-                autoWrapCol={true}
-                filters={true}
-                dropdownMenu={true}
-                columnSorting={true}
-                manualColumnResize={true}
-                contextMenu={true}
-                language="es-ES"
-                width="100%"
-                afterInit={() => {
-                  console.log('✅ HotTable inicializado correctamente')
-                }}
-                afterRender={() => {
-                  console.log('✅ HotTable renderizado')
-                }}
-              />
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-2xl font-bold mb-4">
-              {editingAsset ? 'Editar Activo' : 'Crear Activo'}
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Símbolo *</label>
-                <input
-                  type="text"
-                  value={formData.symbol}
-                  onChange={(e) => setFormData({ ...formData, symbol: e.target.value.toUpperCase() })}
-                  className="w-full px-3 py-2 border rounded"
-                  required
-                  disabled={!!editingAsset}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Nombre *</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border rounded"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Tipo</label>
-                <select
-                  value={formData.asset_type}
-                  onChange={(e) => setFormData({ ...formData, asset_type: e.target.value })}
-                  className="w-full px-3 py-2 border rounded"
-                >
-                  <option value="stock">Acción</option>
-                  <option value="etf">ETF</option>
-                  <option value="crypto">Criptomoneda</option>
-                  <option value="bond">Bono</option>
-                  <option value="fund">Fondo</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Mercado</label>
-                <input
-                  type="text"
-                  value={formData.market}
-                  onChange={(e) => setFormData({ ...formData, market: e.target.value })}
-                  className="w-full px-3 py-2 border rounded"
-                  placeholder="NASDAQ, NYSE, etc."
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Moneda</label>
-                <input
-                  type="text"
-                  value={formData.currency}
-                  onChange={(e) => setFormData({ ...formData, currency: e.target.value.toUpperCase() })}
-                  className="w-full px-3 py-2 border rounded"
-                />
-              </div>
-
-              <div className="flex gap-2 justify-end">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 border rounded hover:bg-gray-50"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
-                  {editingAsset ? 'Actualizar' : 'Crear'}
-                </button>
-              </div>
-            </form>
+      <div className="h-full flex flex-col space-y-2 md:space-y-3 p-4 md:p-6">
+        {/* Cabecera - compacta */}
+        <div className="flex-shrink-0 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+          <div>
+            <h1 className="text-xl md:text-2xl font-bold">Catálogo de Activos</h1>
+            <p className="text-xs md:text-sm text-gray-600">Gestiona acciones, ETFs y otros activos</p>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={handleUpdateAllQuotes}
+              className="px-2 py-1 md:px-4 md:py-2 bg-green-600 text-white rounded hover:bg-green-700 text-xs md:text-sm"
+            >
+              📈 Actualizar Cotizaciones
+            </button>
+            <button
+              onClick={openCreateModal}
+              className="px-2 py-1 md:px-4 md:py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs md:text-sm"
+            >
+              + Añadir Activo
+            </button>
           </div>
         </div>
-      )}
 
-      {/* Modal de Importación Histórica */}
-      {showImportModal && importingAsset && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-2xl font-bold mb-4">Importar Datos Históricos</h2>
-            <p className="text-gray-600 mb-4">
-              Activo: <span className="font-semibold">{importingAsset.symbol}</span>
-            </p>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Fecha Inicio</label>
-                <input
-                  type="date"
-                  value={importData.from_date}
-                  onChange={(e) => setImportData({ ...importData, from_date: e.target.value })}
-                  className="w-full px-3 py-2 border rounded"
-                  max={importData.to_date}
+        {/* Búsqueda - compacta */}
+        <div className="flex-shrink-0 bg-white p-2 md:p-4 rounded-lg shadow">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+              placeholder="Buscar por símbolo o nombre..."
+              className="flex-1 px-2 py-1 md:px-4 md:py-2 border rounded text-xs md:text-sm"
+            />
+            <button
+              onClick={handleSearch}
+              className="px-3 py-1 md:px-6 md:py-2 bg-gray-600 text-white rounded hover:bg-gray-700 text-xs md:text-sm"
+            >
+              Buscar
+            </button>
+          </div>
+        </div>
+
+        {/* Tabla con Handsontable - altura flexible */}
+        <div className="flex-1 min-h-0 bg-white rounded-lg shadow overflow-hidden flex flex-col">
+          <div className="flex-1 min-h-0 p-2 md:p-4">
+            {filteredAssets.length === 0 ? (
+              <div className="h-full flex items-center justify-center text-gray-500">
+                No se encontraron activos
+              </div>
+            ) : (
+              <div className="h-full">
+                {(() => {
+                  console.log('🔍 Renderizando HotTable con:', {
+                    filas: tableData.length,
+                    columnas: columns.length,
+                    datos: tableData.slice(0, 2)
+                  })
+                  return null
+                })()}
+                <HotTable
+                  ref={hotTableRef}
+                  data={tableData}
+                  columns={columns}
+                  colHeaders={true}
+                  rowHeaders={true}
+                  height="100%"
+                  licenseKey="non-commercial-and-evaluation"
+                  stretchH="all"
+                  autoWrapRow={true}
+                  autoWrapCol={true}
+                  filters={true}
+                  dropdownMenu={true}
+                  columnSorting={true}
+                  manualColumnResize={true}
+                  contextMenu={true}
+                  language="es-ES"
+                  width="100%"
+                  afterInit={() => {
+                    console.log('✅ HotTable inicializado correctamente')
+                  }}
+                  afterRender={() => {
+                    console.log('✅ HotTable renderizado')
+                  }}
                 />
               </div>
+            )}
+          </div>
+        </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-1">Fecha Fin</label>
-                <input
-                  type="date"
-                  value={importData.to_date}
-                  onChange={(e) => setImportData({ ...importData, to_date: e.target.value })}
-                  className="w-full px-3 py-2 border rounded"
-                  min={importData.from_date}
-                  max={new Date().toISOString().split('T')[0]}
-                />
-              </div>
+        {/* Modal */}
+        {showModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <h2 className="text-2xl font-bold mb-4">
+                {editingAsset ? 'Editar Activo' : 'Crear Activo'}
+              </h2>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Símbolo *</label>
+                  <input
+                    type="text"
+                    value={formData.symbol}
+                    onChange={(e) => setFormData({ ...formData, symbol: e.target.value.toUpperCase() })}
+                    className="w-full px-3 py-2 border rounded"
+                    required
+                    disabled={!!editingAsset}
+                  />
+                </div>
 
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="force_refresh"
-                  checked={importData.force_refresh}
-                  onChange={(e) => setImportData({ ...importData, force_refresh: e.target.checked })}
-                  className="mr-2"
-                />
-                <label htmlFor="force_refresh" className="text-sm">
-                  Forzar re-importación (sobrescribir existentes)
-                </label>
-              </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Nombre *</label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-3 py-2 border rounded"
+                    required
+                  />
+                </div>
 
-              <div className="bg-yellow-50 border border-yellow-200 rounded p-3 text-sm">
-                <p className="text-yellow-800">
-                  ℹ️ Máximo: 2 años por solicitud. La importación inteligente solo descarga datos faltantes.
-                </p>
-              </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Tipo</label>
+                  <select
+                    value={formData.asset_type}
+                    onChange={(e) => setFormData({ ...formData, asset_type: e.target.value })}
+                    className="w-full px-3 py-2 border rounded"
+                  >
+                    <option value="stock">Acción</option>
+                    <option value="etf">ETF</option>
+                    <option value="crypto">Criptomoneda</option>
+                    <option value="bond">Bono</option>
+                    <option value="fund">Fondo</option>
+                  </select>
+                </div>
 
-              <div className="flex gap-2 justify-end">
-                <button
-                  type="button"
-                  onClick={() => setShowImportModal(false)}
-                  className="px-4 py-2 border rounded hover:bg-gray-50"
-                  disabled={isImporting}
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleImportHistorical}
-                  disabled={isImporting}
-                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400"
-                >
-                  {isImporting ? 'Importando...' : 'Importar'}
-                </button>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Mercado</label>
+                  <input
+                    type="text"
+                    value={formData.market}
+                    onChange={(e) => setFormData({ ...formData, market: e.target.value })}
+                    className="w-full px-3 py-2 border rounded"
+                    placeholder="NASDAQ, NYSE, etc."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">Moneda</label>
+                  <input
+                    type="text"
+                    value={formData.currency}
+                    onChange={(e) => setFormData({ ...formData, currency: e.target.value.toUpperCase() })}
+                    className="w-full px-3 py-2 border rounded"
+                  />
+                </div>
+
+                <div className="flex gap-2 justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setShowModal(false)}
+                    className="px-4 py-2 border rounded hover:bg-gray-50"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  >
+                    {editingAsset ? 'Actualizar' : 'Crear'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Modal de Importación Histórica */}
+        {showImportModal && importingAsset && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <h2 className="text-2xl font-bold mb-4">Importar Datos Históricos</h2>
+              <p className="text-gray-600 mb-4">
+                Activo: <span className="font-semibold">{importingAsset.symbol}</span>
+              </p>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Fecha Inicio</label>
+                  <input
+                    type="date"
+                    value={importData.from_date}
+                    onChange={(e) => setImportData({ ...importData, from_date: e.target.value })}
+                    className="w-full px-3 py-2 border rounded"
+                    max={importData.to_date}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">Fecha Fin</label>
+                  <input
+                    type="date"
+                    value={importData.to_date}
+                    onChange={(e) => setImportData({ ...importData, to_date: e.target.value })}
+                    className="w-full px-3 py-2 border rounded"
+                    min={importData.from_date}
+                    max={new Date().toISOString().split('T')[0]}
+                  />
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="force_refresh"
+                    checked={importData.force_refresh}
+                    onChange={(e) => setImportData({ ...importData, force_refresh: e.target.checked })}
+                    className="mr-2"
+                  />
+                  <label htmlFor="force_refresh" className="text-sm">
+                    Forzar re-importación (sobrescribir existentes)
+                  </label>
+                </div>
+
+                <div className="bg-yellow-50 border border-yellow-200 rounded p-3 text-sm">
+                  <p className="text-yellow-800">
+                    ℹ️ Máximo: 2 años por solicitud. La importación inteligente solo descarga datos faltantes.
+                  </p>
+                </div>
+
+                <div className="flex gap-2 justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setShowImportModal(false)}
+                    className="px-4 py-2 border rounded hover:bg-gray-50"
+                    disabled={isImporting}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleImportHistorical}
+                    disabled={isImporting}
+                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400"
+                  >
+                    {isImporting ? 'Importando...' : 'Importar'}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
       </div>
     </Layout>
   )

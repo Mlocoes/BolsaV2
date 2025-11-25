@@ -44,34 +44,34 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-600">
-      <div className="bg-white p-8 rounded-lg shadow-xl w-96">
-        <h1 className="text-3xl font-bold text-center mb-6 text-gray-900">BolsaV2</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-600 p-4">
+      <div className="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-sm md:max-w-md">
+        <h1 className="text-2xl md:text-3xl font-bold text-center mb-4 md:mb-6 text-gray-900">BolsaV2</h1>
+        <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Usuario</label>
+            <label className="block text-xs md:text-sm font-medium text-gray-700">Usuario</label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm md:text-base"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Contraseña</label>
+            <label className="block text-xs md:text-sm font-medium text-gray-700">Contraseña</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm md:text-base"
               required
             />
           </div>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
           >
             {isSubmitting ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </button>

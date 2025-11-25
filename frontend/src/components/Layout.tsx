@@ -21,12 +21,12 @@ export default function Layout({ children }: LayoutProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="sticky top-0 z-50 bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-8">
-            <h1 className="text-2xl font-bold text-gray-900">BolsaV2</h1>
-            <div className="flex space-x-4">
+    <div className="h-screen overflow-hidden flex flex-col bg-gray-50">
+      <nav className="flex-shrink-0 sticky top-0 z-50 bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+          <div className="flex items-center space-x-4 md:space-x-8">
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900">BolsaV2</h1>
+            <div className="flex space-x-2 md:space-x-4 text-sm md:text-base">
               <button
                 onClick={() => navigate('/dashboard')}
                 className="text-gray-600 hover:text-gray-900"
@@ -77,19 +77,21 @@ export default function Layout({ children }: LayoutProps) {
               </button>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
-            <span className="text-gray-700">{user.username}</span>
+          <div className="flex items-center space-x-2 md:space-x-4">
+            <span className="text-sm md:text-base text-gray-700">{user.username}</span>
             <button
               onClick={handleLogout}
-              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+              className="bg-red-600 text-white px-3 py-1.5 md:px-4 md:py-2 rounded hover:bg-red-700 text-sm md:text-base"
             >
               Cerrar Sesión
             </button>
           </div>
         </div>
       </nav>
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        {children}
+      <main className="flex-1 overflow-y-auto">
+        <div className="h-full max-w-7xl mx-auto px-4 py-4">
+          {children}
+        </div>
       </main>
     </div>
   )

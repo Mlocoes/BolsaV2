@@ -201,7 +201,7 @@ export default function Positions() {
       ],
       rowHeaders: true,
       width: '100%',
-      height: 400,
+      height: '100%',
       licenseKey: 'non-commercial-and-evaluation',
       stretchH: 'all',
       autoColumnSize: true,
@@ -260,18 +260,18 @@ export default function Positions() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Posiciones</h1>
-        <p className="mt-2 text-sm text-gray-600">
+    <div className="h-full flex flex-col space-y-2 md:space-y-3">
+      {/* Header - compacto */}
+      <div className="flex-shrink-0">
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900">Posiciones</h1>
+        <p className="text-xs md:text-sm text-gray-600">
           Histórico de posiciones de tus carteras
         </p>
       </div>
 
-      {/* Portfolio Selector */}
-      <div className="flex items-center space-x-4">
-        <label htmlFor="portfolio" className="text-sm font-medium text-gray-700">
+      {/* Portfolio Selector - compacto */}
+      <div className="flex-shrink-0 flex items-center space-x-2 md:space-x-4">
+        <label htmlFor="portfolio" className="text-xs md:text-sm font-medium text-gray-700">
           Cartera:
         </label>
         <select
@@ -281,7 +281,7 @@ export default function Positions() {
             const portfolio = portfolios.find(p => p.id === e.target.value);
             setSelectedPortfolio(portfolio || null);
           }}
-          className="block w-64 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          className="block w-40 md:w-64 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-xs md:text-sm"
         >
           {portfolios.map(portfolio => (
             <option key={portfolio.id} value={portfolio.id}>
@@ -291,26 +291,26 @@ export default function Positions() {
         </select>
       </div>
 
-      {/* Positions Table */}
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-          <div className="flex items-center justify-between">
+      {/* Positions Table - altura flexible */}
+      <div className="flex-1 min-h-0 bg-white shadow rounded-lg overflow-hidden flex flex-col">
+        <div className="flex-shrink-0 px-2 py-2 md:px-4 md:py-3 border-b border-gray-200">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
             <div>
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
+              <h3 className="text-sm md:text-base font-medium text-gray-900">
                 Histórico de Posiciones
               </h3>
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="text-xs md:text-sm text-gray-500">
                 Visualiza el estado de tu cartera en diferentes fechas
               </p>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 md:space-x-4">
               {availableDates.length > 0 && (
                 <div className="flex flex-col">
                   <label className="text-xs text-gray-500 mb-1">Fecha:</label>
                   <select
                     value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
-                    className="block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2"
+                    className="block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-xs md:text-sm px-2 py-1 md:px-3 md:py-2"
                   >
                     {availableDates.map(date => (
                       <option key={date} value={date}>
@@ -327,13 +327,13 @@ export default function Positions() {
             </div>
           </div>
         </div>
-        <div className="p-4">
+        <div className="flex-1 min-h-0 p-2 md:p-4 overflow-auto">
           {selectedSnapshot ? (
-            <div>
-              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                <div className="flex items-center justify-between">
+            <div className="h-full flex flex-col space-y-2">
+              <div className="flex-shrink-0 p-2 md:p-3 bg-blue-50 border border-blue-200 rounded-md">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                   <div>
-                    <p className="text-sm font-medium text-blue-900">
+                    <p className="text-xs md:text-sm font-medium text-blue-900">
                       📸 Visualizando snapshot del {new Date(selectedSnapshot.date || selectedSnapshot.snapshot_date || '').toLocaleDateString('es-ES', {
                         weekday: 'long',
                         year: 'numeric',
@@ -355,16 +355,18 @@ export default function Positions() {
                   )}
                 </div>
               </div>
-              <div ref={hotTableRef} />
+              <div className="flex-1 min-h-0" ref={hotTableRef} />
               <style>{`
                 .htPositive { color: #059669; font-weight: 600; }
                 .htNegative { color: #DC2626; font-weight: 600; }
               `}</style>
             </div>
           ) : (
-            <div className="text-center py-8 text-gray-500">
-              <p className="mb-2">No hay datos históricos disponibles para esta cartera.</p>
-              <p className="text-sm">El sistema crea automáticamente snapshots diarios de tus posiciones.</p>
+            <div className="h-full flex items-center justify-center text-center text-gray-500">
+              <div>
+                <p className="mb-2">No hay datos históricos disponibles para esta cartera.</p>
+                <p className="text-sm">El sistema crea automáticamente snapshots diarios de tus posiciones.</p>
+              </div>
             </div>
           )}
         </div>
