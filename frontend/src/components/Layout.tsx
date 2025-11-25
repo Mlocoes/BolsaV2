@@ -22,7 +22,7 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow">
+      <nav className="sticky top-0 z-50 bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-8">
             <h1 className="text-2xl font-bold text-gray-900">BolsaV2</h1>
@@ -32,6 +32,12 @@ export default function Layout({ children }: LayoutProps) {
                 className="text-gray-600 hover:text-gray-900"
               >
                 Panel de Control
+              </button>
+              <button
+                onClick={() => navigate('/positions')}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                Posiciones
               </button>
               <button
                 onClick={() => navigate('/portfolios')}

@@ -5,6 +5,7 @@ import { useAuthStore } from './stores/authStore'
 import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
+import Positions from './pages/Positions'
 import Portfolios from './pages/Portfolios'
 import AssetsCatalog from './pages/AssetsCatalog'
 import Quotes from './pages/Quotes'
@@ -43,6 +44,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/positions"
+          element={
+            <ProtectedRoute>
+              <Positions />
             </ProtectedRoute>
           }
         />
