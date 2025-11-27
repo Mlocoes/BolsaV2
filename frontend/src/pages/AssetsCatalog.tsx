@@ -300,7 +300,7 @@ export default function AssetsCatalog() {
 
   return (
     <Layout>
-      <div className="h-full flex flex-col space-y-2 md:space-y-3 p-4 md:p-6">
+      <div className="flex flex-col h-full space-y-2 md:space-y-3">
         {/* Cabecera - compacta */}
         <div className="flex-shrink-0 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
           <div>
@@ -344,48 +344,38 @@ export default function AssetsCatalog() {
         </div>
 
         {/* Tabla con Handsontable - altura flexible */}
-        <div className="flex-1 min-h-0 bg-white rounded-lg shadow overflow-hidden flex flex-col">
-          <div className="flex-1 min-h-0 p-2 md:p-4">
+        <div className="flex-1 bg-white rounded-lg shadow overflow-hidden relative">
+          <div className="absolute inset-0 p-2 md:p-4">
             {filteredAssets.length === 0 ? (
               <div className="h-full flex items-center justify-center text-gray-500">
                 No se encontraron activos
               </div>
             ) : (
-              <div className="h-full">
-                {(() => {
-                  console.log('🔍 Renderizando HotTable con:', {
-                    filas: tableData.length,
-                    columnas: columns.length,
-                    datos: tableData.slice(0, 2)
-                  })
-                  return null
-                })()}
-                <HotTable
-                  ref={hotTableRef}
-                  data={tableData}
-                  columns={columns}
-                  colHeaders={true}
-                  rowHeaders={true}
-                  height="100%"
-                  licenseKey="non-commercial-and-evaluation"
-                  stretchH="all"
-                  autoWrapRow={true}
-                  autoWrapCol={true}
-                  filters={true}
-                  dropdownMenu={true}
-                  columnSorting={true}
-                  manualColumnResize={true}
-                  contextMenu={true}
-                  language="es-ES"
-                  width="100%"
-                  afterInit={() => {
-                    console.log('✅ HotTable inicializado correctamente')
-                  }}
-                  afterRender={() => {
-                    console.log('✅ HotTable renderizado')
-                  }}
-                />
-              </div>
+              <HotTable
+                ref={hotTableRef}
+                data={tableData}
+                columns={columns}
+                colHeaders={true}
+                rowHeaders={true}
+                height="100%"
+                licenseKey="non-commercial-and-evaluation"
+                stretchH="all"
+                autoWrapRow={true}
+                autoWrapCol={true}
+                filters={true}
+                dropdownMenu={true}
+                columnSorting={true}
+                manualColumnResize={true}
+                contextMenu={true}
+                language="es-ES"
+                width="100%"
+                afterInit={() => {
+                  console.log('✅ HotTable inicializado correctamente')
+                }}
+                afterRender={() => {
+                  console.log('✅ HotTable renderizado')
+                }}
+              />
             )}
           </div>
         </div>

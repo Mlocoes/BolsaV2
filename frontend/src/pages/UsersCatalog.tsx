@@ -107,25 +107,25 @@ export default function UsersCatalog() {
   }))
 
   const columns = [
-    { 
-      data: 'username', 
-      title: 'Usuario', 
+    {
+      data: 'username',
+      title: 'Usuario',
       readOnly: true,
       width: 150,
       className: 'htLeft htBold'
     },
-    { 
-      data: 'email', 
-      title: 'Correo', 
+    {
+      data: 'email',
+      title: 'Correo',
       readOnly: true,
       width: 250
     },
-    { 
-      data: 'status', 
-      title: 'Estado', 
+    {
+      data: 'status',
+      title: 'Estado',
       readOnly: true,
       width: 100,
-      renderer: function(_instance: any, td: HTMLTableCellElement, _row: number, _col: number, _prop: any, value: any) {
+      renderer: function (_instance: any, td: HTMLTableCellElement, _row: number, _col: number, _prop: any, value: any) {
         td.innerHTML = value
         if (value === 'Activo') {
           td.style.backgroundColor = '#dcfce7'
@@ -140,9 +140,9 @@ export default function UsersCatalog() {
         return td
       }
     },
-    { 
-      data: 'created_at', 
-      title: 'Creado', 
+    {
+      data: 'created_at',
+      title: 'Creado',
       readOnly: true,
       width: 120
     },
@@ -151,28 +151,28 @@ export default function UsersCatalog() {
       title: 'Acciones',
       readOnly: true,
       width: 200,
-      renderer: function(_instance: any, td: HTMLTableCellElement, row: number, _col: number, _prop: any, _value: any) {
+      renderer: function (_instance: any, td: HTMLTableCellElement, row: number, _col: number, _prop: any, _value: any) {
         const user = users[row]
         if (!user) return td
-        
+
         td.innerHTML = ''
         td.style.textAlign = 'center'
-        
+
         // Botón toggle status
         const toggleBtn = document.createElement('button')
         toggleBtn.innerHTML = user.is_active ? 'Desactivar' : 'Activar'
         toggleBtn.className = 'text-blue-600 hover:text-blue-900 mr-3 text-sm font-medium'
         toggleBtn.onclick = () => toggleUserStatus(user.id, user.is_active)
-        
+
         // Botón eliminar
         const deleteBtn = document.createElement('button')
         deleteBtn.innerHTML = 'Eliminar'
         deleteBtn.className = 'text-red-600 hover:text-red-900 text-sm font-medium'
         deleteBtn.onclick = () => handleDelete(user.id, user.username)
-        
+
         td.appendChild(toggleBtn)
         td.appendChild(deleteBtn)
-        
+
         return td
       }
     }
@@ -193,122 +193,122 @@ export default function UsersCatalog() {
 
   return (
     <Layout>
-      <div className="container mx-auto p-6 space-y-6">
-      {/* Cabecera */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Gestión de Usuarios</h1>
-          <p className="text-gray-600">Gestiona los usuarios del sistema (Solo administradores)</p>
+      <div className="flex flex-col h-full space-y-4">
+        {/* Cabecera */}
+        <div className="flex-shrink-0 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Gestión de Usuarios</h1>
+            <p className="text-gray-600">Gestiona los usuarios del sistema (Solo administradores)</p>
+          </div>
+          <button
+            onClick={() => setShowModal(true)}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            + Crear Usuario
+          </button>
         </div>
-        <button
-          onClick={() => setShowModal(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          + Crear Usuario
-        </button>
-      </div>
 
-      {/* Tabla con Handsontable */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="p-4">
-          {users.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              No se encontraron usuarios
-            </div>
-          ) : (
-            <HotTable
-              ref={hotTableRef}
-              data={tableData}
-              columns={columns}
-              colHeaders={true}
-              rowHeaders={true}
-              height="500"
-              licenseKey="non-commercial-and-evaluation"
-              stretchH="all"
-              autoWrapRow={true}
-              autoWrapCol={true}
-              filters={true}
-              dropdownMenu={true}
-              columnSorting={true}
-              manualColumnResize={true}
-              contextMenu={['copy']}
-              language="es-ES"
-            />
-          )}
-        </div>
-      </div>
-
-      {/* Modal Crear Usuario */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-2xl font-bold mb-4">Crear Usuario</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Usuario *</label>
-                <input
-                  type="text"
-                  value={formData.username}
-                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                  className="w-full px-3 py-2 border rounded"
-                  required
-                />
+        {/* Tabla con Handsontable */}
+        <div className="flex-1 bg-white rounded-lg shadow overflow-hidden relative">
+          <div className="absolute inset-0 p-4">
+            {users.length === 0 ? (
+              <div className="text-center py-12 text-gray-500">
+                No se encontraron usuarios
               </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Correo Electrónico *</label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-3 py-2 border rounded"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Contraseña *</label>
-                <input
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-3 py-2 border rounded"
-                  required
-                  minLength={6}
-                />
-                <p className="text-xs text-gray-500 mt-1">Mínimo 6 caracteres</p>
-              </div>
-
-              <div className="flex gap-2 justify-end">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowModal(false)
-                    setFormData({ username: '', email: '', password: '' })
-                  }}
-                  className="px-4 py-2 border rounded hover:bg-gray-50"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
-                  Crear
-                </button>
-              </div>
-            </form>
+            ) : (
+              <HotTable
+                ref={hotTableRef}
+                data={tableData}
+                columns={columns}
+                colHeaders={true}
+                rowHeaders={true}
+                height="100%"
+                licenseKey="non-commercial-and-evaluation"
+                stretchH="all"
+                autoWrapRow={true}
+                autoWrapCol={true}
+                filters={true}
+                dropdownMenu={true}
+                columnSorting={true}
+                manualColumnResize={true}
+                contextMenu={['copy']}
+                language="es-ES"
+              />
+            )}
           </div>
         </div>
-      )}
 
-      {/* Cuadro de Información */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <h3 className="font-semibold text-yellow-900 mb-2">⚠️ Área de Administración</h3>
-        <p className="text-sm text-yellow-800">
-          Esta página es solo para administradores del sistema. Todas las operaciones se registran y auditan.
-        </p>
-      </div>
+        {/* Modal Crear Usuario */}
+        {showModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <h2 className="text-2xl font-bold mb-4">Crear Usuario</h2>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Usuario *</label>
+                  <input
+                    type="text"
+                    value={formData.username}
+                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                    className="w-full px-3 py-2 border rounded"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">Correo Electrónico *</label>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full px-3 py-2 border rounded"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">Contraseña *</label>
+                  <input
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="w-full px-3 py-2 border rounded"
+                    required
+                    minLength={6}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Mínimo 6 caracteres</p>
+                </div>
+
+                <div className="flex gap-2 justify-end">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowModal(false)
+                      setFormData({ username: '', email: '', password: '' })
+                    }}
+                    className="px-4 py-2 border rounded hover:bg-gray-50"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  >
+                    Crear
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Cuadro de Información */}
+        <div className="flex-shrink-0 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <h3 className="font-semibold text-yellow-900 mb-2">⚠️ Área de Administración</h3>
+          <p className="text-sm text-yellow-800">
+            Esta página es solo para administradores del sistema. Todas las operaciones se registran y auditan.
+          </p>
+        </div>
       </div>
     </Layout>
   )

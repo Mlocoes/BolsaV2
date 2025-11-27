@@ -49,3 +49,14 @@
   opacity: 0.8;
   transform: scale(1.05);
 }
+
+/* Asegurar que el contenedor interno de Handsontable ocupe todo el espacio */
+.handsontable .wtHolder {
+  height: 100% !important;
+  width: 100% !important;
+}
+
+.handsontable {
+  width: 100% !important;
+  height: 100% !important;
+}

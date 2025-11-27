@@ -123,14 +123,14 @@ export default function ImportData() {
 
   return (
     <Layout>
-      <div className="container mx-auto p-6 space-y-6">
-        <div>
+      <div className="flex flex-col h-full space-y-4">
+        <div className="flex-shrink-0">
           <h1 className="text-3xl font-bold">Importar Datos</h1>
           <p className="text-gray-600">Importa transacciones y cotizaciones desde archivos Excel (recomendado) o CSV</p>
         </div>
 
         {/* Pestañas */}
-        <div className="border-b border-gray-200">
+        <div className="flex-shrink-0 border-b border-gray-200">
           <nav className="-mb-px flex space-x-8">
             <button
               onClick={() => setActiveTab('transactions')}
@@ -154,7 +154,7 @@ export default function ImportData() {
         </div>
 
         {/* Contenido */}
-        <div className="bg-white rounded-lg shadow p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto bg-white rounded-lg shadow p-6 space-y-6">
           {/* Descargar Plantilla */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <h3 className="font-semibold mb-2">📄 Descargar Plantilla</h3>

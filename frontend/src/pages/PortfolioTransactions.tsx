@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { portfolioService } from '../services/portfolioService';
 import type { Transaction } from '../types/portfolio';
@@ -7,14 +7,9 @@ import { ArrowLeft, Save, Trash2, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { HotTable } from '@handsontable/react';
 import 'handsontable/dist/handsontable.full.min.css';
+import '../styles/handsontable-custom.css';
 import { registerLanguageDictionary, esMX } from 'handsontable/i18n';
 import { registerAllModules } from 'handsontable/registry';
-import numbro from 'numbro';
-import esES from 'numbro/dist/languages/es-ES.min.js';
-
-// Registrar idioma en numbro
-numbro.registerLanguage(esES);
-numbro.setLanguage('es-ES');
 
 // Registrar módulos de Handsontable
 registerAllModules();
@@ -72,7 +67,7 @@ export default function PortfolioTransactions() {
         }
     };
 
-    const getHotData = () => {
+    const hotData = useMemo(() => {
         return transactions.map(t => {
             let dateStr = '';
             if (t.transaction_date) {
@@ -91,7 +86,7 @@ export default function PortfolioTransactions() {
                 notes: t.notes || ''
             };
         });
-    };
+    }, [transactions, idToSymbolMap]);
 
     const handleDeleteSelected = async () => {
         if (!hotRef.current) return;
@@ -210,7 +205,7 @@ export default function PortfolioTransactions() {
     if (loading) {
         return (
             <Layout>
-                <div className="flex justify-center items-center h-64">
+                <div className="flex justify-center items-center h-full">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
                 </div>
             </Layout>
@@ -219,8 +214,8 @@ export default function PortfolioTransactions() {
 
     return (
         <Layout>
-            <div className="space-y-6">
-                <div className="flex items-center justify-between">
+            <div className="flex flex-col h-full space-y-4 min-h-0">
+                <div className="flex-shrink-0 flex items-center justify-between">
                     <div className="flex items-center space-x-4">
                         <button
                             onClick={() => navigate('/transactions')}
@@ -263,57 +258,74 @@ export default function PortfolioTransactions() {
                     </div>
                 </div>
 
-                <div className="bg-white shadow rounded-lg p-4 overflow-hidden">
-                    <HotTable
-                        ref={hotRef}
-                        data={getHotData()}
-                        licenseKey="non-commercial-and-evaluation"
-                        language="es-ES"
-                        colHeaders={[
-                            'Fecha', 'Activo', 'Tipo', 'Cantidad', 'Precio', 'Comisiones', 'Notas'
-                        ]}
-                        columns={[
-                            { data: 'date', type: 'date', dateFormat: 'DD/MM/YYYY', correctFormat: true },
-                            {
-                                data: 'asset',
-                                type: 'dropdown',
-                                source: Object.keys(assetMap).sort()
-                            },
-                            {
-                                data: 'type',
-                                type: 'dropdown',
-                                source: ['buy', 'sell', 'dividend', 'deposit', 'withdrawal']
-                            },
-                            {
-                                data: 'quantity',
-                                type: 'numeric',
-                                numericFormat: { pattern: '0,0.000000', culture: 'es-ES' }
-                            },
-                            {
-                                data: 'price',
-                                type: 'numeric',
-                                numericFormat: { pattern: '0,0.00', culture: 'es-ES' }
-                            },
-                            {
-                                data: 'fees',
-                                type: 'numeric',
-                                numericFormat: { pattern: '0,0.00', culture: 'es-ES' }
-                            },
-                            { data: 'notes', type: 'text' }
-                        ]}
-                        minSpareRows={1}
-                        rowHeaders={true}
-                        width="100%"
-                        height="600px"
-                        stretchH="all"
-                        contextMenu={true}
-                        manualColumnResize={true}
-                        manualRowResize={true}
-                        filters={true}
-                        dropdownMenu={true}
-                        columnSorting={true}
-                    />
-                    <div className="mt-2 text-xs text-gray-500">
+
+                <div className="flex-1 bg-white shadow rounded-lg relative overflow-hidden flex flex-col">
+                    <div className="flex-1 relative" style={{ minHeight: '400px' }}>
+                        {Object.keys(assetMap).length === 0 ? (
+                            <div className="absolute inset-0 flex items-center justify-center text-gray-500">
+                                <div className="text-center">
+                                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mb-2"></div>
+                                    <p>Cargando activos...</p>
+                                </div>
+                            </div>
+                        ) : (
+                            <div style={{ height: '100%', width: '100%', overflow: 'hidden' }}>
+                                <HotTable
+                                    ref={hotRef}
+                                    data={hotData}
+                                    licenseKey="non-commercial-and-evaluation"
+                                    language="es-ES"
+                                    colHeaders={[
+                                        'Fecha', 'Activo', 'Tipo', 'Cantidad', 'Precio', 'Comisiones', 'Notas'
+                                    ]}
+                                    columns={[
+                                        { data: 'date', type: 'date', dateFormat: 'DD/MM/YYYY', correctFormat: true },
+                                        {
+                                            data: 'asset',
+                                            type: 'dropdown',
+                                            source: Object.keys(assetMap).sort()
+                                        },
+                                        {
+                                            data: 'type',
+                                            type: 'dropdown',
+                                            source: ['buy', 'sell', 'dividend', 'deposit', 'withdrawal']
+                                        },
+                                        {
+                                            data: 'quantity',
+                                            type: 'numeric',
+                                            numericFormat: { pattern: '0,0.000000' }
+                                        },
+                                        {
+                                            data: 'price',
+                                            type: 'numeric',
+                                            numericFormat: { pattern: '0,0.00' }
+                                        },
+                                        {
+                                            data: 'fees',
+                                            type: 'numeric',
+                                            numericFormat: { pattern: '0,0.00' }
+                                        },
+                                        { data: 'notes', type: 'text' }
+                                    ]}
+                                    minSpareRows={1}
+                                    rowHeaders={true}
+                                    width="100%"
+                                    height="100%"
+                                    stretchH="all"
+                                    contextMenu={true}
+                                    manualColumnResize={true}
+                                    manualRowResize={true}
+                                    filters={true}
+                                    dropdownMenu={true}
+                                    columnSorting={true}
+                                    afterInit={() => {
+                                        console.log('✅ HotTable inicializado correctamente');
+                                    }}
+                                />
+                            </div>
+                        )}
+                    </div>
+                    <div className="p-2 text-xs text-gray-500 bg-gray-50 border-t">
                         * Escribe en la última fila vacía para agregar una nueva transacción.
                     </div>
                 </div>

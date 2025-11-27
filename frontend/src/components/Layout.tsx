@@ -88,8 +88,8 @@ export default function Layout({ children }: LayoutProps) {
           </div>
         </div>
       </nav>
-      <main className="flex-1 overflow-y-auto">
-        <div className="h-full max-w-7xl mx-auto px-4 py-4">
+      <main className="flex-1 overflow-hidden flex flex-col">
+        <div className="flex-1 flex flex-col h-full max-w-7xl mx-auto px-4 py-4 w-full">
           {children}
         </div>
       </main>

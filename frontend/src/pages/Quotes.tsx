@@ -69,7 +69,7 @@ export default function Quotes() {
       const response = await api.get('/quotes', {
         params: { limit: 1000 }
       })
-      
+
       const quotesBySymbol = new Map<string, Quote>()
       response.data.forEach((quote: Quote) => {
         const existing = quotesBySymbol.get(quote.symbol)
@@ -77,11 +77,11 @@ export default function Quotes() {
           quotesBySymbol.set(quote.symbol, quote)
         }
       })
-      
-      const latestQuotes = Array.from(quotesBySymbol.values()).sort((a, b) => 
+
+      const latestQuotes = Array.from(quotesBySymbol.values()).sort((a, b) =>
         a.symbol.localeCompare(b.symbol)
       )
-      
+
       setQuotes(latestQuotes)
     } catch (error) {
       console.error('Error al cargar cotizaciones:', error)
@@ -121,10 +121,10 @@ export default function Quotes() {
         }
       })
 
-      const sortedQuotes = response.data.sort((a: Quote, b: Quote) => 
+      const sortedQuotes = response.data.sort((a: Quote, b: Quote) =>
         new Date(b.date).getTime() - new Date(a.date).getTime()
       )
-      
+
       setQuotes(sortedQuotes)
     } catch (error) {
       console.error('Error al cargar cotizaciones:', error)
@@ -166,45 +166,45 @@ export default function Quotes() {
   const columns = [
     { data: 'fecha', title: 'Fecha', readOnly: true, width: 120 },
     { data: 'activo', title: 'Activo', readOnly: true, width: 200 },
-    { 
-      data: 'cotizacion', 
-      title: 'Cotización', 
+    {
+      data: 'cotizacion',
+      title: 'Cotización',
       type: 'numeric',
       numericFormat: { pattern: '$0,0.00' },
       readOnly: true,
       width: 120,
       className: 'htRight htBold'
     },
-    { 
-      data: 'apertura', 
-      title: 'Apertura', 
+    {
+      data: 'apertura',
+      title: 'Apertura',
       type: 'numeric',
       numericFormat: { pattern: '$0,0.00' },
       readOnly: true,
       width: 120,
       className: 'htRight'
     },
-    { 
-      data: 'maximo', 
-      title: 'Máximo', 
+    {
+      data: 'maximo',
+      title: 'Máximo',
       type: 'numeric',
       numericFormat: { pattern: '$0,0.00' },
       readOnly: true,
       width: 120,
       className: 'htRight'
     },
-    { 
-      data: 'minimo', 
-      title: 'Mínimo', 
+    {
+      data: 'minimo',
+      title: 'Mínimo',
       type: 'numeric',
       numericFormat: { pattern: '$0,0.00' },
       readOnly: true,
       width: 120,
       className: 'htRight'
     },
-    { 
-      data: 'volumen', 
-      title: 'Volumen', 
+    {
+      data: 'volumen',
+      title: 'Volumen',
       type: 'numeric',
       numericFormat: { pattern: '0,0' },
       readOnly: true,
@@ -215,15 +215,15 @@ export default function Quotes() {
 
   return (
     <Layout>
-      <div className="container mx-auto p-6 space-y-6">
+      <div className="flex flex-col h-full space-y-4">
         {/* Cabecera */}
-        <div>
+        <div className="flex-shrink-0">
           <h1 className="text-3xl font-bold">Cotizaciones</h1>
           <p className="text-gray-600">Consulta el histórico de cotizaciones de los activos</p>
         </div>
 
         {/* Filtros */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="flex-shrink-0 bg-white rounded-lg shadow p-6">
           <h5 className="text-lg font-semibold mb-4">Filtros</h5>
 
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
@@ -288,48 +288,56 @@ export default function Quotes() {
         </div>
 
         {/* Tabla con Handsontable */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h5 className="text-lg font-semibold mb-4">
-            Resultados {quotes.length > 0 && `(${quotes.length})`}
-          </h5>
+        <div className="flex-1 bg-white rounded-lg shadow overflow-hidden relative">
+          <div className="absolute inset-0 p-6 flex flex-col">
+            <h5 className="flex-shrink-0 text-lg font-semibold mb-4">
+              Resultados {quotes.length > 0 && `(${quotes.length})`}
+            </h5>
 
-          {isLoading ? (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-              <p className="mt-4 text-gray-600">Cargando...</p>
-            </div>
-          ) : quotes.length === 0 ? (
-            <div className="text-center text-gray-500 py-12">
-              <p>No se encontraron cotizaciones</p>
-              <small className="text-gray-400">
-                {selectedAsset === 'all' 
-                  ? 'Presiona "Buscar" para cargar las últimas cotizaciones de todos los activos'
-                  : 'Selecciona un rango de fechas y presiona "Buscar"'
-                }
-              </small>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <HotTable
-                ref={hotTableRef}
-                data={tableData}
-                columns={columns}
-                colHeaders={true}
-                rowHeaders={true}
-                height="500"
-                licenseKey="non-commercial-and-evaluation"
-                stretchH="all"
-                autoWrapRow={true}
-                autoWrapCol={true}
-                filters={true}
-                dropdownMenu={true}
-                columnSorting={true}
-                manualColumnResize={true}
-                contextMenu={true}
-                language="es-ES"
-              />
-            </div>
-          )}
+            {isLoading ? (
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                  <p className="mt-4 text-gray-600">Cargando...</p>
+                </div>
+              </div>
+            ) : quotes.length === 0 ? (
+              <div className="flex-1 flex items-center justify-center text-gray-500">
+                <div className="text-center">
+                  <p>No se encontraron cotizaciones</p>
+                  <small className="text-gray-400">
+                    {selectedAsset === 'all'
+                      ? 'Presiona "Buscar" para cargar las últimas cotizaciones de todos los activos'
+                      : 'Selecciona un rango de fechas y presiona "Buscar"'
+                    }
+                  </small>
+                </div>
+              </div>
+            ) : (
+              <div className="flex-1 overflow-hidden relative">
+                <div className="absolute inset-0">
+                  <HotTable
+                    ref={hotTableRef}
+                    data={tableData}
+                    columns={columns}
+                    colHeaders={true}
+                    rowHeaders={true}
+                    height="100%"
+                    licenseKey="non-commercial-and-evaluation"
+                    stretchH="all"
+                    autoWrapRow={true}
+                    autoWrapCol={true}
+                    filters={true}
+                    dropdownMenu={true}
+                    columnSorting={true}
+                    manualColumnResize={true}
+                    contextMenu={true}
+                    language="es-ES"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </Layout>
