@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { HotTable } from '@handsontable/react-wrapper'
+import { HotTable } from '@handsontable/react'
 import { registerAllModules } from 'handsontable/registry'
 import { registerLanguageDictionary, esMX } from 'handsontable/i18n'
 import 'handsontable/dist/handsontable.full.min.css'
@@ -246,38 +246,31 @@ export default function AssetsCatalog() {
     {
       data: 'id',
       title: 'Acciones',
-      readOnly: true,
+      editor: false,
+      // Removed readOnly to allow interactive button clicks while editor is disabled
       width: 200,
-      renderer: function (_instance: any, td: HTMLTableCellElement, row: number, _col: number, _prop: any, _value: any) {
-        const asset = filteredAssets[row]
-        if (!asset) return td
-
+      renderer: function (_instance: any, td: HTMLTableCellElement, _row: number, _col: number, _prop: any, _value: any) {
         td.innerHTML = ''
         td.style.textAlign = 'center'
+        td.style.pointerEvents = 'auto'
+        td.style.cursor = 'default'
 
-        // Botón importar
-        const importBtn = document.createElement('button')
-        importBtn.innerHTML = '📥'
-        importBtn.title = 'Importar Histórico'
-        importBtn.className = 'text-green-600 hover:text-green-900 mr-2 text-lg'
-        importBtn.onclick = () => openImportModal(asset)
+        // Helper to create button string (no inline events, handled by hook)
+        const createBtnHTML = (text: string, className: string, title: string = '') => {
+          return `<button class="${className}" title="${title}">${text}</button>`
+        }
 
-        // Botón editar
-        const editBtn = document.createElement('button')
-        editBtn.innerHTML = 'Editar'
-        editBtn.className = 'text-blue-600 hover:text-blue-900 mr-2 text-sm font-medium'
-        editBtn.onclick = () => openEditModal(asset)
+        const importBtn = createBtnHTML('📥', 'action-btn-import text-green-600 hover:text-green-900 mr-2 text-lg cursor-pointer', 'Importar Histórico')
+        const editBtn = createBtnHTML('Editar', 'action-btn-edit text-blue-600 hover:text-blue-900 mr-2 text-sm font-medium cursor-pointer')
+        const deleteBtn = createBtnHTML('Eliminar', 'action-btn-delete text-red-600 hover:text-red-900 text-sm font-medium cursor-pointer')
 
-        // Botón eliminar
-        const deleteBtn = document.createElement('button')
-        deleteBtn.innerHTML = 'Eliminar'
-        deleteBtn.className = 'text-red-600 hover:text-red-900 text-sm font-medium'
-        deleteBtn.onclick = () => handleDelete(asset.id, asset.symbol)
-
-        td.appendChild(importBtn)
-        td.appendChild(editBtn)
-        td.appendChild(deleteBtn)
-
+        td.innerHTML = `${importBtn}${editBtn}${deleteBtn}`
+        // Add accessible attributes to buttons (a11y)
+        const btns = td.querySelectorAll('button')
+        btns.forEach(b => {
+          b.setAttribute('role', 'button')
+          if (!b.getAttribute('aria-label')) b.setAttribute('aria-label', b.textContent?.trim() || 'Acción')
+        })
         return td
       }
     }
@@ -369,6 +362,42 @@ export default function AssetsCatalog() {
                 contextMenu={true}
                 language="es-ES"
                 width="100%"
+                afterOnCellMouseDown={(event: any, coords: any) => {
+                  // Handle button clicks globally to avoid event interception issues
+                  // Use prop check instead of hardcoding column index to support reordering
+                  const instance = (hotTableRef.current as any)?.hotInstance
+                  if (!instance) return
+                  const colProp = instance.colToProp(coords.col)
+                  if (colProp !== 'id' || coords.row < 0) return
+
+                  const target = event.target as HTMLElement
+                  const button = target.closest('button')
+
+                  if (button) {
+                    // Stop propagation to prevent row selection/editing
+                    event.stopImmediatePropagation()
+
+                    // Get the correct asset using source data
+                    const physicalRow = instance.toPhysicalRow(coords.row)
+                    const rowData = instance.getSourceDataAtRow(physicalRow)
+                    const assetId = rowData?.id
+
+                    if (!assetId) return
+
+                    // Find the full asset object
+                    const asset = assets.find(a => a.id === assetId)
+                    if (!asset) return
+
+                    // Execute action based on button class
+                    if (button.classList.contains('action-btn-import')) {
+                      openImportModal(asset)
+                    } else if (button.classList.contains('action-btn-edit')) {
+                      openEditModal(asset)
+                    } else if (button.classList.contains('action-btn-delete')) {
+                      handleDelete(asset.id, asset.symbol)
+                    }
+                  }
+                }}
                 afterInit={() => {
                   console.log('✅ HotTable inicializado correctamente')
                 }}
