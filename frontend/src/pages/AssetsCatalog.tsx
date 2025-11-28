@@ -51,6 +51,21 @@ export default function AssetsCatalog() {
     loadAssets()
   }, [])
 
+  // Listen for custom events dispatched from renderer buttons
+  useEffect(() => {
+    const handler = (e: any) => {
+      const { action, assetId } = e.detail || {}
+      if (!action || !assetId) return
+      const asset = assets.find(a => a.id === assetId)
+      if (!asset) return
+      if (action === 'import') openImportModal(asset)
+      if (action === 'edit') openEditModal(asset)
+      if (action === 'delete') handleDelete(asset.id, asset.symbol)
+    }
+    document.addEventListener('asset-action', handler)
+    return () => document.removeEventListener('asset-action', handler)
+  }, [assets])
+
   const loadAssets = async () => {
     setIsLoading(true)
     try {
@@ -256,21 +271,27 @@ export default function AssetsCatalog() {
         td.style.cursor = 'default'
 
         // Helper to create button string (no inline events, handled by hook)
-        const createBtnHTML = (text: string, className: string, title: string = '') => {
-          return `<button class="${className}" title="${title}">${text}</button>`
+        const createBtnHTML = (text: string, className: string, title: string = '', action: string = '', id: string = '') => {
+          // Add data-action and inline dispatch to trigger custom events
+          const escapedId = id.replace(/\"/g, '&quot;')
+          return `<button class=\"${className}\" title=\"${title}\" data-action=\"${action}\" data-asset-id=\"${escapedId}\" onclick=\"document.dispatchEvent(new CustomEvent('asset-action',{detail:{action:'${action}',assetId:'${escapedId}'}}))\">${text}</button>`
         }
 
-        const importBtn = createBtnHTML('📥', 'action-btn-import text-green-600 hover:text-green-900 mr-2 text-lg cursor-pointer', 'Importar Histórico')
-        const editBtn = createBtnHTML('Editar', 'action-btn-edit text-blue-600 hover:text-blue-900 mr-2 text-sm font-medium cursor-pointer')
-        const deleteBtn = createBtnHTML('Eliminar', 'action-btn-delete text-red-600 hover:text-red-900 text-sm font-medium cursor-pointer')
+        const importBtn = createBtnHTML('📥', 'action-btn-import text-green-600 hover:text-green-900 mr-2 text-lg cursor-pointer', 'Importar Histórico', 'import', String(_value))
+        const editBtn = createBtnHTML('Editar', 'action-btn-edit text-blue-600 hover:text-blue-900 mr-2 text-sm font-medium cursor-pointer', 'Editar activo', 'edit', String(_value))
+        const deleteBtn = createBtnHTML('Eliminar', 'action-btn-delete text-red-600 hover:text-red-900 text-sm font-medium cursor-pointer', 'Eliminar activo', 'delete', String(_value))
 
         td.innerHTML = `${importBtn}${editBtn}${deleteBtn}`
-        // Add accessible attributes to buttons (a11y)
+        // Ensure buttons are clickable and accessible (reinforce attributes)
         const btns = td.querySelectorAll('button')
         btns.forEach(b => {
+          b.setAttribute('type', 'button')
           b.setAttribute('role', 'button')
+          b.setAttribute('tabindex', '0')
+          b.setAttribute('style', (b.getAttribute('style') || '') + ';pointer-events:auto;')
           if (!b.getAttribute('aria-label')) b.setAttribute('aria-label', b.textContent?.trim() || 'Acción')
         })
+        // (attributes already set above)
         return td
       }
     }
@@ -369,9 +390,9 @@ export default function AssetsCatalog() {
                   if (!instance) return
                   const colProp = instance.colToProp(coords.col)
                   if (colProp !== 'id' || coords.row < 0) return
-
                   const target = event.target as HTMLElement
                   const button = target.closest('button')
+                  console.debug('AssetsCatalog click:', { coords, colProp, targetTag: target.tagName, buttonClass: button?.className })
 
                   if (button) {
                     // Stop propagation to prevent row selection/editing
