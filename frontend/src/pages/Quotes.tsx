@@ -70,8 +70,24 @@ export default function Quotes() {
         params: { limit: 1000 }
       })
 
+      // Mapear respuesta del backend al formato interno
+      // El backend devuelve: { asset_id, timestamp, close, ... }
+      // Necesitamos: { symbol, date, close, ... }
+      const mappedQuotes: Quote[] = response.data.map((q: any) => {
+        const asset = assets.find(a => a.id === q.asset_id)
+        return {
+          symbol: asset ? asset.symbol : 'UNKNOWN',
+          date: q.timestamp,
+          close: q.close,
+          open: q.open,
+          high: q.high,
+          low: q.low,
+          volume: q.volume
+        }
+      })
+
       const quotesBySymbol = new Map<string, Quote>()
-      response.data.forEach((quote: Quote) => {
+      mappedQuotes.forEach((quote) => {
         const existing = quotesBySymbol.get(quote.symbol)
         if (!existing || new Date(quote.date) > new Date(existing.date)) {
           quotesBySymbol.set(quote.symbol, quote)
@@ -121,7 +137,18 @@ export default function Quotes() {
         }
       })
 
-      const sortedQuotes = response.data.sort((a: Quote, b: Quote) =>
+      // Mapear respuesta del backend
+      const mappedQuotes: Quote[] = response.data.map((q: any) => ({
+        symbol: asset.symbol, // Ya conocemos el símbolo porque filtramos por él
+        date: q.timestamp,
+        close: q.close,
+        open: q.open,
+        high: q.high,
+        low: q.low,
+        volume: q.volume
+      }))
+
+      const sortedQuotes = mappedQuotes.sort((a, b) =>
         new Date(b.date).getTime() - new Date(a.date).getTime()
       )
 

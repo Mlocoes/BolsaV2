@@ -50,6 +50,13 @@
   transform: scale(1.05);
 }
 
+/* Style for Actions cell to avoid inline styles and reflows */
+.htActionCell {
+  text-align: center !important;
+  pointer-events: auto !important;
+  cursor: default !important;
+}
+
 /* Asegurar que el contenedor interno de Handsontable ocupe todo el espacio */
 .handsontable .wtHolder {
   height: 100% !important;

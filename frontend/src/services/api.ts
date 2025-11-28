@@ -90,6 +90,11 @@ export const authAPI = {
   },
 
   logout: async () => {
+    console.log('authAPI.logout called')
+    const apiUrl = new URL(API_BASE_URL)
+    const isCrossPort = window.location.port !== apiUrl.port
+    const sessionId = localStorage.getItem('session_id')
+    console.log('logout() isCrossPort:', isCrossPort, 'sessionId in localStorage:', !!sessionId)
     const response = await api.post('/auth/logout')
     // Limpiar session_id del localStorage
     localStorage.removeItem('session_id')

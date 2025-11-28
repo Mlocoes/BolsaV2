@@ -56,6 +56,7 @@ export default function Login() {
               onChange={(e) => setUsername(e.target.value)}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm md:text-base"
               required
+              autoComplete="username"
             />
           </div>
           <div>
@@ -66,6 +67,7 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm md:text-base"
               required
+              autoComplete="current-password"
             />
           </div>
           <button

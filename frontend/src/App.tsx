@@ -16,12 +16,11 @@ import PortfolioTransactions from './pages/PortfolioTransactions'
 import TransactionsPortfolioSelection from './pages/TransactionsPortfolioSelection'
 
 function App() {
-  const { logout } = useAuthStore()
+  const { checkAuth } = useAuthStore()
 
   useEffect(() => {
-    // SIEMPRE hacer logout al cargar/recargar (F5)
-    // Esto fuerza que el usuario tenga que hacer login cada vez
-    logout().catch(() => {
+    // Verificar si hay sesión activa al cargar. Evitamos forzar logout porque genera 401s innecesarios.
+    checkAuth().catch(() => {
       // Ignorar errores si no hay sesión
     })
 

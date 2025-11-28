@@ -266,9 +266,7 @@ export default function AssetsCatalog() {
       width: 200,
       renderer: function (_instance: any, td: HTMLTableCellElement, _row: number, _col: number, _prop: any, _value: any) {
         td.innerHTML = ''
-        td.style.textAlign = 'center'
-        td.style.pointerEvents = 'auto'
-        td.style.cursor = 'default'
+        td.classList.add('htActionCell')
 
         // Helper to create button string (no inline events, handled by hook)
         const createBtnHTML = (text: string, className: string, title: string = '', action: string = '', id: string = '') => {
