@@ -51,6 +51,32 @@ export default function AssetsCatalog() {
     loadAssets()
   }, [])
 
+  // Global click listener for action buttons to capture clicks even if Handsontable intercepts events
+  useEffect(() => {
+    const handler = (ev: Event) => {
+      const target = ev.target as HTMLElement
+      const button = target.closest('button') as HTMLElement | null
+      if (!button) return
+      const actionType = button.getAttribute('data-action')
+      const assetId = button.getAttribute('data-asset-id')
+      if (!actionType || !assetId) return
+
+      // Prevent default selection interactions
+      ev.stopPropagation()
+      ev.preventDefault()
+
+      const asset = assets.find(a => a.id === assetId)
+      if (!asset) return
+
+      if (actionType === 'import') openImportModal(asset)
+      else if (actionType === 'edit') openEditModal(asset)
+      else if (actionType === 'delete') handleDelete(asset.id, asset.symbol)
+    }
+
+    document.addEventListener('click', handler)
+    return () => document.removeEventListener('click', handler)
+  }, [assets])
+
   // Listen for custom events dispatched from renderer buttons
   useEffect(() => {
     const handler = (e: any) => {
@@ -270,9 +296,9 @@ export default function AssetsCatalog() {
 
         // Helper to create button string (no inline events, handled by hook)
         const createBtnHTML = (text: string, className: string, title: string = '', action: string = '', id: string = '') => {
-          // Add data-action and inline dispatch to trigger custom events
-          const escapedId = id.replace(/\"/g, '&quot;')
-          return `<button class=\"${className}\" title=\"${title}\" data-action=\"${action}\" data-asset-id=\"${escapedId}\" onclick=\"document.dispatchEvent(new CustomEvent('asset-action',{detail:{action:'${action}',assetId:'${escapedId}'}}))\">${text}</button>`
+          // Add data-action and data-asset-id attributes; avoid inline onclick and rely on global click listener
+          const escapedId = String(id).replace(/\"/g, '&quot;')
+          return `<button type=\"button\" class=\"${className}\" title=\"${title}\" data-action=\"${action}\" data-asset-id=\"${escapedId}\">${text}</button>`
         }
 
         const importBtn = createBtnHTML('📥', 'action-btn-import text-green-600 hover:text-green-900 mr-2 text-lg cursor-pointer', 'Importar Histórico', 'import', String(_value))
@@ -407,12 +433,13 @@ export default function AssetsCatalog() {
                     const asset = assets.find(a => a.id === assetId)
                     if (!asset) return
 
-                    // Execute action based on button class
-                    if (button.classList.contains('action-btn-import')) {
+                    // Execute action based on data-action attribute
+                    const actionType = button.getAttribute('data-action')
+                    if (actionType === 'import') {
                       openImportModal(asset)
-                    } else if (button.classList.contains('action-btn-edit')) {
+                    } else if (actionType === 'edit') {
                       openEditModal(asset)
-                    } else if (button.classList.contains('action-btn-delete')) {
+                    } else if (actionType === 'delete') {
                       handleDelete(asset.id, asset.symbol)
                     }
                   }

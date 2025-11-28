@@ -57,6 +57,14 @@
   cursor: default !important;
 }
 
+/* Ensure HT clones allow pointer events for action cells */
+.handsontable .ht_clone_top .htActionCell,
+.handsontable .ht_clone_left .htActionCell,
+.handsontable .ht_clone_top_left_corner .htActionCell,
+.handsontable .ht_clone_bottom .htActionCell {
+  pointer-events: auto !important;
+}
+
 /* Asegurar que el contenedor interno de Handsontable ocupe todo el espacio */
 .handsontable .wtHolder {
   height: 100% !important;
@@ -66,4 +74,11 @@
 .handsontable {
   width: 100% !important;
   height: 100% !important;
+}
+
+/* Class for action cells to ensure buttons are clickable */
+.htActionCell {
+  text-align: center !important;
+  pointer-events: auto !important;
+  cursor: default !important;
 }
