@@ -65,6 +65,8 @@
   pointer-events: auto !important;
 }
 
+
+
 /* Class for action cells to ensure buttons are clickable */
 .htActionCell {
   text-align: center !important;

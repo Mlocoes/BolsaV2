@@ -351,8 +351,8 @@ export default function Quotes() {
               </div>
             </div>
           ) : (
-            <div className="flex-1 relative px-6 pb-6 overflow-hidden">
-              <div className="absolute inset-0 mx-6 mb-6">
+            <div className="flex-1 relative min-h-0">
+              <div className="absolute inset-0 px-6 pb-6">
                 <HotTable
                   ref={hotTableRef}
                   data={tableData}
