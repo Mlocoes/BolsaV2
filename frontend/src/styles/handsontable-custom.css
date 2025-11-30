@@ -65,17 +65,6 @@
   pointer-events: auto !important;
 }
 
-/* Asegurar que el contenedor interno de Handsontable ocupe todo el espacio */
-.handsontable .wtHolder {
-  height: 100% !important;
-  width: 100% !important;
-}
-
-.handsontable {
-  width: 100% !important;
-  height: 100% !important;
-}
-
 /* Class for action cells to ensure buttons are clickable */
 .htActionCell {
   text-align: center !important;

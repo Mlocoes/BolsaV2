@@ -251,7 +251,7 @@ export default function Quotes() {
 
   return (
     <Layout>
-      <div className="flex flex-col h-full space-y-4">
+      <div className="flex flex-col h-full overflow-hidden space-y-4">
         {/* Cabecera */}
         <div className="flex-shrink-0">
           <h1 className="text-3xl font-bold">Cotizaciones</h1>
@@ -324,7 +324,7 @@ export default function Quotes() {
         </div>
 
         {/* Tabla con Handsontable */}
-        <div className="flex-1 bg-white rounded-lg shadow overflow-hidden flex flex-col">
+        <div className="flex-1 bg-white rounded-lg shadow overflow-hidden flex flex-col min-h-0">
           <div className="p-6 flex-shrink-0">
             <h5 className="text-lg font-semibold">
               Resultados {quotes.length > 0 && `(${quotes.length})`}
@@ -351,26 +351,28 @@ export default function Quotes() {
               </div>
             </div>
           ) : (
-            <div className="flex-1 px-6 pb-6" style={{ minHeight: 0 }}>
-              <HotTable
-                ref={hotTableRef}
-                data={tableData}
-                columns={columns}
-                colHeaders={true}
-                rowHeaders={true}
-                height="100%"
-                width="100%"
-                licenseKey="non-commercial-and-evaluation"
-                stretchH="all"
-                autoWrapRow={true}
-                autoWrapCol={true}
-                filters={true}
-                dropdownMenu={true}
-                columnSorting={true}
-                manualColumnResize={true}
-                contextMenu={true}
-                language="es-ES"
-              />
+            <div className="flex-1 relative px-6 pb-6 overflow-hidden">
+              <div className="absolute inset-0 mx-6 mb-6">
+                <HotTable
+                  ref={hotTableRef}
+                  data={tableData}
+                  columns={columns}
+                  colHeaders={true}
+                  rowHeaders={true}
+                  height="100%"
+                  width="100%"
+                  licenseKey="non-commercial-and-evaluation"
+                  stretchH="all"
+                  autoWrapRow={true}
+                  autoWrapCol={true}
+                  filters={true}
+                  dropdownMenu={true}
+                  columnSorting={true}
+                  manualColumnResize={true}
+                  contextMenu={true}
+                  language="es-ES"
+                />
+              </div>
             </div>
           )}
         </div>
