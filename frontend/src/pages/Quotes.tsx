@@ -351,28 +351,26 @@ export default function Quotes() {
               </div>
             </div>
           ) : (
-            <div className="flex-1 relative min-h-0">
-              <div className="absolute inset-0 px-6 pb-6">
-                <HotTable
-                  ref={hotTableRef}
-                  data={tableData}
-                  columns={columns}
-                  colHeaders={true}
-                  rowHeaders={true}
-                  height="100%"
-                  width="100%"
-                  licenseKey="non-commercial-and-evaluation"
-                  stretchH="all"
-                  autoWrapRow={true}
-                  autoWrapCol={true}
-                  filters={true}
-                  dropdownMenu={true}
-                  columnSorting={true}
-                  manualColumnResize={true}
-                  contextMenu={true}
-                  language="es-ES"
-                />
-              </div>
+            <div className="flex-1 relative w-full" style={{ height: 'calc(100vh - 300px)' }}>
+              <HotTable
+                ref={hotTableRef}
+                data={tableData}
+                columns={columns}
+                colHeaders={true}
+                rowHeaders={true}
+                height="100%"
+                width="100%"
+                licenseKey="non-commercial-and-evaluation"
+                stretchH="all"
+                autoWrapRow={true}
+                autoWrapCol={true}
+                filters={true}
+                dropdownMenu={true}
+                columnSorting={true}
+                manualColumnResize={true}
+                contextMenu={true}
+                language="es-ES"
+              />
             </div>
           )}
         </div>
