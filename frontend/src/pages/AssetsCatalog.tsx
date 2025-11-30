@@ -24,7 +24,8 @@ interface Asset {
 }
 
 export default function AssetsCatalog() {
-  console.log('🚀 AssetsCatalog component renderizando')
+  // Debug: mark component initialization so we can confirm the bundle loaded in the browser
+  console.log('🚀 AssetsCatalog INIT - bundle id: ASSETS_BUNDLE_20251128')
   const [assets, setAssets] = useState<Asset[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -33,6 +34,7 @@ export default function AssetsCatalog() {
   const [editingAsset, setEditingAsset] = useState<Asset | null>(null)
   const [importingAsset, setImportingAsset] = useState<Asset | null>(null)
   const [isImporting, setIsImporting] = useState(false)
+
   const [formData, setFormData] = useState({
     symbol: '',
     name: '',
@@ -45,52 +47,54 @@ export default function AssetsCatalog() {
     to_date: new Date().toISOString().split('T')[0],
     force_refresh: false
   })
-  const hotTableRef = useRef(null)
+  const hotTableRef = useRef<any>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const handleMouseDown = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      const button = target.closest('button')
+
+      if (button) {
+        const actionType = button.getAttribute('data-action')
+        const assetId = button.getAttribute('data-asset-id')
+
+        if (actionType && assetId) {
+          // Stop propagation immediately
+          e.stopPropagation()
+
+          // We don't prevent default here to allow the button visual press state, 
+          // but we might need it if HT interferes. Let's try just stopPropagation first.
+          // Actually, for mousedown, if we don't prevent default, HT might start selection.
+          // But if we do, the button might not 'click'. 
+          // Since we trigger action manually, it's fine.
+
+          const asset = assets.find(a => String(a.id) === String(assetId) || a.symbol === assetId)
+          if (asset) {
+            if (actionType === 'import') openImportModal(asset)
+            else if (actionType === 'edit') openEditModal(asset)
+            else if (actionType === 'delete') handleDelete(asset.id, asset.symbol)
+          }
+        }
+      }
+    }
+
+    // Use capture phase on mousedown to beat Handsontable's selection logic
+    container.addEventListener('mousedown', handleMouseDown, { capture: true })
+
+    return () => {
+      container.removeEventListener('mousedown', handleMouseDown, { capture: true })
+    }
+  }, [assets])
 
   useEffect(() => {
     loadAssets()
   }, [])
 
-  // Global click listener for action buttons to capture clicks even if Handsontable intercepts events
-  useEffect(() => {
-    const handler = (ev: Event) => {
-      const target = ev.target as HTMLElement
-      const button = target.closest('button') as HTMLElement | null
-      if (!button) return
-      const actionType = button.getAttribute('data-action')
-      const assetId = button.getAttribute('data-asset-id')
-      if (!actionType || !assetId) return
 
-      // Prevent default selection interactions
-      ev.stopPropagation()
-      ev.preventDefault()
-
-      const asset = assets.find(a => a.id === assetId)
-      if (!asset) return
-
-      if (actionType === 'import') openImportModal(asset)
-      else if (actionType === 'edit') openEditModal(asset)
-      else if (actionType === 'delete') handleDelete(asset.id, asset.symbol)
-    }
-
-    document.addEventListener('click', handler)
-    return () => document.removeEventListener('click', handler)
-  }, [assets])
-
-  // Listen for custom events dispatched from renderer buttons
-  useEffect(() => {
-    const handler = (e: any) => {
-      const { action, assetId } = e.detail || {}
-      if (!action || !assetId) return
-      const asset = assets.find(a => a.id === assetId)
-      if (!asset) return
-      if (action === 'import') openImportModal(asset)
-      if (action === 'edit') openEditModal(asset)
-      if (action === 'delete') handleDelete(asset.id, asset.symbol)
-    }
-    document.addEventListener('asset-action', handler)
-    return () => document.removeEventListener('asset-action', handler)
-  }, [assets])
 
   const loadAssets = async () => {
     setIsLoading(true)
@@ -287,23 +291,27 @@ export default function AssetsCatalog() {
     {
       data: 'id',
       title: 'Acciones',
-      editor: false,
-      // Removed readOnly to allow interactive button clicks while editor is disabled
+      readOnly: true,
       width: 200,
       renderer: function (_instance: any, td: HTMLTableCellElement, _row: number, _col: number, _prop: any, _value: any) {
         td.innerHTML = ''
         td.classList.add('htActionCell')
 
         // Helper to create button string (no inline events, handled by hook)
-        const createBtnHTML = (text: string, className: string, title: string = '', action: string = '', id: string = '') => {
+        const createBtnHTML = (text: string, className: string, title: string = '', action: string = '', id: string = '', symbol: string = '') => {
           // Add data-action and data-asset-id attributes; avoid inline onclick and rely on global click listener
           const escapedId = String(id).replace(/\"/g, '&quot;')
-          return `<button type=\"button\" class=\"${className}\" title=\"${title}\" data-action=\"${action}\" data-asset-id=\"${escapedId}\">${text}</button>`
+          const escapedSymbol = String(symbol ?? '').replace(/\"/g, '&quot;')
+          return `<button type=\"button\" class=\"${className}\" title=\"${title}\" data-action=\"${action}\" data-asset-id=\"${escapedId}\" data-asset-symbol=\"${escapedSymbol}\">${text}</button>`
         }
 
-        const importBtn = createBtnHTML('📥', 'action-btn-import text-green-600 hover:text-green-900 mr-2 text-lg cursor-pointer', 'Importar Histórico', 'import', String(_value))
-        const editBtn = createBtnHTML('Editar', 'action-btn-edit text-blue-600 hover:text-blue-900 mr-2 text-sm font-medium cursor-pointer', 'Editar activo', 'edit', String(_value))
-        const deleteBtn = createBtnHTML('Eliminar', 'action-btn-delete text-red-600 hover:text-red-900 text-sm font-medium cursor-pointer', 'Eliminar activo', 'delete', String(_value))
+        // Attempt to pass symbol to buttons to match asset by symbol when necessary
+        const instance: any = (_instance as any)
+        const source = instance?.getSourceDataAtRow ? instance.getSourceDataAtRow(instance.toPhysicalRow(_row)) : undefined
+        const symbol = source?.symbol || ''
+        const importBtn = createBtnHTML('📥', 'action-btn-import text-green-600 hover:text-green-900 mr-2 text-lg cursor-pointer', 'Importar Histórico', 'import', String(_value), String(symbol))
+        const editBtn = createBtnHTML('Editar', 'action-btn-edit text-blue-600 hover:text-blue-900 mr-2 text-sm font-medium cursor-pointer', 'Editar activo', 'edit', String(_value), String(symbol))
+        const deleteBtn = createBtnHTML('Eliminar', 'action-btn-delete text-red-600 hover:text-red-900 text-sm font-medium cursor-pointer', 'Eliminar activo', 'delete', String(_value), String(symbol))
 
         td.innerHTML = `${importBtn}${editBtn}${deleteBtn}`
         // Ensure buttons are clickable and accessible (reinforce attributes)
@@ -382,7 +390,10 @@ export default function AssetsCatalog() {
         </div>
 
         {/* Tabla con Handsontable - altura flexible */}
-        <div className="flex-1 bg-white rounded-lg shadow overflow-hidden relative">
+        <div
+          ref={containerRef}
+          className="flex-1 bg-white rounded-lg shadow overflow-hidden relative"
+        >
           <div className="absolute inset-0 p-2 md:p-4">
             {filteredAssets.length === 0 ? (
               <div className="h-full flex items-center justify-center text-gray-500">
@@ -407,49 +418,6 @@ export default function AssetsCatalog() {
                 contextMenu={true}
                 language="es-ES"
                 width="100%"
-                afterOnCellMouseDown={(event: any, coords: any) => {
-                  // Handle button clicks globally to avoid event interception issues
-                  // Use prop check instead of hardcoding column index to support reordering
-                  const instance = (hotTableRef.current as any)?.hotInstance
-                  if (!instance) return
-                  const colProp = instance.colToProp(coords.col)
-                  if (colProp !== 'id' || coords.row < 0) return
-                  const target = event.target as HTMLElement
-                  const button = target.closest('button')
-                  console.debug('AssetsCatalog click:', { coords, colProp, targetTag: target.tagName, buttonClass: button?.className })
-
-                  if (button) {
-                    // Stop propagation to prevent row selection/editing
-                    event.stopImmediatePropagation()
-
-                    // Get the correct asset using source data
-                    const physicalRow = instance.toPhysicalRow(coords.row)
-                    const rowData = instance.getSourceDataAtRow(physicalRow)
-                    const assetId = rowData?.id
-
-                    if (!assetId) return
-
-                    // Find the full asset object
-                    const asset = assets.find(a => a.id === assetId)
-                    if (!asset) return
-
-                    // Execute action based on data-action attribute
-                    const actionType = button.getAttribute('data-action')
-                    if (actionType === 'import') {
-                      openImportModal(asset)
-                    } else if (actionType === 'edit') {
-                      openEditModal(asset)
-                    } else if (actionType === 'delete') {
-                      handleDelete(asset.id, asset.symbol)
-                    }
-                  }
-                }}
-                afterInit={() => {
-                  console.log('✅ HotTable inicializado correctamente')
-                }}
-                afterRender={() => {
-                  console.log('✅ HotTable renderizado')
-                }}
               />
             )}
           </div>
@@ -615,6 +583,8 @@ export default function AssetsCatalog() {
             </div>
           </div>
         )}
+        {/* Debug helper: show last click action */}
+
       </div>
     </Layout>
   )

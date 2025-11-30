@@ -27,6 +27,14 @@ BolsaV2 es una aplicación robusta, segura y escalable para la gestión de carte
 - **Secret Management** utilizando Docker Secrets.
 - **CI/CD** configurado con GitHub Actions.
 
+## 📚 Documentación Detallada
+
+Para profundizar en cada componente del sistema, consulta las guías específicas:
+
+- [📘 Documentación del Backend](backend/README.md): API, Modelos, Configuración.
+- [📙 Documentación del Frontend](frontend/README.md): Componentes, Estado, Build.
+- [🗃️ Documentación de Base de Datos](backend/db/README.md): Esquema, Migraciones, Backups.
+
 ## 🛠️ Tech Stack
 
 - **Lenguajes:** Python 3.11+, TypeScript, SQL.

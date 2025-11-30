@@ -5,6 +5,7 @@ import { registerLanguageDictionary, esMX } from 'handsontable/i18n'
 import 'handsontable/dist/handsontable.full.min.css'
 import '../styles/handsontable-custom.css'
 import api from '../services/api'
+import { useNavigate } from 'react-router-dom'
 import Layout from '../components/Layout'
 
 // Registrar todos los módulos de Handsontable
@@ -38,10 +39,18 @@ export default function Quotes() {
   const [endDate, setEndDate] = useState('')
   const [datesDisabled, setDatesDisabled] = useState(true)
   const hotTableRef = useRef(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     loadAssets()
   }, [])
+
+  // Auto-load latest quotes when assets are available and currently showing 'all'
+  useEffect(() => {
+    if (assets.length > 0 && selectedAsset === 'all') {
+      loadLatestQuotes()
+    }
+  }, [assets, selectedAsset])
 
   useEffect(() => {
     if (selectedAsset === 'all') {
@@ -99,9 +108,14 @@ export default function Quotes() {
       )
 
       setQuotes(latestQuotes)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al cargar cotizaciones:', error)
-      alert('Error al cargar cotizaciones')
+      if (error.response?.status === 401) {
+        alert('Sesión expirada. Por favor inicia sesión de nuevo.')
+        navigate('/login', { replace: true })
+      } else {
+        alert('Error al cargar cotizaciones')
+      }
     } finally {
       setIsLoading(false)
     }
@@ -153,9 +167,14 @@ export default function Quotes() {
       )
 
       setQuotes(sortedQuotes)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al cargar cotizaciones:', error)
-      alert('Error al cargar cotizaciones')
+      if (error.response?.status === 401) {
+        alert('Sesión expirada. Por favor inicia sesión de nuevo.')
+        navigate('/login', { replace: true })
+      } else {
+        alert('Error al cargar cotizaciones')
+      }
     } finally {
       setIsLoading(false)
     }
