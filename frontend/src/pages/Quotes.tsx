@@ -324,56 +324,55 @@ export default function Quotes() {
         </div>
 
         {/* Tabla con Handsontable */}
-        <div className="flex-1 bg-white rounded-lg shadow overflow-hidden relative">
-          <div className="absolute inset-0 p-6 flex flex-col">
-            <h5 className="flex-shrink-0 text-lg font-semibold mb-4">
+        <div className="flex-1 bg-white rounded-lg shadow overflow-hidden flex flex-col">
+          <div className="p-6 flex-shrink-0">
+            <h5 className="text-lg font-semibold">
               Resultados {quotes.length > 0 && `(${quotes.length})`}
             </h5>
-
-            {isLoading ? (
-              <div className="flex-1 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                  <p className="mt-4 text-gray-600">Cargando...</p>
-                </div>
-              </div>
-            ) : quotes.length === 0 ? (
-              <div className="flex-1 flex items-center justify-center text-gray-500">
-                <div className="text-center">
-                  <p>No se encontraron cotizaciones</p>
-                  <small className="text-gray-400">
-                    {selectedAsset === 'all'
-                      ? 'Presiona "Buscar" para cargar las últimas cotizaciones de todos los activos'
-                      : 'Selecciona un rango de fechas y presiona "Buscar"'
-                    }
-                  </small>
-                </div>
-              </div>
-            ) : (
-              <div className="flex-1 overflow-hidden relative">
-                <div className="absolute inset-0">
-                  <HotTable
-                    ref={hotTableRef}
-                    data={tableData}
-                    columns={columns}
-                    colHeaders={true}
-                    rowHeaders={true}
-                    height="100%"
-                    licenseKey="non-commercial-and-evaluation"
-                    stretchH="all"
-                    autoWrapRow={true}
-                    autoWrapCol={true}
-                    filters={true}
-                    dropdownMenu={true}
-                    columnSorting={true}
-                    manualColumnResize={true}
-                    contextMenu={true}
-                    language="es-ES"
-                  />
-                </div>
-              </div>
-            )}
           </div>
+
+          {isLoading ? (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center">
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <p className="mt-4 text-gray-600">Cargando...</p>
+              </div>
+            </div>
+          ) : quotes.length === 0 ? (
+            <div className="flex-1 flex items-center justify-center text-gray-500">
+              <div className="text-center">
+                <p>No se encontraron cotizaciones</p>
+                <small className="text-gray-400">
+                  {selectedAsset === 'all'
+                    ? 'Presiona "Buscar" para cargar las últimas cotizaciones de todos los activos'
+                    : 'Selecciona un rango de fechas y presiona "Buscar"'
+                  }
+                </small>
+              </div>
+            </div>
+          ) : (
+            <div className="flex-1 px-6 pb-6" style={{ minHeight: 0 }}>
+              <HotTable
+                ref={hotTableRef}
+                data={tableData}
+                columns={columns}
+                colHeaders={true}
+                rowHeaders={true}
+                height="100%"
+                width="100%"
+                licenseKey="non-commercial-and-evaluation"
+                stretchH="all"
+                autoWrapRow={true}
+                autoWrapCol={true}
+                filters={true}
+                dropdownMenu={true}
+                columnSorting={true}
+                manualColumnResize={true}
+                contextMenu={true}
+                language="es-ES"
+              />
+            </div>
+          )}
         </div>
       </div>
     </Layout>
