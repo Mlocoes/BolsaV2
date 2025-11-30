@@ -46,6 +46,29 @@ api.interceptors.request.use(
   }
 )
 
+// Interceptor para manejar errores de respuesta (global)
+api.interceptors.response.use(
+  (response) => {
+    return response
+  },
+  (error) => {
+    // Si recibimos un 401 (Unauthorized), significa que la sesión expiró o es inválida
+    if (error.response && error.response.status === 401) {
+      console.warn('Sesión expirada o inválida (401). Redirigiendo a login...')
+
+      // Limpiar datos de sesión locales
+      localStorage.removeItem('session_id')
+      localStorage.removeItem('auth-storage') // Limpiar zustand store si persiste ahí
+
+      // Redirigir al login si no estamos ya ahí
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login'
+      }
+    }
+    return Promise.reject(error)
+  }
+)
+
 // Ya no necesitamos el interceptor de tokens
 // Las cookies se envían automáticamente
 
@@ -71,7 +94,7 @@ export const authAPI = {
       console.log('Login response received:', response.data)
 
       // El backend ya establece la cookie HttpOnly automáticamente
-      
+
       // En desarrollo (cross-port), guardamos session_id para el header
       if (response.data.session_id) {
         localStorage.setItem('session_id', response.data.session_id)

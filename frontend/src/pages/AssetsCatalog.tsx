@@ -425,7 +425,7 @@ export default function AssetsCatalog() {
 
         {/* Modal */}
         {showModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[2000]">
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
               <h2 className="text-2xl font-bold mb-4">
                 {editingAsset ? 'Editar Activo' : 'Crear Activo'}
@@ -512,7 +512,7 @@ export default function AssetsCatalog() {
 
         {/* Modal de Importación Histórica */}
         {showImportModal && importingAsset && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[2000]">
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
               <h2 className="text-2xl font-bold mb-4">Importar Datos Históricos</h2>
               <p className="text-gray-600 mb-4">
