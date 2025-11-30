@@ -205,8 +205,7 @@ export default function Quotes() {
     cotizacion: quote.close,
     apertura: quote.open || null,
     maximo: quote.high || null,
-    minimo: quote.low || null,
-    volumen: quote.volume || null
+    minimo: quote.low || null
   }))
 
   const columns = [
@@ -246,15 +245,6 @@ export default function Quotes() {
       numericFormat: { pattern: '$0,0.00' },
       readOnly: true,
       width: 120,
-      className: 'htRight'
-    },
-    {
-      data: 'volumen',
-      title: 'Volumen',
-      type: 'numeric',
-      numericFormat: { pattern: '0,0' },
-      readOnly: true,
-      width: 150,
       className: 'htRight'
     }
   ]

@@ -201,10 +201,10 @@ class QuoteService:
                     errors=[f"Asset {symbol} no existe en la base de datos. Créalo primero."]
                 )
 
-            # Obtener datos históricos completos
+            # Obtener datos históricos (últimos 100 días con plan gratuito)
             df, meta_data = self.alpha_vantage_ts.get_daily(
                 symbol=symbol.upper(),
-                outputsize='full'
+                outputsize='compact'  # 'compact' = últimos 100 días (gratis), 'full' requiere premium
             )
             
             if df is None or df.empty:

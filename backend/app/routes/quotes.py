@@ -26,7 +26,7 @@ async def get_quotes(
     symbol: Optional[str] = Query(None, description="Filtrar por símbolo"),
     start_date: Optional[date] = Query(None, description="Fecha de inicio"),
     end_date: Optional[date] = Query(None, description="Fecha de fin"),
-    limit: int = Query(100, ge=1, le=10000, description="Límite de resultados"),
+    limit: int = Query(10000, ge=1, le=10000, description="Límite de resultados"),
     db: Session = Depends(get_db),
     user: dict = Depends(require_auth)
 ):
