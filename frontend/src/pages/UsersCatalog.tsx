@@ -209,20 +209,20 @@ export default function UsersCatalog() {
         </div>
 
         {/* Tabla con Handsontable */}
-        <div className="flex-1 bg-white rounded-lg shadow overflow-hidden relative">
-          <div className="absolute inset-0 p-4">
+        <div className="flex-1 bg-white rounded-lg shadow p-4" style={{ minHeight: '300px', display: 'flex', flexDirection: 'column' }}>
             {users.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
+              <div className="flex-1 flex items-center justify-center text-gray-500">
                 No se encontraron usuarios
               </div>
             ) : (
+              <div style={{ height: '400px', width: '100%' }}>
               <HotTable
                 ref={hotTableRef}
                 data={tableData}
                 columns={columns}
                 colHeaders={true}
                 rowHeaders={true}
-                height="100%"
+                height={400}
                 licenseKey="non-commercial-and-evaluation"
                 stretchH="all"
                 autoWrapRow={true}
@@ -234,8 +234,8 @@ export default function UsersCatalog() {
                 contextMenu={['copy']}
                 language="es-ES"
               />
+              </div>
             )}
-          </div>
         </div>
 
         {/* Modal Crear Usuario */}

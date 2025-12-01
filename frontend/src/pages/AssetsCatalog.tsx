@@ -392,21 +392,22 @@ export default function AssetsCatalog() {
         {/* Tabla con Handsontable - altura flexible */}
         <div
           ref={containerRef}
-          className="flex-1 bg-white rounded-lg shadow overflow-hidden relative"
+          className="flex-1 bg-white rounded-lg shadow p-2 md:p-4"
+          style={{ minHeight: '400px', display: 'flex', flexDirection: 'column' }}
         >
-          <div className="absolute inset-0 p-2 md:p-4">
             {filteredAssets.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-gray-500">
+              <div className="flex-1 flex items-center justify-center text-gray-500">
                 No se encontraron activos
               </div>
             ) : (
+              <div style={{ height: '500px', width: '100%' }}>
               <HotTable
                 ref={hotTableRef}
                 data={tableData}
                 columns={columns}
                 colHeaders={true}
                 rowHeaders={true}
-                height="100%"
+                height={500}
                 licenseKey="non-commercial-and-evaluation"
                 stretchH="all"
                 autoWrapRow={true}
@@ -419,8 +420,8 @@ export default function AssetsCatalog() {
                 language="es-ES"
                 width="100%"
               />
+              </div>
             )}
-          </div>
         </div>
 
         {/* Modal */}

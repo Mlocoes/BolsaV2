@@ -310,7 +310,7 @@ export default function PortfolioTransactions() {
                                     minSpareRows={1}
                                     rowHeaders={true}
                                     width="100%"
-                                    height="100%"
+                                    height={500}
                                     stretchH="all"
                                     contextMenu={true}
                                     manualColumnResize={true}
