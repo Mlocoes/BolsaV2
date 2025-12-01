@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { HotTable } from '@handsontable/react-wrapper'
+import { HotTable } from '@handsontable/react'
 import { registerAllModules } from 'handsontable/registry'
 import { registerLanguageDictionary, esMX } from 'handsontable/i18n'
 import 'handsontable/dist/handsontable.full.min.css'
@@ -48,7 +48,7 @@ export default function Quotes() {
   // Auto-load latest quotes when assets are available and currently showing 'all'
   useEffect(() => {
     if (assets.length > 0 && selectedAsset === 'all') {
-      loadLatestQuotes()
+      loadLatestQuotes(assets)
     }
   }, [assets, selectedAsset])
 
@@ -72,7 +72,7 @@ export default function Quotes() {
     }
   }
 
-  const loadLatestQuotes = async () => {
+  const loadLatestQuotes = async (currentAssets: Asset[]) => {
     setIsLoading(true)
     try {
       const response = await api.get('/quotes', {
@@ -83,7 +83,7 @@ export default function Quotes() {
       // El backend devuelve: { asset_id, timestamp, close, ... }
       // Necesitamos: { symbol, date, close, ... }
       const mappedQuotes: Quote[] = response.data.map((q: any) => {
-        const asset = assets.find(a => a.id === q.asset_id)
+        const asset = currentAssets.find(a => a.id === q.asset_id)
         return {
           symbol: asset ? asset.symbol : 'UNKNOWN',
           date: q.timestamp,
@@ -123,7 +123,7 @@ export default function Quotes() {
 
   const loadFilteredQuotes = async () => {
     if (selectedAsset === 'all') {
-      loadLatestQuotes()
+      loadLatestQuotes(assets)
       return
     }
 
@@ -215,7 +215,6 @@ export default function Quotes() {
       data: 'cotizacion',
       title: 'Cotización',
       type: 'numeric',
-      numericFormat: { pattern: '$0,0.00' },
       readOnly: true,
       width: 120,
       className: 'htRight htBold'
@@ -224,7 +223,6 @@ export default function Quotes() {
       data: 'apertura',
       title: 'Apertura',
       type: 'numeric',
-      numericFormat: { pattern: '$0,0.00' },
       readOnly: true,
       width: 120,
       className: 'htRight'
@@ -233,7 +231,6 @@ export default function Quotes() {
       data: 'maximo',
       title: 'Máximo',
       type: 'numeric',
-      numericFormat: { pattern: '$0,0.00' },
       readOnly: true,
       width: 120,
       className: 'htRight'
@@ -242,7 +239,6 @@ export default function Quotes() {
       data: 'minimo',
       title: 'Mínimo',
       type: 'numeric',
-      numericFormat: { pattern: '$0,0.00' },
       readOnly: true,
       width: 120,
       className: 'htRight'
@@ -265,8 +261,10 @@ export default function Quotes() {
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             {/* Selector de Activo */}
             <div>
-              <label className="block text-sm font-medium mb-1">Activo</label>
+              <label htmlFor="quotes-asset-select" className="block text-sm font-medium mb-1">Activo</label>
               <select
+                id="quotes-asset-select"
+                name="asset"
                 className="w-full px-3 py-2 border rounded"
                 value={selectedAsset}
                 onChange={(e) => setSelectedAsset(e.target.value)}
@@ -282,8 +280,10 @@ export default function Quotes() {
 
             {/* Fecha Inicio */}
             <div>
-              <label className="block text-sm font-medium mb-1">Fecha Inicio</label>
+              <label htmlFor="quotes-start-date" className="block text-sm font-medium mb-1">Fecha Inicio</label>
               <input
+                id="quotes-start-date"
+                name="startDate"
                 type="date"
                 className="w-full px-3 py-2 border rounded"
                 value={startDate}
@@ -294,8 +294,10 @@ export default function Quotes() {
 
             {/* Fecha Fin */}
             <div>
-              <label className="block text-sm font-medium mb-1">Fecha Fin</label>
+              <label htmlFor="quotes-end-date" className="block text-sm font-medium mb-1">Fecha Fin</label>
               <input
+                id="quotes-end-date"
+                name="endDate"
                 type="date"
                 className="w-full px-3 py-2 border rounded"
                 value={endDate}
@@ -324,13 +326,7 @@ export default function Quotes() {
         </div>
 
         {/* Tabla con Handsontable */}
-        <div className="flex-1 bg-white rounded-lg shadow overflow-hidden flex flex-col min-h-0">
-          <div className="p-6 flex-shrink-0">
-            <h5 className="text-lg font-semibold">
-              Resultados {quotes.length > 0 && `(${quotes.length})`}
-            </h5>
-          </div>
-
+        <div className="flex-1 bg-white rounded-lg shadow p-4" style={{ minHeight: '300px', display: 'flex', flexDirection: 'column' }}>
           {isLoading ? (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
@@ -344,22 +340,21 @@ export default function Quotes() {
                 <p>No se encontraron cotizaciones</p>
                 <small className="text-gray-400">
                   {selectedAsset === 'all'
-                    ? 'Presiona "Buscar" para cargar las últimas cotizaciones de todos los activos'
+                    ? 'Las cotizaciones se cargan automáticamente'
                     : 'Selecciona un rango de fechas y presiona "Buscar"'
                   }
                 </small>
               </div>
             </div>
           ) : (
-            <div className="flex-1 relative w-full" style={{ height: 'calc(100vh - 300px)' }}>
+            <div style={{ height: '350px', width: '100%' }}>
               <HotTable
                 ref={hotTableRef}
                 data={tableData}
                 columns={columns}
                 colHeaders={true}
                 rowHeaders={true}
-                height="100%"
-                width="100%"
+                height={350}
                 licenseKey="non-commercial-and-evaluation"
                 stretchH="all"
                 autoWrapRow={true}
