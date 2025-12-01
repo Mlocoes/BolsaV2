@@ -406,7 +406,7 @@ export default function AssetsCatalog() {
                 data={tableData}
                 columns={columns}
                 colHeaders={true}
-                rowHeaders={true}
+                rowHeaders={false}
                 height={500}
                 licenseKey="non-commercial-and-evaluation"
                 stretchH="all"

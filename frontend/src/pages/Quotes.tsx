@@ -353,7 +353,7 @@ export default function Quotes() {
                 data={tableData}
                 columns={columns}
                 colHeaders={true}
-                rowHeaders={true}
+                rowHeaders={false}
                 height={350}
                 licenseKey="non-commercial-and-evaluation"
                 stretchH="all"

@@ -308,7 +308,7 @@ export default function PortfolioTransactions() {
                                         { data: 'notes', type: 'text' }
                                     ]}
                                     minSpareRows={1}
-                                    rowHeaders={true}
+                                    rowHeaders={false}
                                     width="100%"
                                     height={500}
                                     stretchH="all"

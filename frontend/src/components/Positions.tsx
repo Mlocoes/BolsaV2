@@ -160,18 +160,19 @@ export default function Positions() {
         'G/P %'
       ],
       columns: [
-        { data: 'symbol', type: 'text', readOnly: true },
-        { data: 'name', type: 'text', readOnly: true },
-        { data: 'asset_type', type: 'text', readOnly: true },
-        { data: 'quantity', type: 'numeric', readOnly: true, numericFormat: { pattern: '0,0.00', culture: 'es-ES' } },
-        { data: 'average_price', type: 'numeric', readOnly: true, numericFormat: { pattern: '0,0.00', culture: 'es-ES' } },
-        { data: 'current_price', type: 'numeric', readOnly: true, numericFormat: { pattern: '0,0.00', culture: 'es-ES' } },
-        { data: 'current_value', type: 'numeric', readOnly: true, numericFormat: { pattern: '0,0.00', culture: 'es-ES' } },
-        { data: 'cost_basis', type: 'numeric', readOnly: true, numericFormat: { pattern: '0,0.00', culture: 'es-ES' } },
+        { data: 'symbol', type: 'text', readOnly: true, width: 90 },
+        { data: 'name', type: 'text', readOnly: true, width: 200 },
+        { data: 'asset_type', type: 'text', readOnly: true, width: 90 },
+        { data: 'quantity', type: 'numeric', readOnly: true, numericFormat: { pattern: '0,0.00', culture: 'es-ES' }, width: 100 },
+        { data: 'average_price', type: 'numeric', readOnly: true, numericFormat: { pattern: '0,0.00', culture: 'es-ES' }, width: 115 },
+        { data: 'current_price', type: 'numeric', readOnly: true, numericFormat: { pattern: '0,0.00', culture: 'es-ES' }, width: 115 },
+        { data: 'current_value', type: 'numeric', readOnly: true, numericFormat: { pattern: '0,0.00', culture: 'es-ES' }, width: 120 },
+        { data: 'cost_basis', type: 'numeric', readOnly: true, numericFormat: { pattern: '0,0.00', culture: 'es-ES' }, width: 115 },
         {
           data: 'profit_loss',
           type: 'numeric',
           readOnly: true,
+          width: 120,
           numericFormat: { pattern: '0,0.00', culture: 'es-ES' },
           renderer: function (instance: any, td: HTMLTableCellElement, row: number, col: number, prop: any, value: any, cellProperties: any) {
             Handsontable.renderers.NumericRenderer.apply(this, [instance, td, row, col, prop, value, cellProperties]);
@@ -187,6 +188,7 @@ export default function Positions() {
           data: 'profit_loss_percent',
           type: 'numeric',
           readOnly: true,
+          width: 90,
           numericFormat: { pattern: '0.00%', culture: 'es-ES' },
           renderer: function (instance: any, td: HTMLTableCellElement, row: number, col: number, prop: any, value: any, cellProperties: any) {
             Handsontable.renderers.NumericRenderer.apply(this, [instance, td, row, col, prop, value, cellProperties]);
@@ -199,12 +201,12 @@ export default function Positions() {
           }
         }
       ],
-      rowHeaders: true,
+      rowHeaders: false,
       width: '100%',
       height: '100%',
       licenseKey: 'non-commercial-and-evaluation',
-      stretchH: 'all',
-      autoColumnSize: true,
+      stretchH: 'none',
+      autoColumnSize: false,
       filters: true,
       dropdownMenu: true,
       columnSorting: true

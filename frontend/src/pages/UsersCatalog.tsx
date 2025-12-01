@@ -221,7 +221,7 @@ export default function UsersCatalog() {
                 data={tableData}
                 columns={columns}
                 colHeaders={true}
-                rowHeaders={true}
+                rowHeaders={false}
                 height={400}
                 licenseKey="non-commercial-and-evaluation"
                 stretchH="all"
