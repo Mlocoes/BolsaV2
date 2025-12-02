@@ -9,7 +9,7 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from app.core.config import settings
 from app.core.session import session_manager
-from app.routes import auth, portfolios, transactions, assets, prices, worker, quotes, import_export, users
+from app.routes import auth, portfolios, transactions, assets, prices, worker, quotes, import_export, users, fiscal
 from app.services.quote_scheduler import quote_scheduler
 # from app.services.snapshot_scheduler import snapshot_scheduler
 from app.api.v1 import snapshots
@@ -128,6 +128,7 @@ app.include_router(worker.router)
 app.include_router(quotes.router)
 app.include_router(import_export.router)
 app.include_router(users.router)
+app.include_router(fiscal.router)
 app.include_router(snapshots.router, prefix="/api/v1/snapshots", tags=["snapshots"])
 
 @app.get("/")

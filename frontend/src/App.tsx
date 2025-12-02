@@ -14,6 +14,7 @@ import UsersCatalog from './pages/UsersCatalog'
 import BulkEditTransactions from './pages/BulkEditTransactions'
 import PortfolioTransactions from './pages/PortfolioTransactions'
 import TransactionsPortfolioSelection from './pages/TransactionsPortfolioSelection'
+import FiscalResult from './pages/FiscalResult'
 
 function App() {
   const { checkAuth } = useAuthStore()
@@ -115,6 +116,14 @@ function App() {
           element={
             <ProtectedRoute>
               <TransactionsPortfolioSelection />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/fiscal-result"
+          element={
+            <ProtectedRoute>
+              <FiscalResult />
             </ProtectedRoute>
           }
         />

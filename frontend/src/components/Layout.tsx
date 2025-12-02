@@ -64,6 +64,12 @@ export default function Layout({ children }: LayoutProps) {
                 Cotizaciones
               </button>
               <button
+                onClick={() => navigate('/fiscal-result')}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                Resultado Fiscal
+              </button>
+              <button
                 onClick={() => navigate('/import')}
                 className="text-gray-600 hover:text-gray-900"
               >
