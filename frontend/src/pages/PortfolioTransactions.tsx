@@ -93,8 +93,8 @@ export default function PortfolioTransactions() {
         const hot = hotRef.current.hotInstance;
         const selected = hot.getSelected();
 
-        if (!selected) {
-            toast('Selecciona celdas o filas para eliminar');
+        if (!selected || selected.length === 0) {
+            toast.error('Selecciona celdas o filas para eliminar');
             return;
         }
 
@@ -120,14 +120,17 @@ export default function PortfolioTransactions() {
             }
         });
 
-        if (toDeleteIds.length === 0) return;
+        if (toDeleteIds.length === 0) {
+            toast.error('Las filas seleccionadas no contienen transacciones válidas para eliminar');
+            return;
+        }
 
-        if (!confirm(`¿Estás seguro de eliminar ${toDeleteIds.length} transacciones?`)) return;
+        if (!confirm(`¿Estás seguro de eliminar ${toDeleteIds.length} transaccion(es)?`)) return;
 
         try {
             setSaving(true);
             await Promise.all(toDeleteIds.map(tid => portfolioService.deleteTransaction(id!, tid)));
-            toast.success('Transacciones eliminadas');
+            toast.success(`${toDeleteIds.length} transaccion(es) eliminadas correctamente`);
             loadData();
         } catch (error) {
             console.error('Error deleting:', error);
@@ -242,7 +245,8 @@ export default function PortfolioTransactions() {
                         </button>
                         <button
                             onClick={handleDeleteSelected}
-                            className="inline-flex items-center px-4 py-2 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50"
+                            disabled={saving}
+                            className="inline-flex items-center px-4 py-2 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <Trash2 className="h-4 w-4 mr-2" />
                             Eliminar
