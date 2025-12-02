@@ -346,31 +346,31 @@ export default function AssetsCatalog() {
 
   return (
     <Layout>
-      <div className="flex flex-col h-full space-y-2 md:space-y-3">
-        {/* Cabecera - compacta */}
-        <div className="flex-shrink-0 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+      <div className="space-y-4">
+        {/* Cabecera */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
           <div>
-            <h1 className="text-xl md:text-2xl font-bold">Catálogo de Activos</h1>
-            <p className="text-xs md:text-sm text-gray-600">Gestiona acciones, ETFs y otros activos</p>
+            <h1 className="text-2xl font-bold">Catálogo de Activos</h1>
+            <p className="text-sm text-gray-600">Gestiona acciones, ETFs y otros activos</p>
           </div>
           <div className="flex gap-2">
             <button
               onClick={handleUpdateAllQuotes}
-              className="px-2 py-1 md:px-4 md:py-2 bg-green-600 text-white rounded hover:bg-green-700 text-xs md:text-sm"
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
             >
               📈 Actualizar Cotizaciones
             </button>
             <button
               onClick={openCreateModal}
-              className="px-2 py-1 md:px-4 md:py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs md:text-sm"
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
             >
               + Añadir Activo
             </button>
           </div>
         </div>
 
-        {/* Búsqueda - compacta */}
-        <div className="flex-shrink-0 bg-white p-2 md:p-4 rounded-lg shadow">
+        {/* Búsqueda */}
+        <div className="bg-white p-4 rounded-lg shadow">
           <div className="flex gap-2">
             <input
               type="text"
@@ -378,28 +378,25 @@ export default function AssetsCatalog() {
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
               placeholder="Buscar por símbolo o nombre..."
-              className="flex-1 px-2 py-1 md:px-4 md:py-2 border rounded text-xs md:text-sm"
+              className="flex-1 px-4 py-2 border rounded text-sm"
             />
             <button
               onClick={handleSearch}
-              className="px-3 py-1 md:px-6 md:py-2 bg-gray-600 text-white rounded hover:bg-gray-700 text-xs md:text-sm"
+              className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm"
             >
               Buscar
             </button>
           </div>
         </div>
 
-        {/* Tabla con Handsontable - altura fija con scroll interno */}
-        <div
-          ref={containerRef}
-          className="bg-white rounded-lg shadow p-2 md:p-4"
-        >
+        {/* Tabla con Handsontable */}
+        <div className="bg-white rounded-lg shadow p-4">
             {filteredAssets.length === 0 ? (
               <div className="flex items-center justify-center text-gray-500 h-96">
                 No se encontraron activos
               </div>
             ) : (
-              <div style={{ height: '500px', width: '100%' }}>
+              <div ref={containerRef} style={{ height: '500px', width: '100%' }}>
               <HotTable
                 ref={hotTableRef}
                 data={tableData}
