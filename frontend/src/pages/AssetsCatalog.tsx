@@ -389,14 +389,13 @@ export default function AssetsCatalog() {
           </div>
         </div>
 
-        {/* Tabla con Handsontable - altura flexible */}
+        {/* Tabla con Handsontable - altura fija con scroll interno */}
         <div
           ref={containerRef}
-          className="flex-1 bg-white rounded-lg shadow p-2 md:p-4"
-          style={{ minHeight: '400px', display: 'flex', flexDirection: 'column' }}
+          className="bg-white rounded-lg shadow p-2 md:p-4"
         >
             {filteredAssets.length === 0 ? (
-              <div className="flex-1 flex items-center justify-center text-gray-500">
+              <div className="flex items-center justify-center text-gray-500 h-96">
                 No se encontraron activos
               </div>
             ) : (
@@ -413,10 +412,56 @@ export default function AssetsCatalog() {
                 autoWrapRow={true}
                 autoWrapCol={true}
                 filters={true}
-                dropdownMenu={true}
+                dropdownMenu={[
+                  'filter_by_condition',
+                  'filter_by_value',
+                  'filter_action_bar',
+                  '---------',
+                  'alignment'
+                ]}
                 columnSorting={true}
                 manualColumnResize={true}
-                contextMenu={true}
+                contextMenu={[
+                  'row_above',
+                  'row_below',
+                  '---------',
+                  'col_left',
+                  'col_right',
+                  '---------',
+                  'remove_row',
+                  'remove_col',
+                  '---------',
+                  'undo',
+                  'redo',
+                  '---------',
+                  'make_read_only',
+                  '---------',
+                  'alignment'
+                ]}
+                afterContextMenuShow={() => {
+                  const mainContainer = document.querySelector('main.overflow-hidden') as HTMLElement;
+                  if (mainContainer) {
+                    mainContainer.style.overflow = 'visible';
+                  }
+                }}
+                afterContextMenuHide={() => {
+                  const mainContainer = document.querySelector('main.overflow-hidden') as HTMLElement;
+                  if (mainContainer) {
+                    mainContainer.style.overflow = 'hidden';
+                  }
+                }}
+                afterDropdownMenuShow={() => {
+                  const mainContainer = document.querySelector('main.overflow-hidden') as HTMLElement;
+                  if (mainContainer) {
+                    mainContainer.style.overflow = 'visible';
+                  }
+                }}
+                afterDropdownMenuHide={() => {
+                  const mainContainer = document.querySelector('main.overflow-hidden') as HTMLElement;
+                  if (mainContainer) {
+                    mainContainer.style.overflow = 'hidden';
+                  }
+                }}
                 language="es-ES"
                 width="100%"
               />
