@@ -402,9 +402,17 @@ class ImportExportService:
                     stats['min_date'] = transaction_date
                 
             except Exception as e:
+                # Rollback para esta fila específica
+                self.db.rollback()
                 stats['errors'].append(f"Fila {idx + 2}: {str(e)}")
+                print(f"❌ Error en fila {idx + 2}: {str(e)}")
         
-        self.db.commit()
+        # Commit final solo si no hubo errores críticos
+        try:
+            self.db.commit()
+        except Exception as e:
+            self.db.rollback()
+            raise ValueError(f"Error al guardar transacciones: {str(e)}")
         
         # Recalcular posiciones para los assets afectados
         # Optimizacion: Recolectar assets afectados y recalcular solo esos
