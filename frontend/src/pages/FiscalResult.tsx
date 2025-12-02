@@ -87,9 +87,28 @@ export default function FiscalResult() {
     const initializeHandsontable = () => {
         if (!hotTableRef.current || !results) return;
 
+        // Obtener el elemento main del Layout para cambiar overflow temporalmente
+        const getMainContainer = () => {
+            return document.querySelector('main.overflow-hidden') as HTMLElement;
+        };
+
         hotInstance.current = new Handsontable(hotTableRef.current, {
             data: results.items,
             language: 'es-ES',
+            afterContextMenuShow: () => {
+                // Cuando se abre el menú contextual, permitir overflow temporalmente
+                const mainContainer = getMainContainer();
+                if (mainContainer) {
+                    mainContainer.style.overflow = 'visible';
+                }
+            },
+            afterContextMenuHide: () => {
+                // Cuando se cierra el menú contextual, restaurar overflow
+                const mainContainer = getMainContainer();
+                if (mainContainer) {
+                    mainContainer.style.overflow = 'hidden';
+                }
+            },
             colHeaders: [
                 'Símbolo',
                 'Fecha Venta',
