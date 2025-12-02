@@ -254,6 +254,7 @@ class ImportExportService:
             'total': len(df),
             'created': 0,
             'skipped': 0,
+            'assets_created': 0,  # Nuevos activos creados
             'errors': [],
             'min_date': None  # Para snapshot recalculation
         }
@@ -271,18 +272,39 @@ class ImportExportService:
         for idx, row in df.iterrows():
             try:
                 # Buscar o crear asset
-                asset_symbol = str(row['asset_symbol']).upper()
+                asset_symbol = str(row['asset_symbol']).upper().strip()
                 asset = self.db.query(Asset).filter(Asset.symbol == asset_symbol).first()
                 
                 if not asset:
                     # Crear asset si no existe
+                    # Intentar obtener información adicional del símbolo
+                    asset_name = asset_symbol
+                    asset_type = 'stock'  # Default
+                    
+                    # Intentar detectar el tipo por el símbolo
+                    if asset_symbol.endswith('.L') or asset_symbol.endswith('.LON'):
+                        asset_type = 'stock'
+                        asset_name = asset_symbol
+                    elif asset_symbol.startswith('EUR') or asset_symbol.startswith('USD'):
+                        asset_type = 'forex'
+                    elif len(asset_symbol) <= 5 and asset_symbol.isalpha():
+                        asset_type = 'stock'
+                    
                     asset = Asset(
                         symbol=asset_symbol,
-                        name=asset_symbol,
-                        asset_type='stock' # Default to stock
+                        name=asset_name,
+                        asset_type=asset_type,
+                        currency='USD',  # Default currency
+                        market=None
                     )
                     self.db.add(asset)
                     self.db.flush()
+                    
+                    # Incrementar contador de activos creados
+                    stats['assets_created'] += 1
+                    
+                    # Log para tracking
+                    print(f"✨ Activo creado automáticamente: {asset_symbol} ({asset_type})")
                 
                 # Parsear fecha (DD/MM/YYYY o YYYY-MM-DD)
                 date_val = row['date']

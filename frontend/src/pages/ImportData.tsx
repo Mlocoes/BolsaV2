@@ -7,6 +7,7 @@ interface ImportStats {
   created: number
   updated: number
   skipped: number
+  assets_created?: number
   errors: string[]
 }
 
@@ -251,6 +252,12 @@ export default function ImportData() {
                   <div className="text-2xl font-bold text-yellow-600">{importResult.skipped}</div>
                   <div className="text-sm text-gray-600">Omitidos</div>
                 </div>
+                {importResult.assets_created && importResult.assets_created > 0 && (
+                  <div className="bg-purple-50 p-4 rounded">
+                    <div className="text-2xl font-bold text-purple-600">{importResult.assets_created}</div>
+                    <div className="text-sm text-gray-600">Activos Nuevos</div>
+                  </div>
+                )}
               </div>
 
               {importResult.errors.length > 0 && (

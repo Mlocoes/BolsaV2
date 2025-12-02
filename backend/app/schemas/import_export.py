@@ -12,6 +12,7 @@ class ImportStats(BaseModel):
     created: int = Field(..., description="Registros creados")
     updated: int = Field(0, description="Registros actualizados")
     skipped: int = Field(0, description="Registros omitidos (duplicados)")
+    assets_created: int = Field(0, description="Activos nuevos creados automáticamente")
     errors: List[str] = Field(default_factory=list, description="Lista de errores")
 
 
