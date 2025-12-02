@@ -272,19 +272,32 @@ class ImportExportService:
         for idx, row in df.iterrows():
             try:
                 # Buscar o crear asset
-                asset_symbol = str(row['asset_symbol']).upper().strip()
-                asset = self.db.query(Asset).filter(Asset.symbol == asset_symbol).first()
+                asset_symbol_or_name = str(row['asset_symbol']).strip()
+                
+                # Primero intentar buscar por símbolo (case-insensitive)
+                asset = self.db.query(Asset).filter(
+                    Asset.symbol.ilike(asset_symbol_or_name)
+                ).first()
+                
+                # Si no se encuentra, buscar por nombre de empresa
+                if not asset:
+                    asset = self.db.query(Asset).filter(
+                        Asset.name.ilike(f"%{asset_symbol_or_name}%")
+                    ).first()
+                    
+                    if asset:
+                        print(f"🔍 Activo encontrado por nombre: '{asset_symbol_or_name}' → {asset.symbol} ({asset.name})")
                 
                 if not asset:
                     # Crear asset si no existe
-                    # Intentar obtener información adicional del símbolo
-                    asset_name = asset_symbol
+                    # Usar el valor como símbolo (convertir a mayúsculas)
+                    asset_symbol = asset_symbol_or_name.upper()
+                    asset_name = asset_symbol_or_name
                     asset_type = 'stock'  # Default
                     
                     # Intentar detectar el tipo por el símbolo
                     if asset_symbol.endswith('.L') or asset_symbol.endswith('.LON'):
                         asset_type = 'stock'
-                        asset_name = asset_symbol
                     elif asset_symbol.startswith('EUR') or asset_symbol.startswith('USD'):
                         asset_type = 'forex'
                     elif len(asset_symbol) <= 5 and asset_symbol.isalpha():
