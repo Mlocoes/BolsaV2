@@ -151,9 +151,22 @@ export default function PortfolioTransactions() {
 
         try {
             setSaving(true);
-            await Promise.all(toDeleteIds.map(tid => portfolioService.deleteTransaction(id!, tid)));
+            
+            // Eliminar secuencialmente para evitar sobrecarga del backend
+            for (const tid of toDeleteIds) {
+                await portfolioService.deleteTransaction(id!, tid);
+            }
+            
             toast.success(`${toDeleteIds.length} transaccion(es) eliminadas correctamente`);
-            loadData();
+            
+            // Deseleccionar antes de recargar
+            if (hotRef.current) {
+                const hot = hotRef.current.hotInstance;
+                hot.deselectCell();
+            }
+            
+            // Recargar datos
+            await loadData();
         } catch (error) {
             console.error('Error deleting:', error);
             toast.error('Error al eliminar transacciones');
