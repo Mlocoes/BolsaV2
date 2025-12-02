@@ -160,14 +160,16 @@ export default function FiscalResult() {
             ],
             rowHeaders: false,
             width: '100%',
-            height: 450,
+            height: 500,
             licenseKey: 'non-commercial-and-evaluation',
             stretchH: 'none',
             autoColumnSize: false,
             filters: true,
             dropdownMenu: true,
             columnSorting: true,
-            manualColumnResize: true
+            manualColumnResize: true,
+            autoWrapRow: false,
+            autoWrapCol: false
         });
     };
 
@@ -190,7 +192,7 @@ export default function FiscalResult() {
 
     return (
         <Layout>
-            <div className="h-full flex flex-col space-y-4">
+            <div className="flex flex-col h-full gap-4">
                 <div className="flex-shrink-0">
                     <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
                         <Calculator className="h-6 w-6" />
@@ -201,7 +203,7 @@ export default function FiscalResult() {
                     </p>
                 </div>
 
-            <div className="bg-white p-4 rounded-lg shadow space-y-4 md:space-y-0 md:flex md:items-end md:space-x-4">
+            <div className="flex-shrink-0 bg-white p-4 rounded-lg shadow space-y-4 md:space-y-0 md:flex md:items-end md:space-x-4">
                 <div className="flex-1">
                     <label htmlFor="portfolio" className="block text-sm font-medium text-gray-700 mb-1">
                         Cartera
@@ -269,21 +271,21 @@ export default function FiscalResult() {
             </div>
 
             {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                <div className="flex-shrink-0 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
                     {error}
                 </div>
             )}
 
             {results && results.items.length > 0 ? (
-                <div className="flex-1 bg-white shadow rounded-lg p-4" style={{ minHeight: '400px', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                    <div className="flex-shrink-0 pb-4 border-b border-gray-200 flex justify-between items-center">
+                <div className="bg-white shadow rounded-lg" style={{ overflow: 'visible' }}>
+                    <div className="px-4 pt-4 pb-4 border-b border-gray-200 flex justify-between items-center">
                         <h3 className="text-lg font-medium text-gray-900">Detalle de Operaciones</h3>
                         <div className={`text-lg font-bold ${results.total_result >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                             Resultado Total: {results.total_result.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </div>
                     </div>
-                    <div className="flex-1 pt-4" style={{ overflow: 'visible' }}>
-                        <div style={{ height: '450px', width: '100%', maxWidth: '100%' }} ref={hotTableRef} />
+                    <div className="p-4">
+                        <div ref={hotTableRef} />
                         <style>{`
                 .htPositive { color: #059669; font-weight: 600; }
                 .htNegative { color: #DC2626; font-weight: 600; }
