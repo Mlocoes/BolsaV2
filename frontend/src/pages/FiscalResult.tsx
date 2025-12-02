@@ -165,11 +165,31 @@ export default function FiscalResult() {
             stretchH: 'none',
             autoColumnSize: false,
             filters: true,
-            dropdownMenu: true,
+            contextMenu: [
+                'row_above',
+                'row_below',
+                '---------',
+                'col_left',
+                'col_right',
+                '---------',
+                'remove_row',
+                'remove_col',
+                '---------',
+                'undo',
+                'redo',
+                '---------',
+                'alignment',
+                '---------',
+                'filter_by_condition',
+                'filter_by_value',
+                'filter_action_bar'
+            ],
             columnSorting: true,
             manualColumnResize: true,
             autoWrapRow: false,
-            autoWrapCol: false
+            autoWrapCol: false,
+            renderAllRows: false,
+            viewportRowRenderingOffset: 'auto'
         });
     };
 
@@ -277,7 +297,7 @@ export default function FiscalResult() {
             )}
 
             {results && results.items.length > 0 ? (
-                <div className="bg-white shadow rounded-lg" style={{ overflow: 'visible' }}>
+                <div className="bg-white shadow rounded-lg">
                     <div className="px-4 pt-4 pb-4 border-b border-gray-200 flex justify-between items-center">
                         <h3 className="text-lg font-medium text-gray-900">Detalle de Operaciones</h3>
                         <div className={`text-lg font-bold ${results.total_result >= 0 ? 'text-green-600' : 'text-red-600'}`}>

@@ -21,7 +21,7 @@ export default function Layout({ children }: LayoutProps) {
   }
 
   return (
-    <div className="h-screen overflow-hidden flex flex-col bg-gray-50">
+    <div className="h-screen overflow-hidden flex flex-col bg-gray-50" style={{ position: 'relative', zIndex: 0 }}>
       <nav className="flex-shrink-0 sticky top-0 z-50 bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex items-center space-x-4 md:space-x-8">
