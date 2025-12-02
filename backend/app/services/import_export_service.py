@@ -274,6 +274,19 @@ class ImportExportService:
                 # Buscar o crear asset
                 asset_symbol_or_name = str(row['asset_symbol']).strip()
                 
+                # Limpiar saltos de línea y espacios múltiples
+                asset_symbol_or_name = ' '.join(asset_symbol_or_name.split())
+                
+                # Si contiene saltos de línea originales, intentar extraer el ticker
+                # Formato común: "COMPANY NAME\nTICKER\nEXCHANGE" → extraer TICKER
+                parts = str(row['asset_symbol']).split('\n')
+                if len(parts) > 1:
+                    # El ticker suele ser la parte más corta (2-5 caracteres)
+                    ticker_candidates = [p.strip().upper() for p in parts if 2 <= len(p.strip()) <= 10]
+                    if ticker_candidates:
+                        asset_symbol_or_name = ticker_candidates[0]
+                        print(f"📝 Extrayendo ticker: {parts} → {asset_symbol_or_name}")
+                
                 # Primero intentar buscar por símbolo (case-insensitive)
                 asset = self.db.query(Asset).filter(
                     Asset.symbol.ilike(asset_symbol_or_name)
@@ -290,9 +303,9 @@ class ImportExportService:
                 
                 if not asset:
                     # Crear asset si no existe
-                    # Usar el valor como símbolo (convertir a mayúsculas)
-                    asset_symbol = asset_symbol_or_name.upper()
-                    asset_name = asset_symbol_or_name
+                    # Limpiar y validar el símbolo antes de crear
+                    asset_symbol = asset_symbol_or_name.upper()[:20]  # Limitar a 20 caracteres
+                    asset_name = asset_symbol_or_name[:100]  # Limitar nombre también
                     asset_type = 'stock'  # Default
                     
                     # Intentar detectar el tipo por el símbolo
