@@ -89,9 +89,20 @@ export default function PortfolioTransactions() {
     }, [transactions, idToSymbolMap]);
 
     const handleDeleteSelected = async () => {
-        if (!hotRef.current) return;
+        console.log('🟢 handleDeleteSelected EJECUTÁNDOSE');
+        console.log('hotRef.current:', hotRef.current);
+        
+        if (!hotRef.current) {
+            console.log('❌ hotRef.current es null');
+            return;
+        }
+        
         const hot = hotRef.current.hotInstance;
+        console.log('hot instance:', hot);
+        
         const selected = hot.getSelected();
+
+        console.log('🔍 Selección detectada:', selected);
 
         if (!selected || selected.length === 0) {
             toast.error('Selecciona celdas o filas para eliminar');
@@ -109,19 +120,30 @@ export default function PortfolioTransactions() {
             }
         }
 
-        const sourceData = hot.getSourceData();
+        console.log('📋 Índices seleccionados:', Array.from(selectedRowIndices));
+
+        // Usar getData en lugar de getSourceData para obtener los datos visibles
         const toDeleteIds: string[] = [];
+        const toDeleteInfo: any[] = [];
 
         selectedRowIndices.forEach(rowIndex => {
-            const physicalRow = hot.toPhysicalRow(rowIndex);
-            const rowData = sourceData[physicalRow];
-            if (rowData && rowData.id) {
-                toDeleteIds.push(rowData.id);
+            const rowData = hot.getDataAtRow(rowIndex);
+            console.log(`📌 Fila ${rowIndex}:`, rowData);
+            
+            // Los datos están en el orden de las columnas: [date, asset, type, quantity, price, fees, notes]
+            // Pero necesitamos el ID que está en hotData
+            const dataAtIndex = hotData[rowIndex];
+            
+            if (dataAtIndex && dataAtIndex.id) {
+                toDeleteIds.push(dataAtIndex.id);
+                toDeleteInfo.push({ index: rowIndex, id: dataAtIndex.id, asset: dataAtIndex.asset });
             }
         });
 
+        console.log('🗑️ IDs a eliminar:', toDeleteInfo);
+
         if (toDeleteIds.length === 0) {
-            toast.error('Las filas seleccionadas no contienen transacciones válidas para eliminar');
+            toast.error('Las filas seleccionadas no contienen transacciones válidas para eliminar (puede ser una fila vacía)');
             return;
         }
 
@@ -244,12 +266,15 @@ export default function PortfolioTransactions() {
                             Recargar
                         </button>
                         <button
-                            onClick={handleDeleteSelected}
+                            onClick={() => {
+                                console.log('🔴 BOTÓN ELIMINAR CLICKEADO');
+                                handleDeleteSelected();
+                            }}
                             disabled={saving}
                             className="inline-flex items-center px-4 py-2 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <Trash2 className="h-4 w-4 mr-2" />
-                            Eliminar
+                            Eliminar Selección
                         </button>
                         <button
                             onClick={handleSaveWithCreate}
@@ -312,11 +337,27 @@ export default function PortfolioTransactions() {
                                         { data: 'notes', type: 'text' }
                                     ]}
                                     minSpareRows={1}
-                                    rowHeaders={false}
+                                    rowHeaders={true}
                                     width="100%"
                                     height={500}
                                     stretchH="all"
-                                    contextMenu={true}
+                                    contextMenu={{
+                                        items: {
+                                            'remove_row': {
+                                                name: 'Eliminar fila(s)',
+                                                callback: function() {
+                                                    console.log('🟣 Menú contextual - Eliminar fila(s)');
+                                                    handleDeleteSelected();
+                                                }
+                                            },
+                                            'sep1': '---------',
+                                            'row_above': {},
+                                            'row_below': {},
+                                            'sep2': '---------',
+                                            'undo': {},
+                                            'redo': {}
+                                        }
+                                    }}
                                     manualColumnResize={true}
                                     manualRowResize={true}
                                     filters={true}
@@ -324,6 +365,7 @@ export default function PortfolioTransactions() {
                                     columnSorting={true}
                                     afterInit={() => {
                                         console.log('✅ HotTable inicializado correctamente');
+                                        console.log('✅ Versión con rowHeaders y menú contextual');
                                     }}
                                 />
                             </div>
