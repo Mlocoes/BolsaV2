@@ -275,14 +275,14 @@ export default function FiscalResult() {
             )}
 
             {results && results.items.length > 0 ? (
-                <div className="flex-1 bg-white shadow rounded-lg p-4" style={{ minHeight: '400px', display: 'flex', flexDirection: 'column' }}>
+                <div className="flex-1 bg-white shadow rounded-lg p-4 overflow-hidden" style={{ minHeight: '400px', display: 'flex', flexDirection: 'column' }}>
                     <div className="flex-shrink-0 pb-4 border-b border-gray-200 flex justify-between items-center">
                         <h3 className="text-lg font-medium text-gray-900">Detalle de Operaciones</h3>
                         <div className={`text-lg font-bold ${results.total_result >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                             Resultado Total: {results.total_result.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </div>
                     </div>
-                    <div className="flex-1 pt-4 overflow-auto">
+                    <div className="flex-1 pt-4">
                         <div style={{ height: '450px', width: '100%' }} ref={hotTableRef} />
                         <style>{`
                 .htPositive { color: #059669; font-weight: 600; }
