@@ -104,7 +104,7 @@ export default function FiscalResult() {
                     data: 'symbol',
                     type: 'text',
                     readOnly: true,
-                    width: 90
+                    width: 120
                 },
                 {
                     data: 'date_sell',
