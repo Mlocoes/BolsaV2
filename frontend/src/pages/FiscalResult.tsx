@@ -104,49 +104,49 @@ export default function FiscalResult() {
                     data: 'symbol',
                     type: 'text',
                     readOnly: true,
-                    width: 100
+                    width: 80
                 },
                 {
                     data: 'date_sell',
                     type: 'date',
                     dateFormat: 'DD/MM/YYYY',
                     readOnly: true,
-                    width: 120
+                    width: 100
                 },
                 {
                     data: 'date_buy',
                     type: 'date',
                     dateFormat: 'DD/MM/YYYY',
                     readOnly: true,
-                    width: 120
+                    width: 100
                 },
                 {
                     data: 'quantity',
                     type: 'numeric',
                     numericFormat: { pattern: '0,0.00', culture: 'es-ES' },
                     readOnly: true,
-                    width: 100
+                    width: 90
                 },
                 {
                     data: 'price_sell',
                     type: 'numeric',
                     numericFormat: { pattern: '0,0.00', culture: 'es-ES' },
                     readOnly: true,
-                    width: 120
+                    width: 100
                 },
                 {
                     data: 'price_buy',
                     type: 'numeric',
                     numericFormat: { pattern: '0,0.00', culture: 'es-ES' },
                     readOnly: true,
-                    width: 120
+                    width: 100
                 },
                 {
                     data: 'result',
                     type: 'numeric',
                     numericFormat: { pattern: '0,0.00', culture: 'es-ES' },
                     readOnly: true,
-                    width: 140,
+                    width: 110,
                     renderer: function (instance: any, td: HTMLTableCellElement, row: number, col: number, prop: any, value: any, cellProperties: any) {
                         Handsontable.renderers.NumericRenderer.apply(this, [instance, td, row, col, prop, value, cellProperties]);
                         if (value > 0) {
@@ -160,7 +160,7 @@ export default function FiscalResult() {
             ],
             rowHeaders: false,
             width: '100%',
-            height: 500,
+            height: 450,
             licenseKey: 'non-commercial-and-evaluation',
             stretchH: 'none',
             autoColumnSize: false,
@@ -282,8 +282,8 @@ export default function FiscalResult() {
                             Resultado Total: {results.total_result.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </div>
                     </div>
-                    <div className="flex-1 pt-4">
-                        <div style={{ height: '500px', width: '100%' }} ref={hotTableRef} />
+                    <div className="flex-1 pt-4 overflow-auto">
+                        <div style={{ height: '450px', width: '100%' }} ref={hotTableRef} />
                         <style>{`
                 .htPositive { color: #059669; font-weight: 600; }
                 .htNegative { color: #DC2626; font-weight: 600; }
