@@ -141,7 +141,7 @@ export default function Positions() {
       current_value: p.current_value,
       cost_basis: p.cost_basis,
       profit_loss: p.profit_loss,
-      profit_loss_percent: p.profit_loss_percent
+      profit_loss_percent: p.profit_loss_percent / 100
     }));
 
     hotInstance.current = new Handsontable(hotTableRef.current, {
@@ -229,7 +229,7 @@ export default function Positions() {
       current_value: p.current_value,
       cost_basis: p.cost_basis,
       profit_loss: p.profit_loss,
-      profit_loss_percent: p.profit_loss_percent
+      profit_loss_percent: p.profit_loss_percent / 100
     }));
 
     hotInstance.current.loadData(data);
