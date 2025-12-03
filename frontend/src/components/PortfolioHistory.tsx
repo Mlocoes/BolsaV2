@@ -400,9 +400,11 @@ export default function PortfolioHistory({ portfolioId }: PortfolioHistoryProps)
               data={[...snapshots].reverse().map(s => ({
                 fecha: new Date(s.date).toLocaleDateString('es-ES'),
                 valor: s.total_value,
-                cambio_diario: s.daily_pnl_percent,
+                // Convert percentage value to decimal for Handsontable's '0.00%' format
+                cambio_diario: s.daily_pnl_percent / 100,
                 pnl_total: s.total_pnl,
-                pnl_total_percent: s.total_pnl_percent,
+                // Convert percentage value to decimal for Handsontable's '0.00%' format
+                pnl_total_percent: s.total_pnl_percent / 100,
                 posiciones: s.number_of_positions
               }))}
               columns={[
