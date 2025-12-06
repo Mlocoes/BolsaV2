@@ -5,7 +5,7 @@ import type { Transaction } from '../types/portfolio';
 import Layout from '../components/Layout';
 import { ArrowLeft, Save, Trash2, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { HotTable } from '@handsontable/react';
+import Handsontable from 'handsontable';
 import 'handsontable/dist/handsontable.full.min.css';
 import '../styles/handsontable-custom.css';
 import { registerLanguageDictionary, esMX } from 'handsontable/i18n';
@@ -20,7 +20,8 @@ registerLanguageDictionary(esESDictionary);
 export default function PortfolioTransactions() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const hotRef = useRef<any>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const hotRef = useRef<Handsontable | null>(null);
 
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState(true);
@@ -88,21 +89,105 @@ export default function PortfolioTransactions() {
         });
     }, [transactions, idToSymbolMap]);
 
-    const handleDeleteSelected = async () => {
-        console.log('🟢 handleDeleteSelected EJECUTÁNDOSE');
-        console.log('hotRef.current:', hotRef.current);
-        
-        if (!hotRef.current) {
-            console.log('❌ hotRef.current es null');
-            return;
-        }
-        
-        const hot = hotRef.current.hotInstance;
-        console.log('hot instance:', hot);
-        
-        const selected = hot.getSelected();
+    // Inicializar Handsontable
+    useEffect(() => {
+        if (loading || !containerRef.current || Object.keys(assetMap).length === 0) return;
 
-        console.log('🔍 Selección detectada:', selected);
+        // Si ya existe instancia, solo actualizar datos si es necesario (manejado por useEffect aparte)
+        if (hotRef.current) return;
+
+        console.log('🚀 Inicializando Handsontable en PortfolioTransactions');
+
+        hotRef.current = new Handsontable(containerRef.current, {
+            data: hotData,
+            licenseKey: "non-commercial-and-evaluation",
+            language: "es-ES",
+            colHeaders: [
+                'Fecha', 'Activo', 'Tipo', 'Cantidad', 'Precio', 'Comisiones', 'Notas'
+            ],
+            columns: [
+                { data: 'date', type: 'date', dateFormat: 'DD/MM/YYYY', correctFormat: true, width: 100 },
+                {
+                    data: 'asset',
+                    type: 'dropdown',
+                    source: Object.keys(assetMap).sort(),
+                    width: 100
+                },
+                {
+                    data: 'type',
+                    type: 'dropdown',
+                    source: ['buy', 'sell', 'dividend', 'deposit', 'withdrawal'],
+                    width: 100
+                },
+                {
+                    data: 'quantity',
+                    type: 'numeric',
+                    numericFormat: { pattern: '0,0.000000', culture: 'es-ES' },
+                    width: 120
+                },
+                {
+                    data: 'price',
+                    type: 'numeric',
+                    numericFormat: { pattern: '0,0.00', culture: 'es-ES' },
+                    width: 100
+                },
+                {
+                    data: 'fees',
+                    type: 'numeric',
+                    numericFormat: { pattern: '0,0.00', culture: 'es-ES' },
+                    width: 100
+                },
+                { data: 'notes', type: 'text', width: 200 }
+            ],
+            minSpareRows: 1,
+            rowHeaders: true,
+            width: '100%',
+            height: '100%',
+            stretchH: 'all',
+            contextMenu: {
+                items: {
+                    'remove_row': {
+                        name: 'Eliminar fila(s)',
+                        callback: function () {
+                            handleDeleteSelected();
+                        }
+                    },
+                    'sep1': '---------',
+                    'row_above': {},
+                    'row_below': {},
+                    'sep2': '---------',
+                    'undo': {},
+                    'redo': {}
+                }
+            },
+            manualColumnResize: true,
+            manualRowResize: true,
+            filters: true,
+            dropdownMenu: true,
+            columnSorting: true,
+            autoColumnSize: false
+        });
+
+        return () => {
+            if (hotRef.current) {
+                hotRef.current.destroy();
+                hotRef.current = null;
+            }
+        };
+    }, [loading, assetMap]); // Re-init si loading termina o assetMap cambia
+
+    // Actualizar datos cuando cambian
+    useEffect(() => {
+        if (hotRef.current && hotData) {
+            hotRef.current.loadData(hotData);
+        }
+    }, [hotData]);
+
+    const handleDeleteSelected = async () => {
+        if (!hotRef.current) return;
+
+        const hot = hotRef.current; // Instancia directa
+        const selected = hot.getSelected();
 
         if (!selected || selected.length === 0) {
             toast.error('Selecciona celdas o filas para eliminar');
@@ -111,39 +196,31 @@ export default function PortfolioTransactions() {
 
         // Obtener índices de filas únicas seleccionadas
         const selectedRowIndices = new Set<number>();
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         for (const [r1, _c1, r2, _c2] of selected) {
             const start = Math.min(r1, r2);
             const end = Math.max(r1, r2);
             for (let i = start; i <= end; i++) {
-                selectedRowIndices.add(i);
+                selectedRowIndices.add(hot.toPhysicalRow(i));
             }
         }
 
-        console.log('📋 Índices seleccionados:', Array.from(selectedRowIndices));
-
-        // Usar getData en lugar de getSourceData para obtener los datos visibles
         const toDeleteIds: string[] = [];
-        const toDeleteInfo: any[] = [];
+        // Mapeamos los índices físicos a los datos originales
+        // Nota: hotData se mantiene sincronizado via useState, así que los índices deberían coincidir
+        // si no hay filtrado/ordenamiento activo que desincronice el sourceData visual
+
+        // Mejor aproximación: Usar getSourceDataAtRow para obtener el objeto row real
 
         selectedRowIndices.forEach(rowIndex => {
-            const rowData = hot.getDataAtRow(rowIndex);
-            console.log(`📌 Fila ${rowIndex}:`, rowData);
-            
-            // Los datos están en el orden de las columnas: [date, asset, type, quantity, price, fees, notes]
-            // Pero necesitamos el ID que está en hotData
-            const dataAtIndex = hotData[rowIndex];
-            
-            if (dataAtIndex && dataAtIndex.id) {
-                toDeleteIds.push(dataAtIndex.id);
-                toDeleteInfo.push({ index: rowIndex, id: dataAtIndex.id, asset: dataAtIndex.asset });
+            // getSourceDataAtRow de Handsontable devuelve la referencia al objeto en el array original
+            const rowSource = hot.getSourceDataAtRow(rowIndex) as any;
+            if (rowSource && rowSource.id) {
+                toDeleteIds.push(rowSource.id);
             }
         });
 
-        console.log('🗑️ IDs a eliminar:', toDeleteInfo);
-
         if (toDeleteIds.length === 0) {
-            toast.error('Las filas seleccionadas no contienen transacciones válidas para eliminar (puede ser una fila vacía)');
+            toast.error('Las filas seleccionadas no contienen transacciones guardadas para eliminar');
             return;
         }
 
@@ -151,21 +228,15 @@ export default function PortfolioTransactions() {
 
         try {
             setSaving(true);
-            
+
             // Eliminar secuencialmente para evitar sobrecarga del backend
             for (const tid of toDeleteIds) {
                 await portfolioService.deleteTransaction(id!, tid);
             }
-            
+
             toast.success(`${toDeleteIds.length} transaccion(es) eliminadas correctamente`);
-            
-            // Deseleccionar antes de recargar
-            if (hotRef.current) {
-                const hot = hotRef.current.hotInstance;
-                hot.deselectCell();
-            }
-            
-            // Recargar datos
+
+            hot.deselectCell();
             await loadData();
         } catch (error) {
             console.error('Error deleting:', error);
@@ -177,7 +248,7 @@ export default function PortfolioTransactions() {
 
     const handleSaveWithCreate = async () => {
         if (!hotRef.current) return;
-        const hot = hotRef.current.hotInstance;
+        const hot = hotRef.current;
         const sourceData = hot.getSourceData();
 
         try {
@@ -186,7 +257,8 @@ export default function PortfolioTransactions() {
             const updates: any[] = [];
             const creates: any[] = [];
 
-            for (const row of sourceData) {
+            // data includes minSpareRow potentially empty, filter valid rows
+            for (const row of sourceData as any[]) {
                 // Validar datos mínimos
                 if (!row.asset || !row.type || !row.quantity || !row.price || !row.date) continue;
 
@@ -279,10 +351,7 @@ export default function PortfolioTransactions() {
                             Recargar
                         </button>
                         <button
-                            onClick={() => {
-                                console.log('🔴 BOTÓN ELIMINAR CLICKEADO');
-                                handleDeleteSelected();
-                            }}
+                            onClick={handleDeleteSelected}
                             disabled={saving}
                             className="inline-flex items-center px-4 py-2 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
@@ -301,90 +370,22 @@ export default function PortfolioTransactions() {
                 </div>
 
 
-                <div className="flex-1 bg-white shadow rounded-lg relative overflow-hidden flex flex-col">
-                    <div className="flex-1 relative" style={{ minHeight: '400px' }}>
+                <div className="flex-1 bg-white shadow rounded-lg overflow-hidden flex flex-col">
+                    <div className="flex-1 min-h-0 p-4">
                         {Object.keys(assetMap).length === 0 ? (
-                            <div className="absolute inset-0 flex items-center justify-center text-gray-500">
+                            <div className="flex items-center justify-center h-full text-gray-500">
                                 <div className="text-center">
                                     <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mb-2"></div>
                                     <p>Cargando activos...</p>
                                 </div>
                             </div>
                         ) : (
-                            <div style={{ height: '100%', width: '100%', overflow: 'hidden' }}>
-                                <HotTable
-                                    ref={hotRef}
-                                    data={hotData}
-                                    licenseKey="non-commercial-and-evaluation"
-                                    language="es-ES"
-                                    colHeaders={[
-                                        'Fecha', 'Activo', 'Tipo', 'Cantidad', 'Precio', 'Comisiones', 'Notas'
-                                    ]}
-                                    columns={[
-                                        { data: 'date', type: 'date', dateFormat: 'DD/MM/YYYY', correctFormat: true },
-                                        {
-                                            data: 'asset',
-                                            type: 'dropdown',
-                                            source: Object.keys(assetMap).sort()
-                                        },
-                                        {
-                                            data: 'type',
-                                            type: 'dropdown',
-                                            source: ['buy', 'sell', 'dividend', 'deposit', 'withdrawal']
-                                        },
-                                        {
-                                            data: 'quantity',
-                                            type: 'numeric',
-                                            numericFormat: { pattern: '0,0.000000' }
-                                        },
-                                        {
-                                            data: 'price',
-                                            type: 'numeric',
-                                            numericFormat: { pattern: '0,0.00' }
-                                        },
-                                        {
-                                            data: 'fees',
-                                            type: 'numeric',
-                                            numericFormat: { pattern: '0,0.00' }
-                                        },
-                                        { data: 'notes', type: 'text' }
-                                    ]}
-                                    minSpareRows={1}
-                                    rowHeaders={true}
-                                    width="100%"
-                                    height={500}
-                                    stretchH="all"
-                                    contextMenu={{
-                                        items: {
-                                            'remove_row': {
-                                                name: 'Eliminar fila(s)',
-                                                callback: function() {
-                                                    console.log('🟣 Menú contextual - Eliminar fila(s)');
-                                                    handleDeleteSelected();
-                                                }
-                                            },
-                                            'sep1': '---------',
-                                            'row_above': {},
-                                            'row_below': {},
-                                            'sep2': '---------',
-                                            'undo': {},
-                                            'redo': {}
-                                        }
-                                    }}
-                                    manualColumnResize={true}
-                                    manualRowResize={true}
-                                    filters={true}
-                                    dropdownMenu={true}
-                                    columnSorting={true}
-                                    afterInit={() => {
-                                        console.log('✅ HotTable inicializado correctamente');
-                                        console.log('✅ Versión con rowHeaders y menú contextual');
-                                    }}
-                                />
+                            <div className="flex-1 min-h-0 w-full relative h-full">
+                                <div ref={containerRef} className="h-full w-full" />
                             </div>
                         )}
                     </div>
-                    <div className="p-2 text-xs text-gray-500 bg-gray-50 border-t">
+                    <div className="p-2 text-xs text-gray-500 bg-gray-50 border-t flex-shrink-0">
                         * Escribe en la última fila vacía para agregar una nueva transacción.
                     </div>
                 </div>
