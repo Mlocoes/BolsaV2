@@ -76,8 +76,6 @@
 
 /* Force buttons to be clickable and on top */
 .handsontable button[data-action] {
-  position: relative !important;
-  z-index: 1000 !important;
   pointer-events: auto !important;
   cursor: pointer !important;
 }
@@ -85,6 +83,4 @@
 /* Ensure the cell containing the button also allows events */
 .htActionCell {
   pointer-events: auto !important;
-  z-index: 999 !important;
-  position: relative !important;
 }
