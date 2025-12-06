@@ -15,6 +15,8 @@ class Asset(Base):
     asset_type = Column(SQLEnum(AssetType), nullable=False)
     market = Column(String(50), nullable=True)  # NASDAQ, NYSE, etc
     currency = Column(String(10), default="USD")
+    last_price = Column(Float, nullable=True)
+    last_price_updated_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     

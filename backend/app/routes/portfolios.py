@@ -12,7 +12,7 @@ from sqlalchemy.orm import joinedload
 from app.utils.portfolio_utils import get_user_portfolio_or_404
 from ..models.position import Position
 from ..models.asset import Asset
-from ..schemas.portfolio import PortfolioCreate, PortfolioUpdate, PortfolioResponse, PortfolioDetail
+from ..schemas.portfolio import PortfolioCreate, PortfolioUpdate, PortfolioResponse, PortfolioDetail, PositionResponse
 
 router = APIRouter(prefix="/api/portfolios", tags=["portfolios"])
 
@@ -170,6 +170,18 @@ async def recalculate_portfolio_positions(
     db.commit()
     
     return {"message": f"Se han recalculado {recalculated_count} posiciones correctamente"}
+
+@router.get("/{portfolio_id}/positions", response_model=List[PositionResponse])
+async def get_portfolio_positions(
+    portfolio_id: UUID,
+    user: dict = Depends(require_auth),
+    db: Session = Depends(get_db)
+):
+    """Obtener todas las posiciones del portfolio"""
+    # Usar get_portfolio para reutilizar la lógica de carga de relaciones
+    # get_portfolio ya carga selectinload(Portfolio.positions)
+    portfolio = await get_portfolio(portfolio_id, user, db)
+    return portfolio.positions
 
 @router.get("/{portfolio_id}/results")
 async def get_portfolio_results(
