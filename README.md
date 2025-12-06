@@ -12,6 +12,7 @@ BolsaV2 es una aplicación robusta, segura y escalable para la gestión de carte
 - **Autenticación segura** con sesiones efímeras en memoria (no persistentes en disco) y hash de contraseñas Argon2.
 - **Integración con Finnhub** para cotizaciones de mercado en tiempo real e históricas.
 - **Gestión de tareas en segundo plano** (Workers) para importaciones masivas y cálculos pesados.
+- **Optimización**: Caching con Redis, procesamiento paralelo de precios y fallback resiliente a fallos.
 - **Seguridad**: Rate limiting, validación de esquemas con Pydantic, protección CORS.
 
 ### Frontend (React/TypeScript)

@@ -4,6 +4,11 @@
 
 El frontend de BolsaV2 es una aplicación de una sola página (SPA) construida con **React 18** y **TypeScript**. Se enfoca en la velocidad, la interactividad y la visualización de datos financieros complejos. Utiliza **Vite** como herramienta de construcción para un desarrollo ultrarrápido.
 
+**Mejoras Visuales (v2.1):**
+- **Interfaz Unificada:** Diseño estandarizado en todas las pantallas (Catálogo, Transacciones, Resultados).
+- **Tablas Optimizadas:** Integración profunda con Handsontable para rellenar la pantalla (Flexbox) sin desbordamientos.
+- **Charts Interactivos:** Gráficos responsivos que se adaptan al layout fluido.
+
 ## 🛠️ Tecnologías Clave
 
 - **React 18**: Librería de UI.
@@ -66,10 +71,11 @@ La aplicación estará disponible en `http://localhost:3000` (o el puerto que in
 
 ## 🧩 Componentes Clave
 
-### Handsontable (`AssetsCatalog.tsx`, `Quotes.tsx`)
-Utilizamos Handsontable para ofrecer una experiencia similar a Excel.
-- **Características**: Ordenamiento, filtrado, edición en línea (donde se permite), y renderizado eficiente de grandes conjuntos de datos.
-- **Personalización**: Se utilizan "Renderers" personalizados para botones de acción y formato de números/monedas.
+### Handsontable (`AssetsCatalog.tsx`, `PortfolioTransactions.tsx`, etc.)
+Componente central para la manipulación de datos.
+- **Configuración:** `stretchH: 'all'`, `autoColumnSize: false`, y `renderAllRows: false` para máximo rendimiento.
+- **Renderizadores Custom:** `ActionRenderer` para botones (Editar/Borrar) y `CurrencyRenderer` para formato financiero europeo.
+- **Scroll Interno:** Contenedores con `overflow: hidden` para que la tabla maneje su propio scroll vertical y horizontal sin romper el layout de la página.
 
 ### Gráficos (`PerformanceChart.tsx`)
 Implementados con Recharts. Muestran la evolución del valor del portafolio a lo largo del tiempo basándose en los `Snapshots` calculados por el backend.

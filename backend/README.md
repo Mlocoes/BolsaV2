@@ -2,7 +2,12 @@
 
 ## 📋 Descripción General
 
-El backend de BolsaV2 está construido con **FastAPI**, un framework moderno y de alto rendimiento para construir APIs con Python 3.11+. Utiliza una arquitectura asíncrona para manejar múltiples solicitudes concurrentes de manera eficiente, ideal para aplicaciones financieras en tiempo real.
+El backend de BolsaV2 está construido con **FastAPI**, un framework moderno y de alto rendimiento para construir APIs con Python 3.11+. Utiliza una arquitectura asíncrona para manejar múltiples solicitudes concurrentes de manera eficiente.
+
+**Mejoras Recientes (v2.1):**
+- **Alto Rendimiento:** Procesamiento paralelo de cotizaciones (`asyncio.gather`) y Caching distribuido con **Redis**.
+- **Resiliencia:** Estrategia de fallback de 3 niveles (Cache -> DB -> Promedio) para garantizar disponibilidad de datos incluso si fallan las APIs externas.
+- **Seguridad:** Cookies seguras, rate limiting y protección contra ataques comunes.
 
 ## 🛠️ Tecnologías Clave
 
@@ -55,6 +60,8 @@ Crea un archivo `.env` en la carpeta `backend/` basado en el ejemplo (o usa el d
 - `DATABASE_URL`: `postgresql+asyncpg://user:pass@localhost/dbname`
 - `SECRET_KEY`: Clave para firmar JWTs.
 - `FINNHUB_API_KEY`: API Key para datos de mercado.
+- `REDIS_URL`: `redis://localhost:6379/0` (Esencial para sesiones y caching).
+- `FINNHUB_RATE_LIMIT`: `60` (Peticiones/minuto).
 
 ### 4. Ejecución del Servidor
 

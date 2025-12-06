@@ -15,6 +15,7 @@ BolsaV2 utiliza **PostgreSQL** como sistema de gestión de base de datos relacio
 2.  **assets**
     *   Catálogo maestro de instrumentos financieros.
     *   `id` (UUID), `symbol` (Unique, ej: AAPL), `name`, `asset_type` (stock, etf, crypto), `currency`.
+    *   `last_price` (Float), `last_price_updated_at` (Timestamp): Caché persistente del último precio conocido para fallbacks.
 
 3.  **portfolios**
     *   Contenedor lógico para las inversiones de un usuario.
