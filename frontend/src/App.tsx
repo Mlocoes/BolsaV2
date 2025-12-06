@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
-import { useAuthStore } from './stores/authStore'
+// import { useAuthStore } from './stores/authStore'
 import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
@@ -17,19 +17,15 @@ import TransactionsPortfolioSelection from './pages/TransactionsPortfolioSelecti
 import FiscalResult from './pages/FiscalResult'
 
 function App() {
-  const { checkAuth } = useAuthStore()
+  // const { checkAuth } = useAuthStore() // Ya no se usa checkAuth al inicio
 
+  /* 
+   * NOTA: Eliminado checkAuth() para cumplir el requisito de que "F5" cierra la sesión.
+   * Al no verificar la sesión al inicio, el estado isAuthenticated es false por defecto,
+   * y el ProtectedRoute redirigirá a /login automáticamente.
+   */
   useEffect(() => {
-    // Verificar si hay sesión activa al cargar. Evitamos forzar logout porque genera 401s innecesarios.
-    checkAuth().catch(() => {
-      // Ignorar errores si no hay sesión
-    })
-
-    // Forzar navegación a login SIN cambiar la URL completa
-    // Solo si no estamos ya en login
-    if (window.location.pathname !== '/login') {
-      window.history.replaceState(null, '', '/login')
-    }
+    // Limpiar cualquier estado residual si fuera necesario, aunque el store se reinicia en F5
   }, [])
 
   return (
