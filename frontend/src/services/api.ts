@@ -2,12 +2,13 @@ import axios from 'axios'
 
 // Detectar dinámicamente la URL del API basándose en el host actual
 const getApiBaseUrl = () => {
-  // Si estamos en desarrollo con Vite, usar la variable de entorno
-  if (import.meta.env.DEV) {
-    return import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
+  // Si hay una URL explícita en variables de entorno, usarla (prioridad alta)
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL
   }
 
-  // En producción, usar el mismo host que está sirviendo el frontend
+  // En desarrollo y producción, intentar construir la URL relativa al host actual
+  // Esto permite que funcione tanto en localhost como en acceso por IP (ej. 192.168.x.x)
   const host = window.location.hostname
   const protocol = window.location.protocol
   return `${protocol}//${host}:8000/api`

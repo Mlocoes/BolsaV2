@@ -90,6 +90,7 @@ export default function AssetsCatalog() {
     }
   }, [assets])
 
+
   useEffect(() => {
     loadAssets()
   }, [])
@@ -391,19 +392,19 @@ export default function AssetsCatalog() {
 
         {/* Tabla con Handsontable */}
         <div className="bg-white rounded-lg shadow p-4">
-            {filteredAssets.length === 0 ? (
-              <div className="flex items-center justify-center text-gray-500 h-96">
-                No se encontraron activos
-              </div>
-            ) : (
-              <div ref={containerRef} style={{ height: '500px', width: '100%' }}>
+          {filteredAssets.length === 0 ? (
+            <div className="flex items-center justify-center text-gray-500 h-96">
+              No se encontraron activos
+            </div>
+          ) : (
+            <div ref={containerRef} className="w-full overflow-hidden">
               <HotTable
                 ref={hotTableRef}
                 data={tableData}
                 columns={columns}
                 colHeaders={true}
                 rowHeaders={false}
-                height={500}
+                height={350}
                 licenseKey="non-commercial-and-evaluation"
                 stretchH="all"
                 autoWrapRow={true}
@@ -460,10 +461,9 @@ export default function AssetsCatalog() {
                   }
                 }}
                 language="es-ES"
-                width="100%"
               />
-              </div>
-            )}
+            </div>
+          )}
         </div>
 
         {/* Modal */}
