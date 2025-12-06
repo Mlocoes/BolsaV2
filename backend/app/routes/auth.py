@@ -110,7 +110,7 @@ async def login(
         value=session_id,
         domain=None,  # Sin dominio para que funcione en misma IP
         httponly=True,  # No accesible desde JavaScript
-        secure=False,   # False para desarrollo HTTP, True para producción HTTPS
+        secure=settings.ENVIRONMENT == "production",   # True solo para producción HTTPS
         samesite="lax",  # lax funciona en HTTP y permite navegación normal
         max_age=86400,  # 24 horas
         path="/",       # Cookie válida para toda la aplicación

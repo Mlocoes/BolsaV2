@@ -2,16 +2,21 @@ import axios from 'axios'
 
 // Detectar dinámicamente la URL del API basándose en el host actual
 const getApiBaseUrl = () => {
-  // Si hay una URL explícita en variables de entorno, usarla (prioridad alta)
+  // 1. Prioridad: Variable de entorno explícita
   if (import.meta.env.VITE_API_BASE_URL) {
     return import.meta.env.VITE_API_BASE_URL
   }
 
-  // En desarrollo y producción, intentar construir la URL relativa al host actual
-  // Esto permite que funcione tanto en localhost como en acceso por IP (ej. 192.168.x.x)
-  const host = window.location.hostname
-  const protocol = window.location.protocol
-  return `${protocol}//${host}:8000/api`
+  // 2. Desarrollo: Asumir que el backend está en el puerto 8000 del mismo host
+  if (import.meta.env.DEV) {
+    const host = window.location.hostname
+    const protocol = window.location.protocol
+    return `${protocol}//${host}:8000/api`
+  }
+
+  // 3. Producción: Usar path relativo (Nginx se encarga del proxy)
+  // Esto evita suposiciones incorrectas sobre puertos o protocolos
+  return '/api'
 }
 
 const API_BASE_URL = getApiBaseUrl()

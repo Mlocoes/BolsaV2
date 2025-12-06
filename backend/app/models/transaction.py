@@ -25,7 +25,7 @@ class Transaction(Base):
     fees = Column(Float, default=0)
     currency = Column(String(10), default="USD")
     notes = Column(String(500))
-    transaction_date = Column(DateTime(timezone=True), server_default=func.now())
+    transaction_date = Column(DateTime(timezone=True), server_default=func.now(), index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
