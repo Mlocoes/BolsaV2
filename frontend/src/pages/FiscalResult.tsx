@@ -179,9 +179,9 @@ export default function FiscalResult() {
             ],
             rowHeaders: false,
             width: '100%',
-            height: 500,
+            height: '100%',
             licenseKey: 'non-commercial-and-evaluation',
-            stretchH: 'none',
+            stretchH: 'all',
             autoColumnSize: false,
             filters: true,
             contextMenu: [
@@ -242,104 +242,104 @@ export default function FiscalResult() {
                     </p>
                 </div>
 
-            <div className="flex-shrink-0 bg-white p-4 rounded-lg shadow space-y-4 md:space-y-0 md:flex md:items-end md:space-x-4">
-                <div className="flex-1">
-                    <label htmlFor="portfolio" className="block text-sm font-medium text-gray-700 mb-1">
-                        Cartera
-                    </label>
-                    <select
-                        id="portfolio"
-                        value={selectedPortfolio?.id || ''}
-                        onChange={(e) => {
-                            const portfolio = portfolios.find(p => p.id === e.target.value);
-                            setSelectedPortfolio(portfolio || null);
-                        }}
-                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                <div className="flex-shrink-0 bg-white p-4 rounded-lg shadow space-y-4 md:space-y-0 md:flex md:items-end md:space-x-4">
+                    <div className="flex-1">
+                        <label htmlFor="portfolio" className="block text-sm font-medium text-gray-700 mb-1">
+                            Cartera
+                        </label>
+                        <select
+                            id="portfolio"
+                            value={selectedPortfolio?.id || ''}
+                            onChange={(e) => {
+                                const portfolio = portfolios.find(p => p.id === e.target.value);
+                                setSelectedPortfolio(portfolio || null);
+                            }}
+                            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        >
+                            {portfolios.map(portfolio => (
+                                <option key={portfolio.id} value={portfolio.id}>
+                                    {portfolio.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
+                            Fecha Inicio
+                        </label>
+                        <div className="relative rounded-md shadow-sm">
+                            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                <Calendar className="h-4 w-4 text-gray-400" />
+                            </div>
+                            <input
+                                type="date"
+                                id="startDate"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                className="block w-full rounded-md border-gray-300 pl-10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-1">
+                            Fecha Fin
+                        </label>
+                        <div className="relative rounded-md shadow-sm">
+                            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                <Calendar className="h-4 w-4 text-gray-400" />
+                            </div>
+                            <input
+                                type="date"
+                                id="endDate"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                className="block w-full rounded-md border-gray-300 pl-10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            />
+                        </div>
+                    </div>
+
+                    <button
+                        onClick={calculateResults}
+                        disabled={loading || !selectedPortfolio}
+                        className="w-full md:w-auto bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                        {portfolios.map(portfolio => (
-                            <option key={portfolio.id} value={portfolio.id}>
-                                {portfolio.name}
-                            </option>
-                        ))}
-                    </select>
+                        {loading ? 'Calculando...' : 'Calcular'}
+                    </button>
                 </div>
 
-                <div>
-                    <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
-                        Fecha Inicio
-                    </label>
-                    <div className="relative rounded-md shadow-sm">
-                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                            <Calendar className="h-4 w-4 text-gray-400" />
-                        </div>
-                        <input
-                            type="date"
-                            id="startDate"
-                            value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                            className="block w-full rounded-md border-gray-300 pl-10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        />
+                {error && (
+                    <div className="flex-shrink-0 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                        {error}
                     </div>
-                </div>
+                )}
 
-                <div>
-                    <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-1">
-                        Fecha Fin
-                    </label>
-                    <div className="relative rounded-md shadow-sm">
-                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                            <Calendar className="h-4 w-4 text-gray-400" />
+                {results && results.items.length > 0 ? (
+                    <div className="bg-white shadow rounded-lg flex-1 min-h-0 overflow-hidden flex flex-col">
+                        <div className="px-4 pt-4 pb-4 border-b border-gray-200 flex justify-between items-center flex-shrink-0">
+                            <h3 className="text-lg font-medium text-gray-900">Detalle de Operaciones</h3>
+                            <div className={`text-lg font-bold ${results.total_result >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                Resultado Total: {results.total_result.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </div>
                         </div>
-                        <input
-                            type="date"
-                            id="endDate"
-                            value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                            className="block w-full rounded-md border-gray-300 pl-10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        />
-                    </div>
-                </div>
-
-                <button
-                    onClick={calculateResults}
-                    disabled={loading || !selectedPortfolio}
-                    className="w-full md:w-auto bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                    {loading ? 'Calculando...' : 'Calcular'}
-                </button>
-            </div>
-
-            {error && (
-                <div className="flex-shrink-0 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-                    {error}
-                </div>
-            )}
-
-            {results && results.items.length > 0 ? (
-                <div className="bg-white shadow rounded-lg">
-                    <div className="px-4 pt-4 pb-4 border-b border-gray-200 flex justify-between items-center">
-                        <h3 className="text-lg font-medium text-gray-900">Detalle de Operaciones</h3>
-                        <div className={`text-lg font-bold ${results.total_result >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            Resultado Total: {results.total_result.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </div>
-                    </div>
-                    <div className="p-4">
-                        <div ref={hotTableRef} />
-                        <style>{`
+                        <div className="flex-1 min-h-0 w-full relative">
+                            <div ref={hotTableRef} className="h-full w-full" />
+                            <style>{`
                 .htPositive { color: #059669; font-weight: 600; }
                 .htNegative { color: #DC2626; font-weight: 600; }
               `}</style>
+                        </div>
                     </div>
-                </div>
-            ) : results ? (
-                <div className="flex-1 flex items-center justify-center bg-white shadow rounded-lg p-12 text-center text-gray-500">
-                    <div>
-                        <Calculator className="mx-auto h-12 w-12 text-gray-300" />
-                        <h3 className="mt-2 text-sm font-medium text-gray-900">No hay resultados fiscales</h3>
-                        <p className="mt-1 text-sm text-gray-500">No se encontraron operaciones cerradas en el período seleccionado.</p>
+                ) : results ? (
+                    <div className="flex-1 flex items-center justify-center bg-white shadow rounded-lg p-12 text-center text-gray-500">
+                        <div>
+                            <Calculator className="mx-auto h-12 w-12 text-gray-300" />
+                            <h3 className="mt-2 text-sm font-medium text-gray-900">No hay resultados fiscales</h3>
+                            <p className="mt-1 text-sm text-gray-500">No se encontraron operaciones cerradas en el período seleccionado.</p>
+                        </div>
                     </div>
-                </div>
-            ) : null}
+                ) : null}
             </div>
         </Layout>
     );
